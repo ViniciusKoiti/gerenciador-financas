@@ -4,6 +4,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.TransacaoMapp
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import com.vinicius.gerenciamento_financeiro.port.in.GerenciarTransacaoUseCase;
 import com.vinicius.gerenciamento_financeiro.port.out.transacao.TransacaoRepository;
@@ -18,7 +19,7 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
     private final TransacaoRepository transacaoRepository;
     private final TransacaoMapper transacaoMapper;
 
-    public TransacaoService(TransacaoRepository transacaoRepository,
+    public TransacaoService(@Qualifier("transacaoPersistenceAdapter") TransacaoRepository transacaoRepository,
                             TransacaoMapper transacaoMapper) {
         this.transacaoRepository = transacaoRepository;
         this.transacaoMapper = transacaoMapper;

@@ -10,13 +10,25 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface TransacaoMapper {
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "tipo", expression = "java(Transacao.Tipo)")
-    Transacao toEntity(TransacaoPost dto);
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "tipo", expression = "java(Transacao.Tipo)")
-    Transacao toEntity(TransacaoPut dto);
 
+    default Transacao toEntity(TransacaoPost dto) {
+        return Transacao.builder()
+                .descricao(dto.descricao())
+                .valor(dto.valor())
+                .tipo(dto.tipo())
+                .data(dto.data())
+                .build();
+    }
+
+    default Transacao toEntity(TransacaoPut dto) {
+        return Transacao.builder()
+                .id(dto.id())
+                .descricao(dto.descricao())
+                .valor(dto.valor())
+                .tipo(dto.tipo())
+                .data(dto.data())
+                .build();
+    }
     TransacaoResponse toResponse(Transacao transacao);
 }

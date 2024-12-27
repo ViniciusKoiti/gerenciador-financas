@@ -7,6 +7,5 @@ import com.vinicius.gerenciamento_financeiro.port.out.transacao.TransacaoReposit
 import org.springframework.stereotype.Repository;
 
 @Repository
-@Profile("jpa")
-public interface JpaTransacaoRepository extends JpaRepository<Transacao, Long>, TransacaoRepository {
+public interface JpaTransacaoRepository extends JpaRepository<Transacao, Long> {
 }

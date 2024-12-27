@@ -2,7 +2,10 @@ package com.vinicius.gerenciamento_financeiro.domain.model.transacao;
 
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -10,24 +13,25 @@ import java.util.Objects;
 
 
 @Entity
+@Builder
+@Getter
 @Table(name = "transacoes")
 public class Transacao {
 
     public enum Tipo {
         RECEITA, DESPESA, TRANSFERENCIA
     }
-    @Getter
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Getter
     private String descricao;
-    @Getter
     private BigDecimal valor;
-
     @Getter
+    @Setter
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Tipo tipo;
-    @Getter
     private LocalDateTime data;
 
     @ManyToOne
