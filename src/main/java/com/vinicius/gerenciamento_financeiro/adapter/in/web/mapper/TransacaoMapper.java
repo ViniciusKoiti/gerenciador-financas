@@ -5,7 +5,6 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.Tr
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface TransacaoMapper {

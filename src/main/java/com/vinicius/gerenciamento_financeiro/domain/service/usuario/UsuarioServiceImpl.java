@@ -1,6 +1,5 @@
 package com.vinicius.gerenciamento_financeiro.domain.service.usuario;
 
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.UsuarioMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario.UsuarioPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.response.UsuarioResponse;
