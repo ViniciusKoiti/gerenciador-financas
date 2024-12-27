@@ -39,7 +39,11 @@ public class TransacaoController {
     @Operation(summary = "Obter todas as transações")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Transações obtidas com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos")
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acesso não autorizado"
+            )
     })
     @GetMapping
     public ResponseEntity<ApiResponseSistema<List<TransacaoResponse>>> obterTransacoes() {
