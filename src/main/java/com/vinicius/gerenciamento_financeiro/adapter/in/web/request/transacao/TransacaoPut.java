@@ -1,6 +1,5 @@
 package com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao;
 
-import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
