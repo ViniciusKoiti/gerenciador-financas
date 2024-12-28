@@ -5,7 +5,7 @@ import jakarta.persistence.Embeddable;
 @Embeddable
 public class ConfiguracaoTransacao {
 
-    private boolean pago;  // se foi efetivada
+    private boolean pago;
 
     private boolean recorrente;
 

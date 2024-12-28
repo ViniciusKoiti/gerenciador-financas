@@ -13,11 +13,10 @@ import java.util.Objects;
 @Entity
 @Builder
 @Getter
-@NoArgsConstructor  // Adicione isso
-@AllArgsConstructor // Adicione isso
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "transacoes")
 public class Transacao {
-
 
 
     @Id
@@ -34,7 +33,6 @@ public class Transacao {
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
-
 
     @Embedded
     private ConfiguracaoTransacao configuracao;

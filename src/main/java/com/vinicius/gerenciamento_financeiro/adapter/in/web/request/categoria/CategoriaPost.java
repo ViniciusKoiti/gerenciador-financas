@@ -4,8 +4,7 @@ import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMo
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+
 
 public record CategoriaPost(
         @NotBlank(message = "Nome é obrigatório")

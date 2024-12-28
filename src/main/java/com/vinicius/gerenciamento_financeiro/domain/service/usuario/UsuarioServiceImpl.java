@@ -41,9 +41,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     public UsuarioResponse findById(Long id) {
 
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> {
-                    return new UsernameNotFoundException("Usuário não encontrado");
-                });
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
         return mapper.toResponse(usuario);
     }

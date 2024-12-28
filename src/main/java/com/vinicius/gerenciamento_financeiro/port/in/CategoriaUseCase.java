@@ -1,14 +1,18 @@
 package com.vinicius.gerenciamento_financeiro.port.in;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface CategoriaUseCase {
 
-     CategoriaResponse save(Categoria categoria);
+     CategoriaResponse save(CategoriaPost categoria);
      CategoriaResponse findById(Long id);
-     List<CategoriaResponse> findAll(Long id);
+     List<CategoriaResponse> findAll();
+     Page<CategoriaResponse> findAllPaginated(Pageable pageable);
      void deletarCategoria(Long id);
 
 }
