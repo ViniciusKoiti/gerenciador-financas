@@ -5,5 +5,5 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticaca
 
 public interface UsuarioService  {
     UsuarioResponse save(UsuarioPost usuarioPost);
-    UsuarioResponse buscarPorId(Long id);
+    UsuarioResponse findById(Long id);
 }

@@ -34,7 +34,7 @@ public class UsuarioController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponseSistema<UsuarioResponse>> buscarPorId(@PathVariable Long id) {
-        UsuarioResponse response = usuarioService.buscarPorId(id);
+        UsuarioResponse response = usuarioService.findById(id);
         return ResponseEntity.ok(ApiResponseSistema.success(response));
     }
 }

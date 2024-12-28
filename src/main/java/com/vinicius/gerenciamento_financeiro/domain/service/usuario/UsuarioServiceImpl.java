@@ -38,7 +38,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public UsuarioResponse buscarPorId(Long id) {
+    public UsuarioResponse findById(Long id) {
 
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> {
