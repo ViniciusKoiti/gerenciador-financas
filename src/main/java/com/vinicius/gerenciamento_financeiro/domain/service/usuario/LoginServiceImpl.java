@@ -3,7 +3,7 @@ package com.vinicius.gerenciamento_financeiro.domain.service.usuario;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.UsuarioMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario.LoginRequest;
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.response.AuthenticationResponse;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.AuthenticationResponse;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.port.in.LoginUseCase;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;

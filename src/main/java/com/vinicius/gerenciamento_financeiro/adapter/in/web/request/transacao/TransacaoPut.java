@@ -1,6 +1,7 @@
 package com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao;
 
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -21,7 +22,7 @@ public record TransacaoPut(
         BigDecimal valor,
 
         @NotBlank(message = "O tipo é obrigatório.")
-        Transacao.Tipo tipo,
+        TipoMovimentacao tipo,
 
         @NotNull(message = "A data é obrigatória.")
         @PastOrPresent(message = "A data não pode ser no futuro.")

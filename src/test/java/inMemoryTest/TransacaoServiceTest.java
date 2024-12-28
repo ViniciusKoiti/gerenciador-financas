@@ -4,6 +4,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.TransacaoMapp
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.out.memory.MemoryTransacaoRepository;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.service.transacao.TransacaoService;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,7 @@ public class TransacaoServiceTest {
     void deveAdicionarEObterTransacoes() {
         TransacaoRepository repository = new MemoryTransacaoRepository();
         TransacaoService service = new TransacaoService(repository, mapper);
-        TransacaoPost t1 = new TransacaoPost("Salário", new BigDecimal("1000"), Transacao.Tipo.RECEITA, LocalDateTime.now());
+        TransacaoPost t1 = new TransacaoPost("Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA, LocalDateTime.now());
         service.adicionarTransacao(t1);
         assertEquals(1, service.obterTodasTransacoes().size());
         verify(mapper).toEntity(t1);
@@ -39,12 +40,12 @@ public class TransacaoServiceTest {
     void deveCalcularSaldoCorretamente() {
         TransacaoRepository repository = new MemoryTransacaoRepository();
         TransacaoService service = new TransacaoService(repository, mapper);
-        TransacaoPost t1 = new TransacaoPost("Salário", new BigDecimal("1000"), Transacao.Tipo.RECEITA, LocalDateTime.now());
-        TransacaoPost t2 = new TransacaoPost("Aluguel", new BigDecimal("500"), Transacao.Tipo.DESPESA, LocalDateTime.now());
+        TransacaoPost t1 = new TransacaoPost("Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA, LocalDateTime.now());
+        TransacaoPost t2 = new TransacaoPost("Aluguel", new BigDecimal("500"), TipoMovimentacao.DESPESA, LocalDateTime.now());
         Usuario usuario = new Usuario(1L);
 
-        Transacao transacaoEntity1 = new Transacao(null, "Salário", new BigDecimal("1000"), Transacao.Tipo.RECEITA, LocalDateTime.now(),usuario);
-        Transacao transacaoEntity2 = new Transacao(null, "Aluguel", new BigDecimal("500"), Transacao.Tipo.DESPESA, LocalDateTime.now(), usuario);
+        Transacao transacaoEntity1 = new Transacao(null, "Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA, LocalDateTime.now(),usuario);
+        Transacao transacaoEntity2 = new Transacao(null, "Aluguel", new BigDecimal("500"), TipoMovimentacao.DESPESA, LocalDateTime.now(), usuario);
         when(mapper.toEntity(t1)).thenReturn(transacaoEntity1);
         when(mapper.toEntity(t2)).thenReturn(transacaoEntity2);
         service.adicionarTransacao(t1);

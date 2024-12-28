@@ -1,10 +1,10 @@
 package com.vinicius.gerenciamento_financeiro.domain.model.transacao;
 
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -13,33 +13,36 @@ import java.util.Objects;
 @Entity
 @Builder
 @Getter
+@NoArgsConstructor  // Adicione isso
+@AllArgsConstructor // Adicione isso
 @Table(name = "transacoes")
 public class Transacao {
 
-    public enum Tipo {
-        RECEITA, DESPESA, TRANSFERENCIA
-    }
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String descricao;
     private BigDecimal valor;
-    @Getter
     @Setter
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Tipo tipo;
+    private TipoMovimentacao tipo;
     private LocalDateTime data;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
+
+    @Embedded
+    private ConfiguracaoTransacao configuracao;
+
     public Transacao(Long id,
                      String descricao,
                      BigDecimal valor,
-                     Tipo tipo,
+                     TipoMovimentacao tipo,
                      LocalDateTime data,
                      Usuario usuario) {
         this.id = id;
@@ -48,10 +51,6 @@ public class Transacao {
         this.tipo = tipo;
         this.data = data;
         this.usuario = usuario;
-    }
-
-    public Transacao() {
-
     }
 
     public BigDecimal calcularValorComTaxa(BigDecimal taxa) {

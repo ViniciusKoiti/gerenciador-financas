@@ -4,6 +4,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.TransacaoMapp
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import com.vinicius.gerenciamento_financeiro.port.in.GerenciarTransacaoUseCase;
@@ -40,9 +41,9 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
         List<Transacao> transacoes = transacaoRepository.buscarTodasTransacoes();
         BigDecimal saldo = BigDecimal.ZERO;
         for (Transacao transacao : transacoes) {
-            if (transacao.getTipo() == Transacao.Tipo.RECEITA) {
+            if (transacao.getTipo() == TipoMovimentacao.RECEITA) {
                 saldo = saldo.add(transacao.getValor());
-            } else if (transacao.getTipo() == Transacao.Tipo.DESPESA) {
+            } else if (transacao.getTipo() == TipoMovimentacao.DESPESA) {
                 saldo = saldo.subtract(transacao.getValor());
             }
         }

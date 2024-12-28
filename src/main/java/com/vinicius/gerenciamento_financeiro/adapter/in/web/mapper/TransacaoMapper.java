@@ -15,7 +15,7 @@ public interface TransacaoMapper {
         return Transacao.builder()
                 .descricao(dto.descricao())
                 .valor(dto.valor())
-                .tipo(dto.tipo())
+                .tipo(dto.tipoMovimentacao())
                 .data(dto.data())
                 .build();
     }
