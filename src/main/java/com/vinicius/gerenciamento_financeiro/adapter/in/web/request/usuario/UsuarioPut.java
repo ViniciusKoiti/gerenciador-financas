@@ -1,16 +1,22 @@
 package com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
-public class UsuarioPut {
-    // TODO: Adicione os atributos necessários para criação
+
+@Builder
+public record UsuarioPut(
 
     @NotNull(message = "O id é necessario para atualizar ")
-    private Long id;
+    Long id,
 
+    String nome,
+
+    String email
+
+
+){
 
 }

@@ -3,31 +3,104 @@ package com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPut;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Mapper(componentModel = "spring")
 public interface TransacaoMapper {
 
+    @Named("putToEntity")
+    default Transacao toEntity(TransacaoPut put) {
+        if (put == null) {
+            return null;
+        }
 
-
-    default Transacao toEntity(TransacaoPost dto) {
         return Transacao.builder()
-                .descricao(dto.descricao())
-                .valor(dto.valor())
-                .tipo(dto.tipoMovimentacao())
-                .data(dto.data())
+                .id(put.id())
+                .descricao(put.descricao())
+                .valor(put.valor())
+                .tipo(put.tipo())
+                .data(put.data())
+                .configuracao(criarConfiguracaoPadrao())
                 .build();
     }
 
-    default Transacao toEntity(TransacaoPut dto) {
+    @Named("putToEntity")
+    default Transacao toEntity(TransacaoPost put) {
+        if (put == null) {
+            return null;
+        }
+
         return Transacao.builder()
-                .id(dto.id())
-                .descricao(dto.descricao())
-                .valor(dto.valor())
-                .tipo(dto.tipo())
-                .data(dto.data())
+                .descricao(put.descricao())
+                .valor(put.valor())
+                .tipo(put.tipoMovimentacao())
+                .data(put.data())
+                .configuracao(criarConfiguracaoPadrao())
                 .build();
     }
-    TransacaoResponse toResponse(Transacao transacao);
+
+
+    private ConfiguracaoTransacao criarConfiguracaoPadrao() {
+        return ConfiguracaoTransacao.builder()
+                .recorrente(false)
+                .parcelado(false)
+                .dataVencimento(LocalDate.now())
+                .build();
+    }
+
+    default Transacao atualizarTransacao(Transacao transacaoExistente, TransacaoPut put) {
+        if (transacaoExistente == null || put == null) {
+            throw new IllegalArgumentException("Transação existente e dados de atualização não podem ser nulos");
+        }
+
+        return Transacao.builder()
+                .id(transacaoExistente.getId())
+                .descricao(put.descricao() != null ? put.descricao() : transacaoExistente.getDescricao())
+                .valor(validarValor(put.valor(), transacaoExistente.getValor()))
+                .tipo(put.tipo() != null ? put.tipo() : transacaoExistente.getTipo())
+                .data(put.data() != null ? put.data() : transacaoExistente.getData())
+                .configuracao(transacaoExistente.getConfiguracao())
+                .auditoria(transacaoExistente.getAuditoria())
+                .usuario(transacaoExistente.getUsuario())
+                .build();
+    }
+
+    default TransacaoResponse toResponse(Transacao transacao) {
+        return TransacaoResponse.builder()
+                .id(transacao.getId())
+                .descricao(transacao.getDescricao())
+                .valor(transacao.getValor())
+                .tipo(transacao.getTipo().name())
+                .data(transacao.getData())
+                .pago(transacao.getConfiguracao() != null && transacao.getConfiguracao().getDataPagamento() != null)
+                .configuracao(
+                        transacao.getConfiguracao() != null ?
+                                TransacaoResponse.ConfiguracaoTransacaoResponse.builder()
+                                        .recorrente(transacao.getConfiguracao().isRecorrente())
+                                        .periodicidade(transacao.getConfiguracao().getPeriodicidade())
+                                        .parcelado(transacao.getConfiguracao().isParcelado())
+                                        .dataVencimento(transacao.getConfiguracao().getDataVencimento())
+                                        .dataPagamento(transacao.getConfiguracao().getDataPagamento())
+                                        .build()
+                                : null
+                )
+                .build();
+    }
+
+    default BigDecimal validarValor(BigDecimal novoValor, BigDecimal valorExistente) {
+        if (novoValor == null) {
+            return valorExistente;
+        }
+        if (novoValor.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Valor deve ser maior que zero");
+        }
+        return novoValor;
+    }
 }

@@ -1,6 +1,7 @@
 package com.vinicius.gerenciamento_financeiro.domain.model.usuario;
 
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
+import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -11,9 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "usuario")
@@ -40,6 +39,9 @@ public class Usuario implements UserDetails {
     @Embedded
     private Auditoria auditoria;
 
+    @OneToMany(mappedBy = "usuario")
+    private Set<Categoria> categorias;
+
     public Usuario() {
     }
 
@@ -47,13 +49,20 @@ public class Usuario implements UserDetails {
         this.id = id;
     }
 
-    public Usuario(Long id, String email, String senha, String nome, List<Transacao> transacoes, Auditoria auditoria) {
+    public Usuario(Long id,
+                   String email,
+                   String senha,
+                   String nome,
+                   List<Transacao> transacoes,
+                   Auditoria auditoria,
+                   Set<Categoria> categorias) {
         this.id = id;
         this.email = email;
         this.senha = senha;
         this.nome = nome;
         this.transacoes = transacoes;
         this.auditoria = auditoria;
+        this.categorias = categorias;
     }
 
     public void setSenha(String senha) {
@@ -63,6 +72,21 @@ public class Usuario implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    public void addCategoria(Categoria categoria) {
+        if (categorias == null) {
+            categorias = new HashSet<>();
+        }
+        categorias.add(categoria);
+        categoria.setUsuario(this);
+    }
+
+    public void removeCategoria(Categoria categoria) {
+        if (categorias != null) {
+            categorias.remove(categoria);
+            categoria.setUsuario(null);
+        }
     }
 
     @Override

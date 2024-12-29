@@ -3,8 +3,21 @@ package com.vinicius.gerenciamento_financeiro.domain.model.transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Column;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Embedded;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,7 +38,6 @@ public class Transacao {
     private Long id;
     private String descricao;
     private BigDecimal valor;
-    @Setter
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TipoMovimentacao tipo;
@@ -58,6 +70,8 @@ public class Transacao {
     public BigDecimal calcularValorComTaxa(BigDecimal taxa) {
         return valor.add(valor.multiply(taxa));
     }
+
+
 
 
     @Override
