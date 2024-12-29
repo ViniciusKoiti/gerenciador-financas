@@ -44,8 +44,7 @@ public class LoginServiceImplTest {
     @Test
     void autenticar_DeveRetornarToken_QuandoCredenciaisValidas() {
         LoginRequest loginRequest = new LoginRequest("test@email.com", "senha123");
-        Usuario usuario = new Usuario();
-        usuario.setId(1L);
+        Usuario usuario = Usuario.builder().id(1L).build();
 
         UsuarioResponse usuarioResponse = new UsuarioResponse(1L, "Nome", "test@email.com", "senha123");
         String expectedToken = "jwt-token";

@@ -1,5 +1,7 @@
 package com.vinicius.gerenciamento_financeiro.domain.model.categoria;
 
+import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,10 +41,8 @@ public class Categoria {
     @OneToMany(mappedBy = "categoriaPai")
     private List<Categoria> subcategorias;
 
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime criadoEm;
+    @Embedded
+    private Auditoria auditoria;
 
-    @LastModifiedDate
-    private LocalDateTime atualizadoEm;
+
 }

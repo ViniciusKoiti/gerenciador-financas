@@ -1,5 +1,6 @@
 package com.vinicius.gerenciamento_financeiro.domain.model.usuario;
 
+import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -36,6 +37,9 @@ public class Usuario implements UserDetails {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Transacao> transacoes = new ArrayList<>();
 
+    @Embedded
+    private Auditoria auditoria;
+
     public Usuario() {
     }
 
@@ -43,52 +47,17 @@ public class Usuario implements UserDetails {
         this.id = id;
     }
 
-    public Usuario(Long id, String email, String senha, String nome, List<Transacao> transacoes) {
+    public Usuario(Long id, String email, String senha, String nome, List<Transacao> transacoes, Auditoria auditoria) {
         this.id = id;
         this.email = email;
         this.senha = senha;
         this.nome = nome;
         this.transacoes = transacoes;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getSenha() {
-        return senha;
+        this.auditoria = auditoria;
     }
 
     public void setSenha(String senha) {
         this.senha = senha;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public List<Transacao> getTransacoes() {
-        return transacoes;
-    }
-
-    public void setTransacoes(List<Transacao> transacoes) {
-        this.transacoes = transacoes;
     }
 
     @Override

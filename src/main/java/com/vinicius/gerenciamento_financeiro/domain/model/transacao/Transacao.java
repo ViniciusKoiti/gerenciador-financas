@@ -1,5 +1,6 @@
 package com.vinicius.gerenciamento_financeiro.domain.model.transacao;
 
+import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import jakarta.persistence.*;
@@ -36,6 +37,9 @@ public class Transacao {
 
     @Embedded
     private ConfiguracaoTransacao configuracao;
+
+    @Embedded
+    private Auditoria auditoria;
 
     public Transacao(Long id,
                      String descricao,
