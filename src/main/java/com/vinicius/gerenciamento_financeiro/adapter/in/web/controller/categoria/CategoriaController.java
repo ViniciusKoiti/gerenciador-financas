@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -121,8 +122,8 @@ public class CategoriaController {
                     )),
     })
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponseSistema<CategoriaResponse>> findById(@RequestParam Long categoriaId){
-        CategoriaResponse categoriaResponse = categoriaUseCase.findById(categoriaId);
+    public ResponseEntity<ApiResponseSistema<CategoriaResponse>> findById(@PathVariable String id) {
+        CategoriaResponse categoriaResponse = categoriaUseCase.findById(id);
         ApiResponseSistema<CategoriaResponse> response = new ApiResponseSistema<>(categoriaResponse, "Categoria obtida com sucesso.", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }

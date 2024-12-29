@@ -3,6 +3,8 @@ package com.vinicius.gerenciamento_financeiro.adapter.out.categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -26,6 +28,11 @@ public class CategoriaPersistenceAdapter implements CategoriaRepository {
     @Override
     public List<Categoria> findAll() {
         return repository.findAll();
+    }
+
+    @Override
+    public Page<Categoria> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
     @Override

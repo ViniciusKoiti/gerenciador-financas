@@ -14,9 +14,6 @@ public record CategoriaPost(
         @Size(max = 255, message = "Descrição deve ter no máximo 255 caracteres")
         String descricao,
 
-        @NotNull(message = "Tipo de movimentação é obrigatório")
-        TipoMovimentacao tipo,
-
         String icone,
 
         Long categoriaPaiId

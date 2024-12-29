@@ -1,6 +1,7 @@
 package com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria;
 
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
+import lombok.Getter;
 
 public record CategoriaResponse(
         Long id,
