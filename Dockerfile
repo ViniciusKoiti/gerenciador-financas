@@ -1,0 +1,15 @@
+# Etapa de build: instalar Maven e compilar o projeto
+FROM eclipse-temurin:21-jdk AS build
+
+RUN apt-get update && apt-get install -y maven && apt-get clean
+
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+
+RUN mvn clean package
+
+FROM eclipse-temurin:21-jdk-alpine
+WORKDIR /app
+COPY --from=build /app/target/gerenciamento-financeiro-0.0.1-SNAPSHOT.jar gerenciamento-financeiro.jar
+ENTRYPOINT ["java", "-jar", "gerenciamento-financeiro.jar"]
