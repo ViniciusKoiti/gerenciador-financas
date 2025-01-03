@@ -22,11 +22,11 @@ jobs:
       - name: Run Tests
         run: docker run gerenciamento-financiamento:dev mvn clean test
 
-    deploy:
+deploy:
 
-      needs: build-and-test
-      runs-on: ubuntu-latest
+    needs: build-and-test
+    runs-on: ubuntu-latest
 
-      steps:
-        - name: Subindo aplicação
-          run: docker run -d -p 8080:8080 gerenciamento-financeiro:dev
+    steps:
+      name: Subindo aplicação
+      run: docker run -d -p 8080:8080 gerenciamento-financeiro:dev
