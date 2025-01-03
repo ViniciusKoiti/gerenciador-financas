@@ -22,7 +22,7 @@ jobs:
       - name: Run Tests
         run: docker run gerenciamento-financiamento:dev mvn clean test
 
-deploy:
+  deploy:
 
     needs: build-and-test
     runs-on: ubuntu-latest
