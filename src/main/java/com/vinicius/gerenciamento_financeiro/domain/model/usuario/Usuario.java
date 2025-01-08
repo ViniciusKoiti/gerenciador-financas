@@ -5,9 +5,8 @@ import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
+import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,8 +15,12 @@ import java.util.*;
 
 @Entity
 @Table(name = "usuario")
+@EntityListeners(AuditingEntityListener.class)
 @Builder
 @Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+
 public class Usuario implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,29 +45,6 @@ public class Usuario implements UserDetails {
     @OneToMany(mappedBy = "usuario")
     private Set<Categoria> categorias;
 
-    public Usuario() {
-    }
-
-    public Usuario(Long id) {
-        this.id = id;
-    }
-
-    public Usuario(Long id,
-                   String email,
-                   String senha,
-                   String nome,
-                   List<Transacao> transacoes,
-                   Auditoria auditoria,
-                   Set<Categoria> categorias) {
-        this.id = id;
-        this.email = email;
-        this.senha = senha;
-        this.nome = nome;
-        this.transacoes = transacoes;
-        this.auditoria = auditoria;
-        this.categorias = categorias;
-    }
-
     public void setSenha(String senha) {
         this.senha = senha;
     }
@@ -72,6 +52,10 @@ public class Usuario implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    public Usuario(Long id) {
+        this.id = id;
     }
 
     public void addCategoria(Categoria categoria) {

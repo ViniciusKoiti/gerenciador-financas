@@ -3,6 +3,7 @@ package com.vinicius.gerenciamento_financeiro.domain.service.usuario;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.UsuarioMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario.UsuarioPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.UsuarioResponse;
+import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.port.in.UsuarioService;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
@@ -31,6 +32,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .nome(usuarioPost.nome())
                 .email(usuarioPost.email())
                 .senha(passwordEncoder.encode(usuarioPost.senha()))
+                .auditoria(new Auditoria())
                 .build();
 
         Usuario usuarioSalvo = usuarioRepository.save(usuario);
