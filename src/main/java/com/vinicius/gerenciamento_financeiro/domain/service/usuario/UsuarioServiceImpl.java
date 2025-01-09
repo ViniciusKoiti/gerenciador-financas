@@ -9,9 +9,12 @@ import com.vinicius.gerenciamento_financeiro.port.in.UsuarioService;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Slf4j
@@ -25,7 +28,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     public UsuarioResponse save(UsuarioPost usuarioPost) {
         if (usuarioRepository.existsByEmail(usuarioPost.email())) {
-            throw new RuntimeException("Email já cadastrado");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Email já cadastrado");
         }
 
         Usuario usuario = Usuario.builder()
