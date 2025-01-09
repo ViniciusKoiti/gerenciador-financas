@@ -21,8 +21,8 @@ public class UsuarioController {
     private final LoginUseCase loginUseCase;
 
     @PostMapping("/registrar")
-    public ResponseEntity<ApiResponseSistema<UsuarioResponse>> registrar(@RequestBody @Valid UsuarioPost request) {
-        UsuarioResponse response = usuarioService.save(request);
+    public ResponseEntity<ApiResponseSistema<AuthenticationResponse>> registrar(@RequestBody @Valid UsuarioPost request) {
+        AuthenticationResponse response = usuarioService.save(request);
         return ResponseEntity.ok(ApiResponseSistema.success(response, "Usuário registrado com sucesso"));
     }
 

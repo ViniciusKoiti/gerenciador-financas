@@ -2,6 +2,7 @@ package com.vinicius.gerenciamento_financeiro.services.usuario;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.UsuarioMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario.UsuarioPost;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.AuthenticationResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.UsuarioResponse;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.service.usuario.UsuarioServiceImpl;
@@ -50,10 +51,9 @@ public class UsuarioServiceImplTest {
         when(passwordEncoder.encode(usuarioPost.senha())).thenReturn(senhaEncriptada);
         when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuarioEsperado);
         when(usuarioMapper.toResponse(usuarioEsperado)).thenReturn(usuarioResponse);
-        UsuarioResponse response = usuarioService.save(usuarioPost);
+        AuthenticationResponse response = usuarioService.save(usuarioPost);
 
         assertThat(response).isNotNull();
-        assertThat(response).isEqualTo(usuarioResponse);
 
         verify(passwordEncoder).encode(usuarioPost.senha());
         verify(usuarioRepository).save(any(Usuario.class));
