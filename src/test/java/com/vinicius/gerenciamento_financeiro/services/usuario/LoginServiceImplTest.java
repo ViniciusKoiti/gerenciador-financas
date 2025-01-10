@@ -57,7 +57,7 @@ public class LoginServiceImplTest {
                 .thenReturn(usuarioResponse);
         AuthenticationResponse response = loginService.autenticar(loginRequest);
         assertThat(response.token()).isEqualTo(expectedToken);
-        assertThat(response.usuario()).isEqualTo(usuarioResponse);
+        assertThat(response.user()).isEqualTo(usuarioResponse);
 
         verify(authenticationManager).authenticate(
                 argThat(auth ->

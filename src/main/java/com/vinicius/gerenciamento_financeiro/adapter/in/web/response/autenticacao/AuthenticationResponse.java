@@ -2,5 +2,5 @@ package com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticac
 
 public record AuthenticationResponse(
         String token,
-        UsuarioResponse usuario
+        UsuarioResponse user
 ) {}
