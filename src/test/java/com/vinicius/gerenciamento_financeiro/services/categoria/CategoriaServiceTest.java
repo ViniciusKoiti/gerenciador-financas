@@ -21,7 +21,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
 import java.util.Optional;
+import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 public class CategoriaServiceTest {
@@ -59,7 +61,8 @@ public class CategoriaServiceTest {
                 "Modificado",
                 true,
                 "new-icon",
-                1L
+                null,
+                Collections.emptyList()
         );
 
         when(categoriaMapper.toEntity(any(CategoriaPost.class))).thenReturn(categoria);
@@ -124,7 +127,8 @@ public class CategoriaServiceTest {
                 "Descrição",
                 true,
                 "icon",
-                null
+                null,
+                Collections.emptyList()
         );
 
         when(categoriaRepository.findById(id)).thenReturn(Optional.of(categoria));

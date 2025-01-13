@@ -28,6 +28,12 @@ public class CategoriaPersistenceAdapter implements CategoriaRepository {
     }
 
     @Override
+    public List<Categoria> findByUsuarioId(Long id) {
+        return repository.findCategoriasByUsuarioId(id);
+    }
+
+    @Override
+
     public List<Categoria> findAll() {
         return repository.findAll();
     }

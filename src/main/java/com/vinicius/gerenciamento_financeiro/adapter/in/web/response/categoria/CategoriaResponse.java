@@ -1,15 +1,17 @@
 package com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria;
 
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
-import lombok.Getter;
-
+import java.util.List;
 public record CategoriaResponse(
         Long id,
         String nome,
         String descricao,
         boolean ativa,
         String icone,
-        Long categoriaPaiId
+
+        CategoriaResponse categoriaPai,
+        List<TransacaoResponse> transacoes
 ) {
     public static CategoriaResponse fromEntity(Categoria categoria) {
         return new CategoriaResponse(
@@ -18,7 +20,8 @@ public record CategoriaResponse(
                 categoria.getDescricao(),
                 categoria.isAtiva(),
                 categoria.getIcone(),
-                categoria.getCategoriaPai() != null ? categoria.getCategoriaPai().getId() : null
+                categoria.getCategoriaPai() != null ? CategoriaResponse.fromEntity(categoria.getCategoriaPai()) : null,
+                categoria.getTransacoes().stream().map(TransacaoResponse::fromEntity).toList()
         );
     }
 }

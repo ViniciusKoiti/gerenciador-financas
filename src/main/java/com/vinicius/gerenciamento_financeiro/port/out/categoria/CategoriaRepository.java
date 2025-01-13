@@ -12,6 +12,7 @@ public interface CategoriaRepository {
     void saveAll(List<Categoria> listaDeCategorias);
     Optional<Categoria> findById(Long id);
     List<Categoria> findAll();
+    List<Categoria> findByUsuarioId(Long usuarioId);
 
     Page<Categoria> findAll(Pageable pageable);
 

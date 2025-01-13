@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +32,6 @@ public class CategoriaService implements CategoriaUseCase {
         return categoriaMapper.toResponse(categoriaRepository.save(categoriaMapper.toEntity(entity)));
     }
     public CategoriaResponse findById(String id){
-
-
         try {
             return categoriaRepository.findById(Long.valueOf(id))
                     .map(categoriaMapper::toResponse)
@@ -40,6 +39,14 @@ public class CategoriaService implements CategoriaUseCase {
         } catch (NumberFormatException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID inválido: " + id);
         }
+    }
+
+    public List<CategoriaResponse> findCategoriasByUser(Long usuarioId){
+        List<Categoria> categorias = categoriaRepository.findByUsuarioId(usuarioId);
+
+
+        return categorias.stream().map(categoriaMapper::toResponse).collect(Collectors.toList());
+
     }
 
 
