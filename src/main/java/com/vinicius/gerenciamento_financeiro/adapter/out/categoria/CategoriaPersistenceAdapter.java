@@ -20,6 +20,8 @@ public class CategoriaPersistenceAdapter implements CategoriaRepository {
         return repository.save(entity);
     }
 
+    public void saveAll(List<Categoria> listaCategoria) { repository.saveAll(listaCategoria);}
+
     @Override
     public Optional<Categoria> findById(Long id) {
         return repository.findById(id);

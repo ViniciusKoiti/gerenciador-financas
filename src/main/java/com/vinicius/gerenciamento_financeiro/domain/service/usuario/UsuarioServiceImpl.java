@@ -6,14 +6,19 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario.Usua
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.AuthenticationResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.UsuarioResponse;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
+import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.port.in.LoginUseCase;
 import com.vinicius.gerenciamento_financeiro.port.in.UsuarioService;
+import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import java.time.LocalDateTime;
+import java.util.List;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +31,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 
     private final UsuarioRepository usuarioRepository;
+    private final CategoriaRepository categoriaRepository;
     private final PasswordEncoder passwordEncoder;
     private final LoginUseCase loginUseCase;
     private final UsuarioMapper mapper;
@@ -43,6 +49,60 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .build();
 
         Usuario usuarioSalvo = usuarioRepository.save(usuario);
+        Auditoria auditoria = new Auditoria();
+
+        List<Categoria> categoriasPadrao = List.of(
+                new Categoria(
+                        null,
+                        "A Pagar",
+                        "Despesas pendentes",
+                        true,
+                        "icone-apagar",
+                        null,
+                        null,
+                        null,
+                        usuarioSalvo,
+                        auditoria
+                ),
+                new Categoria(
+                        null,
+                        "Pretendidas",
+                        "Despesas planejadas",
+                        true,
+                        "icone-pretendidas",
+                        null,
+                        null,
+                        null,
+                        usuarioSalvo,
+                        auditoria
+                ),
+                new Categoria(
+                        null,
+                        "Prazo",
+                        "Despesas com prazo",
+                        true,
+                        "icone-prazo",
+                        null,
+                        null,
+                        null,
+                        usuarioSalvo,
+                        auditoria
+                ),
+                new Categoria(
+                        null,
+                        "Pagas",
+                        "Despesas quitadas",
+                        true,
+                        "icone-pagas",
+                        null,
+                        null,
+                        null,
+                        usuarioSalvo,
+                        auditoria
+                )
+        );
+
+        categoriaRepository.saveAll(categoriasPadrao);
 
         LoginRequest login = LoginRequest.builder()
                 .email(usuarioPost.email())

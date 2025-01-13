@@ -1,6 +1,7 @@
 package com.vinicius.gerenciamento_financeiro.domain.model.transacao;
 
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
+import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import jakarta.persistence.Entity;
@@ -46,6 +47,10 @@ public class Transacao {
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
+
+    @ManyToOne
+    @JoinColumn(name = "categoria_id", nullable = false)
+    private Categoria categoria;
 
     @Embedded
     private ConfiguracaoTransacao configuracao;

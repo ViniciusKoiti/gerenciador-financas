@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface CategoriaRepository {
     Categoria save(Categoria entity);
+    void saveAll(List<Categoria> listaDeCategorias);
     Optional<Categoria> findById(Long id);
     List<Categoria> findAll();
 

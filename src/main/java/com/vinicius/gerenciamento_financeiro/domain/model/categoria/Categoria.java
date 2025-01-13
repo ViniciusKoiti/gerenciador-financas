@@ -1,6 +1,10 @@
 package com.vinicius.gerenciamento_financeiro.domain.model.categoria;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -32,15 +36,21 @@ public class Categoria {
 
     private String icone;
 
+    @OneToMany(mappedBy = "categoria")
+    private List<Transacao> transacoes;
+
     @ManyToOne
     @JoinColumn(name = "categoria_pai_id")
+    @JsonBackReference
     private Categoria categoriaPai;
 
     @OneToMany(mappedBy = "categoriaPai")
+    @JsonManagedReference
     private List<Categoria> subcategorias;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
+    @JsonIgnore
     private Usuario usuario;
 
     @Embedded
