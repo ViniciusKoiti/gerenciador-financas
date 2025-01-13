@@ -7,10 +7,8 @@ import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 
 import java.util.List;
@@ -21,6 +19,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
+@EntityListeners(AuditingEntityListener.class)
 public class Categoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

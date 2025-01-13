@@ -40,7 +40,7 @@ class CategoriaControllerTest {
         ResponseEntity<ApiResponseSistema<List<CategoriaResponse>>> response = categoriaController.findByUsuarioId(userId);
 
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals("Categoria obtida com sucesso.", response.getBody().getMessage());
+        assertEquals("Categorias obtidas com sucesso.", response.getBody().getMessage());
         assertEquals(2, response.getBody().getData().size());
         assertEquals("Categoria 1", response.getBody().getData().get(0).nome());
 

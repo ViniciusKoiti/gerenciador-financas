@@ -25,7 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoriaController {
 
-    private CategoriaUseCase categoriaUseCase;
+    private final CategoriaUseCase categoriaUseCase;
 
     @Operation(summary = "Salva Categoria ")
     @ApiResponses(value = {
@@ -126,10 +126,10 @@ public class CategoriaController {
         ApiResponseSistema<CategoriaResponse> response = new ApiResponseSistema<>(categoriaResponse, "Categoria obtida com sucesso.", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }
-    @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponseSistema<List<CategoriaResponse>>> findByUsuarioId(@PathVariable Long userId){
+    @GetMapping("/usuarios/{userId}/categorias")
+    public ResponseEntity<ApiResponseSistema<List<CategoriaResponse>>> findByUsuarioId(@PathVariable Long userId) {
         List<CategoriaResponse> categoriaResponse = categoriaUseCase.findCategoriasByUser(userId);
-        ApiResponseSistema<List<CategoriaResponse>> response = new ApiResponseSistema<>(categoriaResponse, "Categoria obtida com sucesso.", HttpStatus.OK.value());
+        ApiResponseSistema<List<CategoriaResponse>> response = new ApiResponseSistema<>(categoriaResponse, "Categorias obtidas com sucesso.", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }
 }

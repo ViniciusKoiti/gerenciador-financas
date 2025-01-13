@@ -49,7 +49,6 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .build();
 
         Usuario usuarioSalvo = usuarioRepository.save(usuario);
-        Auditoria auditoria = new Auditoria();
 
         List<Categoria> categoriasPadrao = List.of(
                 new Categoria(
@@ -62,7 +61,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                         null,
                         null,
                         usuarioSalvo,
-                        auditoria
+                        new Auditoria()
                 ),
                 new Categoria(
                         null,
@@ -74,7 +73,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                         null,
                         null,
                         usuarioSalvo,
-                        auditoria
+                        new Auditoria()
                 ),
                 new Categoria(
                         null,
@@ -86,7 +85,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                         null,
                         null,
                         usuarioSalvo,
-                        auditoria
+                        new Auditoria()
                 ),
                 new Categoria(
                         null,
@@ -98,7 +97,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                         null,
                         null,
                         usuarioSalvo,
-                        auditoria
+                        new Auditoria()
                 )
         );
 

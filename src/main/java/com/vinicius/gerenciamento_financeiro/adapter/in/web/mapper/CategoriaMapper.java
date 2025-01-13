@@ -5,6 +5,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.Ca
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface CategoriaMapper {
@@ -27,5 +28,20 @@ public interface CategoriaMapper {
                 .build();
     }
 
-    CategoriaResponse toResponse(Categoria categoria);
+    default CategoriaResponse toResponse(Categoria categoria) {
+        if (categoria == null) {
+            return null;
+        }
+
+        return new CategoriaResponse(
+                categoria.getId(),
+                categoria.getNome(),
+                categoria.getDescricao(),
+                categoria.isAtiva(),
+                categoria.getIcone(),
+                categoria.getCategoriaPai() != null ? toResponse(categoria.getCategoriaPai()) : null,
+                null
+        );
+    }
+
 }
