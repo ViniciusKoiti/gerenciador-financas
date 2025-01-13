@@ -13,6 +13,9 @@ public interface CategoriaUseCase {
      CategoriaResponse save(CategoriaPost categoria);
      CategoriaResponse findById(String id);
      List<CategoriaResponse> findAll();
+
+     List<CategoriaResponse> findCategoriasByUser(Long usuarioId);
+
      Page<CategoriaResponse> findAllPaginated(Pageable pageable);
      void deletarCategoria(String id);
 

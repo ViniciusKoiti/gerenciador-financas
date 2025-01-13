@@ -3,6 +3,7 @@ package com.vinicius.gerenciamento_financeiro.adapter.in.web.controller.categori
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.ApiResponseSistema;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
+import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.port.in.CategoriaUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -123,6 +124,12 @@ public class CategoriaController {
     public ResponseEntity<ApiResponseSistema<CategoriaResponse>> findById(@PathVariable String id) {
         CategoriaResponse categoriaResponse = categoriaUseCase.findById(id);
         ApiResponseSistema<CategoriaResponse> response = new ApiResponseSistema<>(categoriaResponse, "Categoria obtida com sucesso.", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/{userId}")
+    public ResponseEntity<ApiResponseSistema<List<CategoriaResponse>>> findByUsuarioId(@PathVariable Long userId){
+        List<CategoriaResponse> categoriaResponse = categoriaUseCase.findCategoriasByUser(userId);
+        ApiResponseSistema<List<CategoriaResponse>> response = new ApiResponseSistema<>(categoriaResponse, "Categoria obtida com sucesso.", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }
 }

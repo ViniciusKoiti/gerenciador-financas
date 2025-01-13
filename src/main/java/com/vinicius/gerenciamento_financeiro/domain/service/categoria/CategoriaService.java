@@ -41,6 +41,8 @@ public class CategoriaService implements CategoriaUseCase {
         }
     }
 
+    @Override
+
     public List<CategoriaResponse> findCategoriasByUser(Long usuarioId){
         List<Categoria> categorias = categoriaRepository.findByUsuarioId(usuarioId);
 
