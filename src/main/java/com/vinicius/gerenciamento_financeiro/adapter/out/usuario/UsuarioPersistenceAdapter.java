@@ -20,7 +20,7 @@ public class UsuarioPersistenceAdapter implements UsuarioRepository {
 
     @Override
     public Optional<Usuario> findById(Long id) {
-        return Optional.empty();
+        return jpaUsuarioRepository.findById(id);
     }
 
     @Override

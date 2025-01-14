@@ -1,10 +1,13 @@
 package com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security;
 
+import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -78,5 +81,15 @@ public class JwtService {
     private Key getSignKey() {
         byte[] keyBytes = chaveSecreta.getBytes();
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public Long getByAutenticaoUsuarioId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("Usuário não autenticado.");
+        }
+
+        Usuario userDetails = (Usuario) authentication.getPrincipal();
+        return userDetails.getId();
     }
 }

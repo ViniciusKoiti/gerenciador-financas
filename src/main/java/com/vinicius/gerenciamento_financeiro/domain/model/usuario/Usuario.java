@@ -18,6 +18,7 @@ import java.util.*;
 @EntityListeners(AuditingEntityListener.class)
 @Builder
 @Getter
+@Setter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 

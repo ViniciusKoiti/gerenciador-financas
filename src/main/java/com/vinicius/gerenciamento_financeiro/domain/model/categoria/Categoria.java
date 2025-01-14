@@ -15,11 +15,11 @@ import java.util.List;
 
 @Entity
 @Table(name = "categoria")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
+@Setter
 @EntityListeners(AuditingEntityListener.class)
 public class Categoria {
     @Id
@@ -36,7 +36,7 @@ public class Categoria {
 
     private String icone;
 
-    @OneToMany(mappedBy = "categoria")
+    @OneToMany(mappedBy = "categoria", fetch = FetchType.EAGER)
     private List<Transacao> transacoes;
 
     @ManyToOne

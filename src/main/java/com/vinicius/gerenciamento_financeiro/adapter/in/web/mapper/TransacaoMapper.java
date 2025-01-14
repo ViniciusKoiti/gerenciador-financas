@@ -3,8 +3,11 @@ package com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPut;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
+import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
+import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
+import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import org.mapstruct.Mapper;
 import org.mapstruct.Named;
 
@@ -31,7 +34,7 @@ public interface TransacaoMapper {
     }
 
     @Named("putToEntity")
-    default Transacao toEntity(TransacaoPost put) {
+    default Transacao toEntity(TransacaoPost put, Categoria categoria, Usuario usuario, Auditoria auditoria) {
         if (put == null) {
             return null;
         }
@@ -41,6 +44,8 @@ public interface TransacaoMapper {
                 .valor(put.valor())
                 .tipo(put.tipoMovimentacao())
                 .data(put.data())
+                .categoria(categoria)
+                .auditoria(auditoria)
                 .configuracao(criarConfiguracaoPadrao())
                 .build();
     }
