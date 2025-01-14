@@ -5,13 +5,13 @@ import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import java.util.List;
 public record CategoriaResponse(
         Long id,
-        String nome,
-        String descricao,
-        boolean ativa,
-        String icone,
+        String name,
+        String description,
+        boolean isActive,
+        String icon,
 
-        CategoriaResponse categoriaPai,
-        List<TransacaoResponse> transacoes
+        CategoriaResponse categoriaResponseFather,
+        List<TransacaoResponse> transactions
 ) {
     public static CategoriaResponse fromEntity(Categoria categoria) {
         return new CategoriaResponse(

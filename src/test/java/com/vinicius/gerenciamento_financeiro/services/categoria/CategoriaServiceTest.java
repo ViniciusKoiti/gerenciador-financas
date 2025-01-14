@@ -73,7 +73,7 @@ public class CategoriaServiceTest {
 
         assertNotNull(result);
         assertEquals(expectedResponse.id(), result.id());
-        assertEquals(expectedResponse.nome(), result.nome());
+        assertEquals(expectedResponse.name(), result.name());
         verify(categoriaRepository).save(any(Categoria.class));
     }
 
@@ -140,7 +140,7 @@ public class CategoriaServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(expectedResponse.id(), result.id());
-        assertEquals(expectedResponse.nome(), result.nome());
+        assertEquals(expectedResponse.name(), result.name());
 
         verify(categoriaRepository).findById(id);
         verify(categoriaMapper).toResponse(categoria);

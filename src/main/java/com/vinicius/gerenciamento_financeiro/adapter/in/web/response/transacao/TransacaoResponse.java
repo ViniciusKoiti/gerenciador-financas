@@ -11,15 +11,15 @@ import java.time.LocalDateTime;
 @Builder
 public record TransacaoResponse(
         Long id,
-        String descricao,
-        BigDecimal valor,
-        String tipo,
+        String description,
+        BigDecimal value,
+        String type,
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-        LocalDateTime data,
-        Boolean pago,
-        ConfiguracaoTransacaoResponse configuracao,
+        LocalDateTime date,
+        Boolean paid,
+        ConfiguracaoTransacaoResponse config,
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-        LocalDateTime dataCriacao
+        LocalDateTime createdDate
 ) {
     @Builder
     public record ConfiguracaoTransacaoResponse(
@@ -64,13 +64,13 @@ public record TransacaoResponse(
     public static TransacaoResponse fromEntity(Transacao transacao) {
         return TransacaoResponse.builder()
                 .id(transacao.getId())
-                .descricao(transacao.getDescricao())
-                .valor(transacao.getValor())
-                .tipo(transacao.getTipo().toString())
-                .data(transacao.getData())
-                .pago(transacao.getConfiguracao().isPago())
-                .configuracao(transacao.getConfiguracao() != null ? ConfiguracaoTransacaoResponse.fromEntity(transacao.getConfiguracao()) : null)
-                .dataCriacao(transacao.getAuditoria() != null ? transacao.getAuditoria().getCriadoEm() : null)
+                .description(transacao.getDescricao())
+                .value(transacao.getValor())
+                .type(transacao.getTipo().toString())
+                .date(transacao.getData())
+                .paid(transacao.getConfiguracao().isPago())
+                .config(transacao.getConfiguracao() != null ? ConfiguracaoTransacaoResponse.fromEntity(transacao.getConfiguracao()) : null)
+                .createdDate(transacao.getAuditoria() != null ? transacao.getAuditoria().getCriadoEm() : null)
                 .build();
     }
 }

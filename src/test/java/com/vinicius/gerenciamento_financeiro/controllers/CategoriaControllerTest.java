@@ -42,7 +42,7 @@ class CategoriaControllerTest {
         assertEquals(200, response.getStatusCodeValue());
         assertEquals("Categorias obtidas com sucesso.", response.getBody().getMessage());
         assertEquals(2, response.getBody().getData().size());
-        assertEquals("Categoria 1", response.getBody().getData().get(0).nome());
+        assertEquals("Categoria 1", response.getBody().getData().get(0).name());
 
         verify(categoriaUseCase, times(1)).findCategoriasByUser(userId);
     }
