@@ -79,12 +79,12 @@ public interface TransacaoMapper {
     default TransacaoResponse toResponse(Transacao transacao) {
         return TransacaoResponse.builder()
                 .id(transacao.getId())
-                .descricao(transacao.getDescricao())
-                .valor(transacao.getValor())
-                .tipo(transacao.getTipo().name())
-                .data(transacao.getData())
-                .pago(transacao.getConfiguracao() != null && transacao.getConfiguracao().getDataPagamento() != null)
-                .configuracao(
+                .description(transacao.getDescricao())
+                .value(transacao.getValor())
+                .type(transacao.getTipo().name())
+                .date(transacao.getData())
+                .paid(transacao.getConfiguracao() != null && transacao.getConfiguracao().getDataPagamento() != null)
+                .config(
                         transacao.getConfiguracao() != null ?
                                 TransacaoResponse.ConfiguracaoTransacaoResponse.builder()
                                         .recorrente(transacao.getConfiguracao().isRecorrente())
