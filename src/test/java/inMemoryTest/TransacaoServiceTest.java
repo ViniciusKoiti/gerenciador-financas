@@ -20,8 +20,11 @@ import com.vinicius.gerenciamento_financeiro.port.out.transacao.TransacaoReposit
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -42,6 +45,9 @@ public class TransacaoServiceTest {
     void deveAdicionarEObterTransacoes() {
         TransacaoRepository repository = new MemoryTransacaoRepository();
         TransacaoService service = new TransacaoService(categoriaRepository, usuarioRepository, jwtService, repository, mapper);
+
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.ofNullable(Categoria.builder().id(1l).build()));
+
         TransacaoPost t1 = new TransacaoPost("Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 1L);
         Auditoria auditoria = new Auditoria();
         service.adicionarTransacao(t1);
@@ -58,17 +64,22 @@ public class TransacaoServiceTest {
         TransacaoPost t1 = new TransacaoPost("Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 1L);
         TransacaoPost t2 = new TransacaoPost("Aluguel", new BigDecimal("500"), TipoMovimentacao.DESPESA, LocalDateTime.now(), 1L);
         Usuario usuario = new Usuario(1L);
-        Categoria categoria = new Categoria();
+        Categoria categoria = Categoria.builder().id(1L).build();
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
         Auditoria auditoria = new Auditoria();
         Transacao transacaoEntity1 = new Transacao(null, "Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA, LocalDateTime.now(),usuario);
         Transacao transacaoEntity2 = new Transacao(null, "Aluguel", new BigDecimal("500"), TipoMovimentacao.DESPESA, LocalDateTime.now(), usuario);
-        when(mapper.toEntity(t1, categoria, usuario, auditoria)).thenReturn(transacaoEntity1);
-        when(mapper.toEntity(t2, categoria, usuario, auditoria)).thenReturn(transacaoEntity2);
+        when(mapper.toEntity(eq(t1), eq(categoria), eq(usuario), any(Auditoria.class)))
+                .thenReturn(transacaoEntity1);
+        when(mapper.toEntity(eq(t2), eq(categoria), eq(usuario), any(Auditoria.class)))
+                .thenReturn(transacaoEntity2);
         service.adicionarTransacao(t1);
         service.adicionarTransacao(t2);
         BigDecimal saldo = service.calcularSaldo();
         assertEquals(new BigDecimal("500"), saldo);
-        verify(mapper).toEntity(t1, categoria, usuario, auditoria);
-        verify(mapper).toEntity(t2, categoria, usuario, auditoria);
+        verify(mapper).toEntity(eq(t1), eq(categoria), eq(usuario), any(Auditoria.class));
+        verify(mapper).toEntity(eq(t2), eq(categoria), eq(usuario), any(Auditoria.class));
     }
 }

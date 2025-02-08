@@ -62,6 +62,7 @@ public class Transacao {
         this.tipo = tipo;
         this.data = data;
         this.usuario = usuario;
+
     }
 
     public BigDecimal calcularValorComTaxa(BigDecimal taxa) {
