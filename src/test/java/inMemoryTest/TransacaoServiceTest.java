@@ -56,16 +56,14 @@ public class TransacaoServiceTest {
         Usuario usuario = new Usuario(1L);
         Transacao transacao = Transacao.builder().id(1L).build();
         Categoria categoria = Categoria.builder().id(1L).build();
-        Auditoria auditoria = new Auditoria();
         TransacaoPost t1 = new TransacaoPost("Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 1L);
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
         when(categoriaRepository.findById(1L)).thenReturn(Optional.ofNullable(categoria));
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
         when(mapper.toEntity(eq(t1), eq(categoria), eq(usuario), any(Auditoria.class)))
                 .thenReturn(transacao);
-
         service.adicionarTransacao(t1);
-        verify(notificarTransacaoService).notificarTransacaoAtrasada(transacao); // Garante que a notificação foi chamada
+        verify(notificarTransacaoService).notificarTransacaoAtrasada(transacao);
         assertEquals(1, service.obterTodasTransacoes().size());
     }
 

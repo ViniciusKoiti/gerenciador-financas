@@ -5,9 +5,10 @@ import com.vinicius.gerenciamento_financeiro.port.in.NotificarUseCase;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
-
+@Service
 public class RabbitMQNotificador implements NotificarUseCase {
 
     private final RabbitTemplate rabbitTemplate;

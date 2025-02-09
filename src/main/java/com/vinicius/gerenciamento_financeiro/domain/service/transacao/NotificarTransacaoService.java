@@ -18,8 +18,8 @@ public class NotificarTransacaoService {
 
     public void notificarTransacaoAtrasada(Transacao transacao){
         LocalDateTime agora = LocalDateTime.now();
-        long delayMillis = ChronoUnit.MILLIS.between(agora, transacao.getConfiguracao().getDataVencimento());
-
+        LocalDateTime dataVencimento = transacao.getConfiguracao().getDataVencimento().atStartOfDay();
+        long delayMillis = ChronoUnit.MILLIS.between(agora, dataVencimento);
         if (delayMillis > 0) {
             notificarUseCase.enviarNotificacaoComAtraso(
                     RabbitMQConstants.EXCHANGE_DELAYED_TRANSACOES_VENCIMENTO,
