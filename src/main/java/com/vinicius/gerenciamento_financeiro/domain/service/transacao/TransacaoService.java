@@ -27,29 +27,30 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
 
     private final JwtService jwtService;
     private final TransacaoRepository transacaoRepository;
+    private final NotificarTransacaoService notificarTransacaoService;
     private final TransacaoMapper transacaoMapper;
 
     public TransacaoService(CategoriaRepository categoriaRepository, UsuarioRepository usuarioRepository, JwtService jwtService, @Qualifier("transacaoPersistenceAdapter") TransacaoRepository transacaoRepository,
-                            TransacaoMapper transacaoMapper) {
+                            NotificarTransacaoService notificarTransacaoService, TransacaoMapper transacaoMapper) {
         this.categoriaRepository = categoriaRepository;
         this.usuarioRepository = usuarioRepository;
         this.jwtService = jwtService;
         this.transacaoRepository = transacaoRepository;
+        this.notificarTransacaoService = notificarTransacaoService;
         this.transacaoMapper = transacaoMapper;
     }
     @Override
     public void adicionarTransacao(TransacaoPost transacaoPost) {
         Long usuarioId = jwtService.getByAutenticaoUsuarioId();
-
         Categoria categoria = categoriaRepository.findById(transacaoPost.categoriaId())
                 .orElseThrow(() -> new IllegalArgumentException("Categoria não encontrada."));
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+
         Auditoria auditoria = new Auditoria();
-
         Transacao transacao = transacaoMapper.toEntity(transacaoPost, categoria,usuario, auditoria);
-
         transacaoRepository.salvarTransacao(transacao);
+        notificarTransacaoService.notificarTransacaoAtrasada(transacao);
     }
 
     @Override

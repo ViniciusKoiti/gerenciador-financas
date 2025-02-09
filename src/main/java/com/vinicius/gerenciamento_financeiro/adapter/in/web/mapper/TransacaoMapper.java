@@ -33,7 +33,7 @@ public interface TransacaoMapper {
                 .build();
     }
 
-    @Named("putToEntity")
+    @Named("postToEntity")
     default Transacao toEntity(TransacaoPost put, Categoria categoria, Usuario usuario, Auditoria auditoria) {
         if (put == null) {
             return null;
