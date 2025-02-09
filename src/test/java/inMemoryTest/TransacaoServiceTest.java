@@ -54,6 +54,7 @@ public class TransacaoServiceTest {
         TransacaoRepository repository = new MemoryTransacaoRepository();
         TransacaoService service = new TransacaoService(categoriaRepository, usuarioRepository, jwtService, repository, notificarTransacaoService, mapper);
         Usuario usuario = new Usuario(1L);
+        Auditoria auditoria = new Auditoria();
         Transacao transacao = Transacao.builder().id(1L).build();
         Categoria categoria = Categoria.builder().id(1L).build();
         TransacaoPost t1 = new TransacaoPost("Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 1L);

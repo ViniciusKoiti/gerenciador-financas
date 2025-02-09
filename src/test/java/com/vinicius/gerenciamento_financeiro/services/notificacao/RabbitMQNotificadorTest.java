@@ -1,7 +1,6 @@
-package com.vinicius.gerenciamento_financeiro.adapter.out.messaging;
+package com.vinicius.gerenciamento_financeiro.services.notificacao;
 
-import com.vinicius.gerenciamento_financeiro.port.in.NotificarUseCase;
-import org.junit.jupiter.api.BeforeEach;
+import com.vinicius.gerenciamento_financeiro.adapter.out.messaging.RabbitMQNotificador;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -9,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.nio.charset.StandardCharsets;
@@ -30,10 +28,6 @@ class RabbitMQNotificadorTest {
     private final String exchange = "exchange.test";
     private final String routingKey = "routing.test";
     private final String mensagem = "Teste de mensagem";
-
-    @BeforeEach
-    void setUp() {
-    }
 
     @Test
     void deveEnviarNotificacaoCorretamente() {

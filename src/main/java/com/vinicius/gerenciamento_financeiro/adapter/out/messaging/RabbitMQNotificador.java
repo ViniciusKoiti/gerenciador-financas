@@ -1,6 +1,5 @@
 package com.vinicius.gerenciamento_financeiro.adapter.out.messaging;
 
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.port.in.NotificarUseCase;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
@@ -16,21 +15,15 @@ public class RabbitMQNotificador implements NotificarUseCase {
     public RabbitMQNotificador(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
-
     @Override
     public void enviarNotificacao(String exchange, String routingKey, String mensagem) {
-        rabbitTemplate.convertAndSend(exchange, mensagem);
+        rabbitTemplate.convertAndSend(exchange, routingKey,mensagem);
+        rabbitTemplate.convertAndSend(exchange, routingKey,mensagem);
     }
-
     public void enviarNotificacaoComAtraso(String exchange, String routingKey, String mensagem, long delayMillis) {
         MessageProperties properties = new MessageProperties();
         properties.setHeader("x-delay", delayMillis);
-
         Message message = new Message(mensagem.getBytes(StandardCharsets.UTF_8), properties);
-
         rabbitTemplate.send(exchange, routingKey, message);
-        System.out.println("📢 Notificação programada para " + delayMillis + "ms | Exchange: " + exchange + " | Routing Key: " + routingKey);
     }
-
-
 }

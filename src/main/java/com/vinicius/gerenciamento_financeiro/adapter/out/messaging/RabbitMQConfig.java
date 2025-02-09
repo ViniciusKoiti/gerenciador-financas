@@ -12,11 +12,11 @@ import static com.vinicius.gerenciamento_financeiro.adapter.out.messaging.Rabbit
 public class RabbitMQConfig {
 
     @Bean
-    public Queue queueTransaction() {
+    public Queue filaTransacoes() {
         return QueueBuilder.durable(FILA_TRANSACOES).build();
     }
     @Bean
-    public CustomExchange exchangeTransactionDelayed(){
+    public CustomExchange exchangeDelayed(){
         return new CustomExchange(EXCHANGE_DELAYED_TRANSACOES_VENCIMENTO, "x-delayed-message", true, false,
                 Map.of("x-delayed-type", "direct"));
     }

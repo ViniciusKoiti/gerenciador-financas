@@ -52,10 +52,7 @@ class NotificarTransacaoServiceTest {
 
     @Test
     void deveEnviarNotificacaoComAtraso_QuandoTransacaoAindaNaoVenceu() {
-        // Executa o método para uma transação futura
         notificarTransacaoService.notificarTransacaoAtrasada(transacaoFutura);
-
-        // Captura os argumentos passados para `enviarNotificacaoComAtraso`
         ArgumentCaptor<Long> delayCaptor = ArgumentCaptor.forClass(Long.class);
         ArgumentCaptor<String> mensagemCaptor = ArgumentCaptor.forClass(String.class);
 
