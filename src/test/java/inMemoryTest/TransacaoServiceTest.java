@@ -10,6 +10,7 @@ import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.service.transacao.TransacaoService;
+import com.vinicius.gerenciamento_financeiro.port.in.NotificarUseCase;
 import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
 import org.junit.jupiter.api.Test;
@@ -40,21 +41,22 @@ public class TransacaoServiceTest {
     private UsuarioRepository usuarioRepository;
 
     @Mock
+    private NotificarUseCase notificarUseCase;
+
+    @Mock
     private JwtService jwtService;
     @Test
     void deveAdicionarEObterTransacoes() {
         TransacaoRepository repository = new MemoryTransacaoRepository();
         TransacaoService service = new TransacaoService(categoriaRepository, usuarioRepository, jwtService, repository, mapper);
-
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.ofNullable(Categoria.builder().id(1l).build()));
-
-        TransacaoPost t1 = new TransacaoPost("Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 1L);
-        Auditoria auditoria = new Auditoria();
-        service.adicionarTransacao(t1);
-        Categoria categoria = new Categoria();
         Usuario usuario = new Usuario(1L);
+        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.ofNullable(Categoria.builder().id(1l).build()));
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        TransacaoPost t1 = new TransacaoPost("Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 1L);
+        service.adicionarTransacao(t1);
+        verify(notificarUseCase).enviarNotificacao(any(String.class), any(String.class));
         assertEquals(1, service.obterTodasTransacoes().size());
-        verify(mapper).toEntity(t1, categoria, usuario, auditoria);
     }
 
     @Test
@@ -68,7 +70,6 @@ public class TransacaoServiceTest {
         when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
-        Auditoria auditoria = new Auditoria();
         Transacao transacaoEntity1 = new Transacao(null, "Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA, LocalDateTime.now(),usuario);
         Transacao transacaoEntity2 = new Transacao(null, "Aluguel", new BigDecimal("500"), TipoMovimentacao.DESPESA, LocalDateTime.now(), usuario);
         when(mapper.toEntity(eq(t1), eq(categoria), eq(usuario), any(Auditoria.class)))
@@ -82,4 +83,7 @@ public class TransacaoServiceTest {
         verify(mapper).toEntity(eq(t1), eq(categoria), eq(usuario), any(Auditoria.class));
         verify(mapper).toEntity(eq(t2), eq(categoria), eq(usuario), any(Auditoria.class));
     }
+
+
+
 }
