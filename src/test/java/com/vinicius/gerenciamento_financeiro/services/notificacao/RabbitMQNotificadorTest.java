@@ -32,7 +32,7 @@ class RabbitMQNotificadorTest {
     @Test
     void deveEnviarNotificacaoCorretamente() {
         rabbitMQNotificador.enviarNotificacao(exchange, routingKey, mensagem);
-        verify(rabbitTemplate).convertAndSend(eq(exchange), eq(mensagem));
+        verify(rabbitTemplate).convertAndSend(eq(exchange),eq(routingKey) ,eq(mensagem));
     }
 
     @Test

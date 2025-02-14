@@ -18,7 +18,6 @@ public class RabbitMQNotificador implements NotificarUseCase {
     @Override
     public void enviarNotificacao(String exchange, String routingKey, String mensagem) {
         rabbitTemplate.convertAndSend(exchange, routingKey,mensagem);
-        rabbitTemplate.convertAndSend(exchange, routingKey,mensagem);
     }
     public void enviarNotificacaoComAtraso(String exchange, String routingKey, String mensagem, long delayMillis) {
         MessageProperties properties = new MessageProperties();
