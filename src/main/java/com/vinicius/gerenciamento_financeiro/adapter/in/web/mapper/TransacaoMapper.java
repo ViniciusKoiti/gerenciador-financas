@@ -80,7 +80,7 @@ public interface TransacaoMapper {
         return TransacaoResponse.builder()
                 .id(transacao.getId())
                 .description(transacao.getDescricao())
-                .value(transacao.getValor())
+                .amount(transacao.getValor())
                 .type(transacao.getTipo().name())
                 .date(transacao.getData())
                 .paid(transacao.getConfiguracao() != null && transacao.getConfiguracao().getDataPagamento() != null)

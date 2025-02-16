@@ -57,4 +57,27 @@ public class Categoria {
     private Auditoria auditoria;
 
 
+    public Categoria(Long id,String nome, String descricao, String icone, Usuario usuario){
+        if (usuario == null) {
+            throw new IllegalArgumentException("Usuário não pode ser nulo ao criar uma Categoria");
+        }
+        this.id = id;
+        this.nome = nome;
+        this.descricao = descricao;
+        this.icone = icone;
+        this.auditoria = new Auditoria();
+        this.usuario = usuario;
+    }
+    public Categoria(String nome, String descricao, String icone, Usuario usuario) {
+        if (usuario == null) {
+            throw new IllegalArgumentException("Usuário não pode ser nulo ao criar uma Categoria");
+        }
+        this.id = null;
+        this.nome = nome;
+        this.descricao = descricao;
+        this.icone = icone;
+        this.auditoria = new Auditoria();
+        this.usuario = usuario;
+    }
+
 }

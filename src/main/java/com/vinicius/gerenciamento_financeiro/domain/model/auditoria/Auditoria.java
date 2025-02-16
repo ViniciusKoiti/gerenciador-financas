@@ -22,6 +22,6 @@ public class Auditoria {
     private LocalDateTime criadoEm;
 
     @LastModifiedDate
-    @Column(nullable = false)
+    @Column
     private LocalDateTime atualizadoEm;
 }

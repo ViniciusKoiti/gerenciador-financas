@@ -9,12 +9,12 @@ import jakarta.validation.constraints.Size;
 public record CategoriaPost(
         @NotBlank(message = "Nome é obrigatório")
         @Size(min = 3, max = 50, message = "Nome deve ter entre 3 e 50 caracteres")
-        String nome,
+        String name,
 
         @Size(max = 255, message = "Descrição deve ter no máximo 255 caracteres")
-        String descricao,
+        String description,
 
-        String icone,
+        String icon,
 
         Long categoriaPaiId
 ) {}

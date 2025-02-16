@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public record TransacaoResponse(
         Long id,
         String description,
-        BigDecimal value,
+        BigDecimal amount,
         String type,
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         LocalDateTime date,
@@ -65,7 +65,7 @@ public record TransacaoResponse(
         return TransacaoResponse.builder()
                 .id(transacao.getId())
                 .description(transacao.getDescricao())
-                .value(transacao.getValor())
+                .amount(transacao.getValor())
                 .type(transacao.getTipo().toString())
                 .date(transacao.getData())
                 .paid(transacao.getConfiguracao().isPago())

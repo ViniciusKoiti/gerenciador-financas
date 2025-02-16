@@ -5,6 +5,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.Ca
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPut;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
+import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import lombok.AllArgsConstructor;
@@ -23,9 +24,10 @@ public interface CategoriaMapper {
 
     default Categoria toEntity(CategoriaPost dto) {
         return Categoria.builder()
-                .nome(dto.nome())
-                .descricao(dto.descricao())
-                .icone(dto.icone())
+                .nome(dto.name())
+                .descricao(dto.description())
+                .icone(dto.icon())
+                .auditoria(new Auditoria())
                 .build();
     }
 
