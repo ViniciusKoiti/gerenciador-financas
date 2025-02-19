@@ -22,6 +22,7 @@ public class LoginServiceImpl implements LoginUseCase {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse autenticar(LoginRequest loginRequest) {
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.email(),
