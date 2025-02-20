@@ -56,10 +56,7 @@ public class CategoriaService implements CategoriaUseCase {
 
     public List<CategoriaResponse> findCategoriasByUser(Long usuarioId){
         List<Categoria> categorias = categoriaRepository.findByUsuarioId(usuarioId);
-
-
         return categorias.stream().map(categoriaMapper::toResponse).collect(Collectors.toList());
-
     }
 
 

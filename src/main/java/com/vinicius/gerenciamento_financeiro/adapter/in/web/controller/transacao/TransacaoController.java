@@ -30,9 +30,9 @@ public class TransacaoController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos")
     })
     @PostMapping
-    public ResponseEntity<ApiResponseSistema<Void>> adicionarTransacao(@Valid @RequestBody TransacaoPost transacaoRequest) {
+    public ResponseEntity<ApiResponseSistema<TransacaoPost>> adicionarTransacao(@Valid @RequestBody TransacaoPost transacaoRequest) {
         gerenciarTransacaoUseCase.adicionarTransacao(transacaoRequest);
-        ApiResponseSistema<Void> response = new ApiResponseSistema<>(null, "Transação adicionada com sucesso.", HttpStatus.CREATED.value());
+        ApiResponseSistema<TransacaoPost> response = new ApiResponseSistema<>(transacaoRequest, "Transação adicionada com sucesso.", HttpStatus.CREATED.value());
         return ResponseEntity.ok(response);
     }
 
