@@ -83,6 +83,9 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
         Categoria categoria = categoriaRepository.findById(categoriaId)
                 .orElseThrow(() -> new IllegalArgumentException("Categoria não  encontrada."));
 
-        Auditoria auditoria = new Auditoria();
+        Transacao transacaoAtualizada = transacao.atualizarCategoria(categoria, transacao.getAuditoria());
+
+        transacaoRepository.salvarTransacao(transacaoAtualizada);
+
     }
 }

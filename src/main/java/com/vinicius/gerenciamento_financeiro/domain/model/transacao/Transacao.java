@@ -69,6 +69,19 @@ public class Transacao {
         return valor.add(valor.multiply(taxa));
     }
 
+    public Transacao atualizarCategoria(Categoria novaCategoria, Auditoria auditoria) {
+        return Transacao.builder()
+                .id(this.id)
+                .descricao(this.descricao)
+                .valor(this.valor)
+                .tipo(this.tipo)
+                .data(this.data)
+                .usuario(this.usuario)
+                .categoria(novaCategoria)
+                .configuracao(this.configuracao)
+                .auditoria(auditoria)
+                .build();
+    }
 
 
 
