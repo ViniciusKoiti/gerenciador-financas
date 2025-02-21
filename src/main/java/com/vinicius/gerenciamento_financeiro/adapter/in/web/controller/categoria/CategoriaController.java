@@ -133,4 +133,5 @@ public class CategoriaController {
         ApiResponseSistema<List<CategoriaResponse>> response = new ApiResponseSistema<>(categoriaResponse, "Categorias obtidas com sucesso.", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }
+
 }

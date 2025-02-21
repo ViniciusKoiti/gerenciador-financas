@@ -12,9 +12,11 @@ import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import com.vinicius.gerenciamento_financeiro.port.in.GerenciarTransacaoUseCase;
 import com.vinicius.gerenciamento_financeiro.port.out.transacao.TransacaoRepository;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -70,5 +72,17 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
             }
         }
         return saldo;
+    }
+
+    @Override
+    public void atualizarTransacaoCategoria(Long categoriaId, Long transacaoId) {
+
+        Transacao transacao = transacaoRepository.buscarTransacaoPorId(transacaoId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Transação não encontrada."));
+
+        Categoria categoria = categoriaRepository.findById(categoriaId)
+                .orElseThrow(() -> new IllegalArgumentException("Categoria não  encontrada."));
+
+        Auditoria auditoria = new Auditoria();
     }
 }

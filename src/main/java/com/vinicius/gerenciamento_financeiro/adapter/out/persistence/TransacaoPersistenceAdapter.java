@@ -5,6 +5,7 @@ import com.vinicius.gerenciamento_financeiro.port.out.transacao.TransacaoReposit
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -19,5 +20,7 @@ public class TransacaoPersistenceAdapter implements TransacaoRepository {
     public List<Transacao> buscarTodasTransacoes() {
         return jpaRepository.findAll();
     }
+
+    public Optional<Transacao> buscarTransacaoPorId(Long id) {return jpaRepository.findById(id);}
 }
 

@@ -1,6 +1,7 @@
 package com.vinicius.gerenciamento_financeiro.adapter.in.web.controller.transacao;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.ApiResponseSistema;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPut;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,6 +50,17 @@ public class TransacaoController {
     public ResponseEntity<ApiResponseSistema<List<TransacaoResponse>>> obterTransacoes() {
         List<TransacaoResponse> transacoes = gerenciarTransacaoUseCase.obterTodasTransacoes();
         ApiResponseSistema<List<TransacaoResponse>> response = new ApiResponseSistema<>(transacoes, "Transações obtidas com sucesso.", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Atualiza Categoria da Transação")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Atualizado com sucesso")
+    })
+    @PatchMapping("/{transacaoId}/")
+    public ResponseEntity<ApiResponseSistema<Void>> atualizarTransacaoCategoria(@PathVariable Long transacaoId, @RequestBody CategoriaPut categoriaId){
+        gerenciarTransacaoUseCase.atualizarTransacaoCategoria(transacaoId, categoriaId.id());
+        ApiResponseSistema<Void> response = new ApiResponseSistema<>(null, "Transações obtidas com sucesso.", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }
 
