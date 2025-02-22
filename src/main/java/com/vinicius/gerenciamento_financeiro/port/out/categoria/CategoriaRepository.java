@@ -15,5 +15,7 @@ public interface CategoriaRepository {
 
     Page<Categoria> findAll(Pageable pageable);
 
+    boolean existsByIdAndUsuarioId(Long categoriaId, Long usuarioId);
+
     void deleteById(Long id);
 }

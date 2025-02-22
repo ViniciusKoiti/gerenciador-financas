@@ -44,6 +44,11 @@ public class CategoriaPersistenceAdapter implements CategoriaRepository {
     }
 
     @Override
+    public boolean existsByIdAndUsuarioId(Long categoriaId, Long usuarioId) {
+        return repository.existsByUsuarioIdAndId(categoriaId,usuarioId);
+    }
+
+    @Override
     public void deleteById(Long id) {
         repository.deleteById(id);
     }

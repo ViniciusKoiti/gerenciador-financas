@@ -70,8 +70,7 @@ public class CategoriaServiceTest {
                 "Modificado",
                 true,
                 "new-icon",
-                null,
-                Collections.emptyList()
+                null
         );
 
         when(categoriaRepository.save(any(Categoria.class))).thenReturn(categoria);
@@ -115,8 +114,7 @@ public class CategoriaServiceTest {
                 "Descrição",
                 true,
                 "icon",
-                null,
-                Collections.emptyList()
+                null
         );
 
         when(categoriaRepository.findById(id)).thenReturn(Optional.of(categoria));

@@ -31,14 +31,12 @@ class CategoriaControllerTest {
 
         Long userId = 1L;
         List<CategoriaResponse> mockCategorias = List.of(
-                new CategoriaResponse(1L, "Categoria 1", "Descrição 1", true, "icone1", null, Collections.emptyList()),
-                new CategoriaResponse(2L, "Categoria 2", "Descrição 2", true, "icone2", null, Collections.emptyList())
+                new CategoriaResponse(1L, "Categoria 1", "Descrição 1", true, "icone1", null),
+                new CategoriaResponse(2L, "Categoria 2", "Descrição 2", true, "icone2", null)
         );
 
         when(categoriaUseCase.findCategoriasByUser(userId)).thenReturn(mockCategorias);
-
         ResponseEntity<ApiResponseSistema<List<CategoriaResponse>>> response = categoriaController.findByUsuarioId(userId);
-
         assertEquals(200, response.getStatusCodeValue());
         assertEquals("Categorias obtidas com sucesso.", response.getBody().getMessage());
         assertEquals(2, response.getBody().getData().size());

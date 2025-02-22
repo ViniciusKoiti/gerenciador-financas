@@ -10,8 +10,7 @@ public record CategoriaResponse(
         boolean isActive,
         String icon,
 
-        CategoriaResponse categoriaResponseFather,
-        List<TransacaoResponse> transactions
+        CategoriaResponse categoriaResponseFather
 ) {
     public static CategoriaResponse fromEntity(Categoria categoria) {
         return new CategoriaResponse(
@@ -20,8 +19,7 @@ public record CategoriaResponse(
                 categoria.getDescricao(),
                 categoria.isAtiva(),
                 categoria.getIcone(),
-                categoria.getCategoriaPai() != null ? CategoriaResponse.fromEntity(categoria.getCategoriaPai()) : null,
-                categoria.getTransacoes().stream().map(TransacaoResponse::fromEntity).toList()
+                categoria.getCategoriaPai() != null ? CategoriaResponse.fromEntity(categoria.getCategoriaPai()) : null
         );
     }
 }

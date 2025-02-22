@@ -53,6 +53,22 @@ public class TransacaoController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Obter todas as transações")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Transações obtidas com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acesso não autorizado"
+            )
+    })
+    @GetMapping("categorias/{categoriaId}")
+    public ResponseEntity<ApiResponseSistema<List<TransacaoResponse>>> buscarTransacoesPorCategoriaId(@PathVariable Long categoriaId){
+        List<TransacaoResponse> transacaoResponses = gerenciarTransacaoUseCase.buscarTransacoesPorCategoriaId(categoriaId);
+        ApiResponseSistema<List<TransacaoResponse>> response = new ApiResponseSistema<>(transacaoResponses, "Transações obtidas com sucesso.", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
+
     @Operation(summary = "Atualiza Categoria da Transação")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Atualizado com sucesso")

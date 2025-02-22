@@ -52,12 +52,7 @@ public interface CategoriaMapper {
                 categoria.getDescricao(),
                 categoria.isAtiva(),
                 categoria.getIcone(),
-                categoria.getCategoriaPai() != null ? toResponse(categoria.getCategoriaPai()) : null,
-                categoria.getTransacoes() != null ?
-                        categoria.getTransacoes().stream()
-                                .map(transacaoMapper::toResponse)
-                                .collect(Collectors.toList()) :
-                        null
+                categoria.getCategoriaPai() != null ? toResponse(categoria.getCategoriaPai()) : null
         );
     }
 }
