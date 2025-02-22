@@ -46,6 +46,7 @@ public interface TransacaoMapper {
                 .data(put.data())
                 .categoria(categoria)
                 .auditoria(auditoria)
+                .usuario(usuario)
                 .configuracao(criarConfiguracaoPadrao())
                 .build();
     }

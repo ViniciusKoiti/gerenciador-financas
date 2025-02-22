@@ -1,13 +1,16 @@
 package com.vinicius.gerenciamento_financeiro.services.categoria;
 
 
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.CategoriaMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
+import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.service.categoria.CategoriaService;
 import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
+import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,6 +36,12 @@ public class CategoriaServiceTest {
 
     @Mock
     private CategoriaMapper categoriaMapper;
+
+    @Mock
+    private JwtService jwtService;
+
+    @Mock
+    private UsuarioRepository usuarioRepository;
 
     @InjectMocks
     private CategoriaService categoriaService;
@@ -65,9 +74,10 @@ public class CategoriaServiceTest {
                 Collections.emptyList()
         );
 
-        when(categoriaMapper.toEntity(any(CategoriaPost.class))).thenReturn(categoria);
         when(categoriaRepository.save(any(Categoria.class))).thenReturn(categoria);
         when(categoriaMapper.toResponse(any(Categoria.class))).thenReturn(expectedResponse);
+        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(new Usuario(1L)));
 
         CategoriaResponse result = categoriaService.save(categoriaPost);
 
@@ -88,28 +98,6 @@ public class CategoriaServiceTest {
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         assertEquals("Categoria não pode ser nula", exception.getReason());
         verifyNoInteractions(categoriaMapper, categoriaRepository);
-    }
-
-    @Test
-    void save_QuandoMapperLancaException_PropagaException() {
-        // Arrange
-        CategoriaPost categoriaPost = new CategoriaPost(
-                "Alimentação",
-                "Gastos com alimentação",
-                "food-icon",
-                null
-
-        );
-
-        when(categoriaMapper.toEntity(categoriaPost))
-                .thenThrow(new RuntimeException("Erro no mapper"));
-
-        // Act & Assert
-        assertThrows(RuntimeException.class, () -> categoriaService.save(categoriaPost));
-
-        verify(categoriaMapper).toEntity(categoriaPost);
-        verifyNoMoreInteractions(categoriaMapper);
-        verifyNoInteractions(categoriaRepository);
     }
 
     @Test

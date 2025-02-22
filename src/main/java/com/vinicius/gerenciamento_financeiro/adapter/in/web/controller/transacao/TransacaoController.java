@@ -57,7 +57,7 @@ public class TransacaoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Atualizado com sucesso")
     })
-    @PatchMapping("/{transacaoId}/")
+    @PatchMapping("/{transacaoId}")
     public ResponseEntity<ApiResponseSistema<Void>> atualizarTransacaoCategoria(@PathVariable Long transacaoId, @RequestBody CategoriaPut categoriaId){
         gerenciarTransacaoUseCase.atualizarTransacaoCategoria(transacaoId, categoriaId.id());
         ApiResponseSistema<Void> response = new ApiResponseSistema<>(null, "Transações obtidas com sucesso.", HttpStatus.OK.value());

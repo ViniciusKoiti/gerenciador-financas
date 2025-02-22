@@ -36,7 +36,7 @@ public class Categoria {
 
     private String icone;
 
-    @OneToMany(mappedBy = "categoria", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "categoria", fetch = FetchType.LAZY)
     private List<Transacao> transacoes;
 
     @ManyToOne

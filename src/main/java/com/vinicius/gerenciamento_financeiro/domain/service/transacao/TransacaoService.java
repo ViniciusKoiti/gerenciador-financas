@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 public class TransacaoService implements GerenciarTransacaoUseCase {
     private final CategoriaRepository categoriaRepository;
     private final UsuarioRepository usuarioRepository;
-
     private final JwtService jwtService;
     private final TransacaoRepository transacaoRepository;
     private final NotificarTransacaoService notificarTransacaoService;
@@ -75,17 +74,13 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
     }
 
     @Override
-    public void atualizarTransacaoCategoria(Long categoriaId, Long transacaoId) {
-
+    public void atualizarTransacaoCategoria(Long transacaoId, Long categoriaId) {
         Transacao transacao = transacaoRepository.buscarTransacaoPorId(transacaoId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Transação não encontrada."));
-
         Categoria categoria = categoriaRepository.findById(categoriaId)
                 .orElseThrow(() -> new IllegalArgumentException("Categoria não  encontrada."));
-
         Transacao transacaoAtualizada = transacao.atualizarCategoria(categoria, transacao.getAuditoria());
-
         transacaoRepository.salvarTransacao(transacaoAtualizada);
-
     }
+
 }

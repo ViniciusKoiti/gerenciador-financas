@@ -31,14 +31,12 @@ public class CategoriaService implements CategoriaUseCase {
     private final UsuarioRepository usuarioRepository;
 
     public CategoriaResponse save(CategoriaPost entity) {
-        Long usuarioId = jwtService.getByAutenticaoUsuarioId();
-
-        Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
         if (entity == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria não pode ser nula");
         }
-
+        Long usuarioId = jwtService.getByAutenticaoUsuarioId();
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
         Categoria categoria = new Categoria(entity.name(), entity.description(), entity.icon(), usuario);
         return categoriaMapper.toResponse(categoriaRepository.save(categoria));
     }
