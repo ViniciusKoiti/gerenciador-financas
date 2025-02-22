@@ -24,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -92,6 +93,8 @@ public class TransacaoServiceTest {
                 .thenReturn(transacaoEntity1);
         when(mapper.toEntity(eq(t2), eq(categoria), eq(usuario), any(Auditoria.class)))
                 .thenReturn(transacaoEntity2);
+        List<Transacao> listaTransacoes = Arrays.asList(transacaoEntity1, transacaoEntity2);
+        when(transacaoRepository.buscarTodasTransacoes()).thenReturn(listaTransacoes);
         service.adicionarTransacao(t1);
         service.adicionarTransacao(t2);
         BigDecimal saldo = service.calcularSaldo();
