@@ -22,5 +22,10 @@ public class TransacaoPersistenceAdapter implements TransacaoRepository {
     }
 
     public Optional<Transacao> buscarTransacaoPorId(Long id) {return jpaRepository.findById(id);}
+
+    @Override
+    public List<Transacao> buscarTransacoesPorCategoriaId(Long id) {
+        return jpaRepository.findAllByCategoria_id(id);
+    }
 }
 

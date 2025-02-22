@@ -83,4 +83,9 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
         transacaoRepository.salvarTransacao(transacaoAtualizada);
     }
 
+    @Override
+    public List<TransacaoResponse> buscarTransacoesPorCategoriaId(Long categoriaId) {
+        return null;
+    }
+
 }

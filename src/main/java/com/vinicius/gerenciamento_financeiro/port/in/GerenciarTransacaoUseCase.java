@@ -14,4 +14,6 @@ public interface GerenciarTransacaoUseCase {
 
     void atualizarTransacaoCategoria(Long categoriaId, Long transacaoId);
 
+    List<TransacaoResponse> buscarTransacoesPorCategoriaId(Long categoriaId);
+
 }

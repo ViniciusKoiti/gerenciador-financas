@@ -11,6 +11,8 @@ public interface TransacaoRepository {
 
     Optional<Transacao> buscarTransacaoPorId(Long id);
 
+    List<Transacao> buscarTransacoesPorCategoriaId(Long id);
+
 
 
 }

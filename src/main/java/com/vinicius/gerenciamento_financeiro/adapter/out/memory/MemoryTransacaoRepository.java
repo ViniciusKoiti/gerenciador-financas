@@ -33,5 +33,10 @@ public class MemoryTransacaoRepository implements TransacaoRepository {
         }).findFirst();
     }
 
+    @Override
+    public List<Transacao> buscarTransacoesPorCategoriaId(Long id) {
+        return null;
+    }
+
 
 }
