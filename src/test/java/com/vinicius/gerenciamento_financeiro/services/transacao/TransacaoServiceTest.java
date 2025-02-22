@@ -61,7 +61,8 @@ public class TransacaoServiceTest {
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(usuarioId);
         when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
         when(usuarioRepository.findById(usuarioId)).thenReturn(Optional.of(usuario));
-        when(transacaoMapper.toEntity(transacaoPost, categoria, usuario, auditoria)).thenReturn(transacao);
+        when(transacaoMapper.toEntity(any(TransacaoPost.class), any(Categoria.class), any(Usuario.class), any(Auditoria.class)))
+                .thenReturn(transacao);
         transacaoService.adicionarTransacao(transacaoPost);
         verify(transacaoRepository, times(1)).salvarTransacao(transacao);
         verify(notificarTransacaoService, times(1)).notificarTransacaoAtrasada(transacao);
