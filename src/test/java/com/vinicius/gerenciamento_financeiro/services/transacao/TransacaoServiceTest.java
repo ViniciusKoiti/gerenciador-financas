@@ -165,8 +165,4 @@ public class TransacaoServiceTest {
         verify(transacaoRepository, times(1)).buscarTransacoesPorCategoriaId(categoriaId);
         verify(transacaoMapper, times(2)).toResponse(any(Transacao.class));
     }
-
-
-
-
 }

@@ -1,4 +1,4 @@
-package com.vinicius.gerenciamento_financeiro.adapter.out.persistence;
+package com.vinicius.gerenciamento_financeiro.adapter.out.transacao;
 
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.port.out.transacao.TransacaoRepository;
