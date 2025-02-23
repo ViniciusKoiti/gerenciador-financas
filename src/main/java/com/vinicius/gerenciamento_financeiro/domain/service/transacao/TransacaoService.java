@@ -86,6 +86,9 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
     @Override
     public List<TransacaoResponse> buscarTransacoesPorCategoriaId(Long categoriaId) {
         List<Transacao> transacaos = transacaoRepository.buscarTransacoesPorCategoriaId(categoriaId);
+
+        System.out.print("DEBUG - Transações do repositorio" + transacaos);
+
         return transacaos.stream().map(transacaoMapper::toResponse).collect(Collectors.toList());
     }
 

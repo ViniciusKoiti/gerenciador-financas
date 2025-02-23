@@ -36,7 +36,7 @@ public interface TransacaoMapper {
     @Named("postToEntity")
     default Transacao toEntity(TransacaoPost put, Categoria categoria, Usuario usuario, Auditoria auditoria) {
         if (put == null) {
-            return null;
+            throw new IllegalArgumentException("Transação existente e dados de atualização não podem ser nulos");
         }
 
         return Transacao.builder()
@@ -60,24 +60,8 @@ public interface TransacaoMapper {
                 .build();
     }
 
-    default Transacao atualizarTransacao(Transacao transacaoExistente, TransacaoPut put) {
-        if (transacaoExistente == null || put == null) {
-            throw new IllegalArgumentException("Transação existente e dados de atualização não podem ser nulos");
-        }
-
-        return Transacao.builder()
-                .id(transacaoExistente.getId())
-                .descricao(put.descricao() != null ? put.descricao() : transacaoExistente.getDescricao())
-                .valor(validarValor(put.valor(), transacaoExistente.getValor()))
-                .tipo(put.tipo() != null ? put.tipo() : transacaoExistente.getTipo())
-                .data(put.data() != null ? put.data() : transacaoExistente.getData())
-                .configuracao(transacaoExistente.getConfiguracao())
-                .auditoria(transacaoExistente.getAuditoria())
-                .usuario(transacaoExistente.getUsuario())
-                .build();
-    }
-
     default TransacaoResponse toResponse(Transacao transacao) {
+
         return TransacaoResponse.builder()
                 .id(transacao.getId())
                 .description(transacao.getDescricao())

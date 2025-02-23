@@ -21,13 +21,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.Optional;
 import java.util.List;
-
 @ExtendWith(MockitoExtension.class)
 public class CategoriaServiceTest {
 
@@ -88,12 +88,10 @@ public class CategoriaServiceTest {
 
     @Test
     void save_QuandoCategoriaNula_LancaException() {
-        // Act & Assert
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
                 () -> categoriaService.save(null)
         );
-
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         assertEquals("Categoria não pode ser nula", exception.getReason());
         verifyNoInteractions(categoriaMapper, categoriaRepository);
@@ -101,13 +99,11 @@ public class CategoriaServiceTest {
 
     @Test
     void findById_QuandoIdExiste_RetornaCategoriaResponse() {
-        // Arrange
         Long id = 1L;
         Categoria categoria = Categoria.builder()
                 .id(id)
                 .nome("Alimentação")
                 .build();
-
         CategoriaResponse expectedResponse = new CategoriaResponse(
                 id,
                 "Alimentação",
@@ -116,18 +112,12 @@ public class CategoriaServiceTest {
                 "icon",
                 null
         );
-
         when(categoriaRepository.findById(id)).thenReturn(Optional.of(categoria));
         when(categoriaMapper.toResponse(categoria)).thenReturn(expectedResponse);
-
-        // Act
         CategoriaResponse result = categoriaService.findById(id.toString());
-
-        // Assert
         assertNotNull(result);
         assertEquals(expectedResponse.id(), result.id());
         assertEquals(expectedResponse.name(), result.name());
-
         verify(categoriaRepository).findById(id);
         verify(categoriaMapper).toResponse(categoria);
         verifyNoMoreInteractions(categoriaRepository, categoriaMapper);

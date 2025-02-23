@@ -41,9 +41,6 @@ public class TransacaoServiceTest {
     private CategoriaRepository categoriaRepository;
 
     @Mock
-    private TransacaoMapper mapper;
-
-    @Mock
     private UsuarioRepository usuarioRepository;
 
     @Mock
@@ -70,7 +67,7 @@ public class TransacaoServiceTest {
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(usuarioId);
         when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
         when(usuarioRepository.findById(usuarioId)).thenReturn(Optional.of(usuario));
-        when(transacaoMapper.toEntity(any(TransacaoPost.class), any(Categoria.class), any(Usuario.class), any(Auditoria.class)))
+        when(transacaoMapper.toEntity(eq(transacaoPost), eq(categoria), eq(usuario), any(Auditoria.class)))
                 .thenReturn(transacao);
         transacaoService.adicionarTransacao(transacaoPost);
         verify(transacaoRepository, times(1)).salvarTransacao(transacao);
@@ -79,7 +76,7 @@ public class TransacaoServiceTest {
 
     @Test
     void deveCalcularSaldoCorretamente() {
-        TransacaoService service = new TransacaoService(categoriaRepository, usuarioRepository, jwtService, transacaoRepository, notificarTransacaoService, mapper);
+        TransacaoService service = new TransacaoService(categoriaRepository, usuarioRepository, jwtService, transacaoRepository, notificarTransacaoService, transacaoMapper);
         TransacaoPost t1 = new TransacaoPost("Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 1L);
         TransacaoPost t2 = new TransacaoPost("Aluguel", new BigDecimal("500"), TipoMovimentacao.DESPESA, LocalDateTime.now(), 1L);
         Usuario usuario = new Usuario(1L);
@@ -89,9 +86,9 @@ public class TransacaoServiceTest {
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
         Transacao transacaoEntity1 = new Transacao(null, "Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA, LocalDateTime.now(),usuario);
         Transacao transacaoEntity2 = new Transacao(null, "Aluguel", new BigDecimal("500"), TipoMovimentacao.DESPESA, LocalDateTime.now(), usuario);
-        when(mapper.toEntity(eq(t1), eq(categoria), eq(usuario), any(Auditoria.class)))
+        when(transacaoMapper.toEntity(eq(t1), eq(categoria), eq(usuario), any(Auditoria.class)))
                 .thenReturn(transacaoEntity1);
-        when(mapper.toEntity(eq(t2), eq(categoria), eq(usuario), any(Auditoria.class)))
+        when(transacaoMapper.toEntity(eq(t2), eq(categoria), eq(usuario), any(Auditoria.class)))
                 .thenReturn(transacaoEntity2);
         List<Transacao> listaTransacoes = Arrays.asList(transacaoEntity1, transacaoEntity2);
         when(transacaoRepository.buscarTodasTransacoes()).thenReturn(listaTransacoes);
@@ -99,16 +96,14 @@ public class TransacaoServiceTest {
         service.adicionarTransacao(t2);
         BigDecimal saldo = service.calcularSaldo();
         assertEquals(new BigDecimal("500"), saldo);
-        verify(mapper).toEntity(eq(t1), eq(categoria), eq(usuario), any(Auditoria.class));
-        verify(mapper).toEntity(eq(t2), eq(categoria), eq(usuario), any(Auditoria.class));
+        verify(transacaoMapper).toEntity(eq(t1), eq(categoria), eq(usuario), any(Auditoria.class));
+        verify(transacaoMapper).toEntity(eq(t2), eq(categoria), eq(usuario), any(Auditoria.class));
     }
 
     @Test
     void deveBuscarTransacoesPorCategoriaId() {
-        // Arrange
         Long categoriaId = 2L;
         Usuario usuario = new Usuario(1L);
-        // Criando uma lista de transações simuladas
         List<Transacao> transacoes = List.of(
                 Transacao.builder()
                         .id(1L)
@@ -158,13 +153,10 @@ public class TransacaoServiceTest {
 
         // Configurando o mock para retornar a lista de transações
         when(transacaoRepository.buscarTransacoesPorCategoriaId(categoriaId)).thenReturn(transacoes);
-        when(transacaoMapper.toResponse(transacoes.get(0))).thenReturn(transacoesResponses.get(0));
-        when(transacaoMapper.toResponse(transacoes.get(1))).thenReturn(transacoesResponses.get(1));
+        when(transacaoMapper.toResponse(any(Transacao.class))).thenReturn(transacoesResponses.get(0),transacoesResponses.get(1));
 
-        // Act
         List<TransacaoResponse> resultado = transacaoService.buscarTransacoesPorCategoriaId(categoriaId);
 
-        // Assert
         assertNotNull(resultado);
         assertEquals(2, resultado.size());
         assertEquals(transacoesResponses.get(0).id(), resultado.get(0).id());
@@ -173,4 +165,8 @@ public class TransacaoServiceTest {
         verify(transacaoRepository, times(1)).buscarTransacoesPorCategoriaId(categoriaId);
         verify(transacaoMapper, times(2)).toResponse(any(Transacao.class));
     }
+
+
+
+
 }
