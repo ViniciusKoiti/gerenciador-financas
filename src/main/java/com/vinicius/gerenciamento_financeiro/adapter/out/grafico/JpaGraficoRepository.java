@@ -6,6 +6,8 @@ import com.vinicius.gerenciamento_financeiro.port.in.GerarGraficoUseCase;
 import com.vinicius.gerenciamento_financeiro.port.out.grafico.GraficoRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 import java.time.ZonedDateTime;
@@ -20,5 +22,5 @@ public interface JpaGraficoRepository extends CrudRepository<Transacao, Long> {
           AND (:dataFim IS NULL OR t.data <= :dataFim)
         GROUP BY t.categoria.nome
     """)
-    List<GraficoResponse> gerarGraficoPorCategoria(Long usuarioId, ZonedDateTime dataInicio, ZonedDateTime dataFim);
+    List<GraficoResponse> gerarGraficoPorCategoria(Long usuarioId, LocalDateTime dataInicio, LocalDateTime dataFim);
 }

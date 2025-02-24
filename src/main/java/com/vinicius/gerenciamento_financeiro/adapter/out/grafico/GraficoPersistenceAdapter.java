@@ -6,6 +6,7 @@ import com.vinicius.gerenciamento_financeiro.port.out.grafico.GraficoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 @Component
@@ -15,6 +16,9 @@ public class GraficoPersistenceAdapter implements GraficoRepository {
     private final JpaGraficoRepository jpaGraficoRepository;
     @Override
     public List<GraficoResponse> gerarGraficoPorCategoria(Long usuarioId, ZonedDateTime dataInicio, ZonedDateTime dataFim) {
-        return jpaGraficoRepository.gerarGraficoPorCategoria(usuarioId, dataInicio, dataFim);
+
+        LocalDateTime inicioLocal = dataInicio.toLocalDateTime();
+        LocalDateTime fimLocal = dataFim.toLocalDateTime();
+        return jpaGraficoRepository.gerarGraficoPorCategoria(usuarioId, inicioLocal, fimLocal);
     }
 }

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,12 +31,11 @@ public class GraficoController {
     })
     @GetMapping("/total/categoria")
     public ResponseEntity<ApiResponseSistema<List<GraficoResponse>>> graficoPorCategoria(
-            @RequestParam ZonedDateTime dataInicio,
-            @RequestParam ZonedDateTime dataFim
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime dataInicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime dataFim
     ){
         List<GraficoResponse> linhasDoGraficoPorCategoria = graficoService.gerarGraficoPorCategoria(dataInicio, dataFim);
         ApiResponseSistema<List<GraficoResponse>> response = new ApiResponseSistema<>(linhasDoGraficoPorCategoria, "Transações obtidas com sucesso.", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
-
     }
 }
