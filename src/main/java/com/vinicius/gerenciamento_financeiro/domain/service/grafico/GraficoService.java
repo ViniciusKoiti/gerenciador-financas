@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 @Service
@@ -26,6 +27,10 @@ public class GraficoService implements GerarGraficoUseCase {
         if (usuarioId == 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuário desconhecido");
         }
-        return graficoRepository.gerarGraficoPorCategoria(usuarioId,dataInicio, dataInicio );
+
+        LocalDateTime dataInicial = dataInicio.toLocalDateTime();
+        LocalDateTime dataFinal = dataFim.toLocalDateTime();
+
+        return graficoRepository.gerarGraficoPorCategoria(usuarioId,dataInicial, dataFinal );
     }
 }

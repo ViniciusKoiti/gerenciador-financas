@@ -15,10 +15,7 @@ public class GraficoPersistenceAdapter implements GraficoRepository {
 
     private final JpaGraficoRepository jpaGraficoRepository;
     @Override
-    public List<GraficoResponse> gerarGraficoPorCategoria(Long usuarioId, ZonedDateTime dataInicio, ZonedDateTime dataFim) {
-
-        LocalDateTime inicioLocal = dataInicio.toLocalDateTime();
-        LocalDateTime fimLocal = dataFim.toLocalDateTime();
-        return jpaGraficoRepository.gerarGraficoPorCategoria(usuarioId, inicioLocal, fimLocal);
+    public List<GraficoResponse> gerarGraficoPorCategoria(Long usuarioId, LocalDateTime dataInicio, LocalDateTime dataFim) {
+        return jpaGraficoRepository.gerarGraficoPorCategoria(usuarioId, dataInicio, dataFim);
     }
 }
