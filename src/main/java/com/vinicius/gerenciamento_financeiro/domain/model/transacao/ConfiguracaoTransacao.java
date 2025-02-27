@@ -17,18 +17,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ConfiguracaoTransacao {
 
-    private boolean pago;
+    private Boolean pago;
 
-    private boolean recorrente;
+    private Boolean recorrente;
 
     private Integer periodicidade;
 
-    private boolean ignorarLimiteCategoria;
+    private Boolean ignorarLimiteCategoria;
 
     private TipoRecorrencia tipoRecorrencia;
 
-    private boolean ignorarOrcamento;
-    private boolean parcelado;
+    private Boolean ignorarOrcamento;
+    private Boolean parcelado;
 
     private LocalDateTime dataPagamento;
     private LocalDate dataVencimento;

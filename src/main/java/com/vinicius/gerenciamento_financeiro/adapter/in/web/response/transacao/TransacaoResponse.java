@@ -34,9 +34,9 @@ public record TransacaoResponse(
 
         public static ConfiguracaoTransacaoResponse fromEntity(ConfiguracaoTransacao configuracao) {
             return ConfiguracaoTransacaoResponse.builder()
-                    .recorrente(configuracao.isRecorrente())
+                    .recorrente(configuracao.getRecorrente())
                     .periodicidade(configuracao.getPeriodicidade())
-                    .parcelado(configuracao.isParcelado())
+                    .parcelado(configuracao.getParcelado())
                     .dataVencimento(configuracao.getDataVencimento())
                     .dataPagamento(configuracao.getDataPagamento())
                     .build();
@@ -68,7 +68,7 @@ public record TransacaoResponse(
                 .amount(transacao.getValor())
                 .type(transacao.getTipo().toString())
                 .date(transacao.getData())
-                .paid(transacao.getConfiguracao().isPago())
+                .paid(transacao.getConfiguracao().getPago())
                 .config(transacao.getConfiguracao() != null ? ConfiguracaoTransacaoResponse.fromEntity(transacao.getConfiguracao()) : null)
                 .createdDate(transacao.getAuditoria() != null ? transacao.getAuditoria().getCriadoEm() : null)
                 .build();

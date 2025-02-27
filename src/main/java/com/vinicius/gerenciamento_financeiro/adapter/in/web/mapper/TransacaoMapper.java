@@ -72,9 +72,9 @@ public interface TransacaoMapper {
                 .config(
                         transacao.getConfiguracao() != null ?
                                 TransacaoResponse.ConfiguracaoTransacaoResponse.builder()
-                                        .recorrente(transacao.getConfiguracao().isRecorrente())
+                                        .recorrente(transacao.getConfiguracao().getRecorrente())
                                         .periodicidade(transacao.getConfiguracao().getPeriodicidade())
-                                        .parcelado(transacao.getConfiguracao().isParcelado())
+                                        .parcelado(transacao.getConfiguracao().getParcelado())
                                         .dataVencimento(transacao.getConfiguracao().getDataVencimento())
                                         .dataPagamento(transacao.getConfiguracao().getDataPagamento())
                                         .build()

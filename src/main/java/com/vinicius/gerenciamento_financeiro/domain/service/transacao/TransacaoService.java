@@ -56,7 +56,8 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
 
     @Override
     public List<TransacaoResponse> obterTodasTransacoes() {
-        return transacaoRepository.buscarTodasTransacoes().stream().map(transacaoMapper::toResponse).collect(Collectors.toList());
+        return transacaoRepository.buscarTodasTransacoes().
+                stream().map(transacaoMapper::toResponse).collect(Collectors.toList());
     }
 
     @Override
