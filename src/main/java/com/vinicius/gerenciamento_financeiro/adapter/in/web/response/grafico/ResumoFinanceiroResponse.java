@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 public class ResumoFinanceiroResponse {
     private BigDecimal totalReceitas;
     private BigDecimal totalDespesas;
+    private BigDecimal saldoTotal;
 
     public BigDecimal getSaldoTotal() {
         if (totalReceitas == null) totalReceitas = BigDecimal.ZERO;
@@ -21,5 +22,6 @@ public class ResumoFinanceiroResponse {
     ResumoFinanceiroResponse(Number totalReceita, Number totalDespesa){
         this.totalReceitas = totalReceitas != null ? new BigDecimal(totalReceitas.toString()) : BigDecimal.ZERO;
         this.totalDespesas = totalDespesas != null ? new BigDecimal(totalDespesas.toString()) : BigDecimal.ZERO;
+        this.saldoTotal = totalReceitas.subtract(totalDespesas);
     }
 }
