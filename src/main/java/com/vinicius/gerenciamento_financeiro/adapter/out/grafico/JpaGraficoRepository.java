@@ -53,7 +53,9 @@ ORDER BY FUNCTION('YEAR', t.data), FUNCTION('MONTH', t.data)
     @Query("""
 SELECT new com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.ResumoFinanceiroResponse(
     SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao.RECEITA THEN t.valor ELSE 0 END),
-    SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao.DESPESA THEN t.valor ELSE 0 END))
+    SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao.DESPESA THEN t.valor ELSE 0 END),
+    (SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao.RECEITA THEN t.valor ELSE 0 END) - 
+     SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao.DESPESA THEN t.valor ELSE 0 END)))
 FROM Transacao t
 WHERE t.usuario.id = :usuarioId
   AND (:dataInicio IS NULL OR t.data >= :dataInicio)
@@ -64,4 +66,5 @@ WHERE t.usuario.id = :usuarioId
             @Param("dataInicio") LocalDateTime dataInicio,
             @Param("dataFim") LocalDateTime dataFim
     );
+
 }

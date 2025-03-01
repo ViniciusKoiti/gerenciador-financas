@@ -28,6 +28,6 @@ public class GraficoPersistenceAdapter implements GraficoRepository {
 
     @Override
     public ResumoFinanceiroResponse gerarResumoFinanceiro(Long usuarioId, LocalDateTime dataInicio, LocalDateTime dataFim) {
-        return jpaGraficoRepository.gerarResumoFinanceiro(usuarioId, dataInicio, dataFim);
+        return jpaGraficoRepository.gerarResumoFinanceiro(usuarioId, dataInicio,dataFim );
     }
 }

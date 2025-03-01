@@ -51,14 +51,8 @@ public class GraficoService implements GerarGraficoUseCase {
         if (usuarioId == 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuário desconhecido");
         }
-
-
         LocalDateTime dataInicial = dataInicio.toLocalDateTime();
         LocalDateTime dataFinal = dataFim.toLocalDateTime();
-
-        ResumoFinanceiroResponse response = graficoRepository.gerarResumoFinanceiro(usuarioId, dataInicial, dataFinal);
-        response.setTotalReceitas(response.getSaldoTotal());
-
         return graficoRepository.gerarResumoFinanceiro(usuarioId, dataInicial, dataFinal);
     }
 }
