@@ -2,6 +2,8 @@ package com.vinicius.gerenciamento_financeiro.domain.service.grafico;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.GraficoResponse;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.ResumoFinanceiroResponse;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.TransacaoPorPeriodoResponse;
 import com.vinicius.gerenciamento_financeiro.port.in.GerarGraficoUseCase;
 import com.vinicius.gerenciamento_financeiro.port.out.grafico.GraficoRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +29,36 @@ public class GraficoService implements GerarGraficoUseCase {
         if (usuarioId == 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuário desconhecido");
         }
+        LocalDateTime dataInicial = dataInicio.toLocalDateTime();
+        LocalDateTime dataFinal = dataFim.toLocalDateTime();
+        return graficoRepository.gerarGraficoPorCategoria(usuarioId,dataInicial, dataFinal );
+    }
+
+    @Override
+    public List<TransacaoPorPeriodoResponse> gerarEvolucaoFinanceira(ZonedDateTime dataInicio, ZonedDateTime dataFim) {
+        Long usuarioId = jwtService.getByAutenticaoUsuarioId();
+        if (usuarioId == 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuário desconhecido");
+        }
+        LocalDateTime dataInicial = dataInicio.toLocalDateTime();
+        LocalDateTime dataFinal = dataFim.toLocalDateTime();
+        return graficoRepository.gerarEvolucaoFinanceira(usuarioId, dataInicial, dataFinal);
+    }
+
+    @Override
+    public ResumoFinanceiroResponse gerarResumoFinanceiro(ZonedDateTime dataInicio, ZonedDateTime dataFim) {
+        Long usuarioId = jwtService.getByAutenticaoUsuarioId();
+        if (usuarioId == 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuário desconhecido");
+        }
+
 
         LocalDateTime dataInicial = dataInicio.toLocalDateTime();
         LocalDateTime dataFinal = dataFim.toLocalDateTime();
 
-        return graficoRepository.gerarGraficoPorCategoria(usuarioId,dataInicial, dataFinal );
+        ResumoFinanceiroResponse response = graficoRepository.gerarResumoFinanceiro(usuarioId, dataInicial, dataFinal);
+        response.setTotalReceitas(response.getSaldoTotal());
+
+        return graficoRepository.gerarResumoFinanceiro(usuarioId, dataInicial, dataFinal);
     }
 }

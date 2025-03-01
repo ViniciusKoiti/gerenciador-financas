@@ -1,4 +1,4 @@
-INSERT INTO usuario (email, senha, nome, criado_em) VALUES ('exemplo@example.com', '$2a$10$rm8uzhw5KT.cL9aO9sjFguYEoo79ixE4ORCng6XMiJ8dnl.cbmyPa', 'Exemplo', CURRENT_TIMESTAMP());
+INSERT INTO usuario (email, senha, nome, criado_em) VALUES ('viniciusnakahara@gmail.com', '$2a$10$rm8uzhw5KT.cL9aO9sjFguYEoo79ixE4ORCng6XMiJ8dnl.cbmyPa', 'Exemplo', CURRENT_TIMESTAMP());
 
 INSERT INTO categoria (nome, descricao, ativa, icone, usuario_id, criado_em) VALUES ('Alimentação', 'Gastos com alimentação', TRUE, 'food', 1, CURRENT_TIMESTAMP());
 INSERT INTO categoria (nome, descricao, ativa, icone, usuario_id, criado_em) VALUES ('Transporte', 'Gastos com transporte', TRUE, 'car', 1, CURRENT_TIMESTAMP());
