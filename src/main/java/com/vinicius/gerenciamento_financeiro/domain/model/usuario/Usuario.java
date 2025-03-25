@@ -1,5 +1,6 @@
 package com.vinicius.gerenciamento_financeiro.domain.model.usuario;
 
+import com.vinicius.gerenciamento_financeiro.domain.model.PixInfo;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
@@ -41,6 +42,9 @@ public class Usuario implements UserDetails {
 
     @Embedded
     private Auditoria auditoria;
+
+    @Embedded
+    private PixInfo pixInfo;
 
     @OneToMany(mappedBy = "usuario")
     private Set<Categoria> categorias;
