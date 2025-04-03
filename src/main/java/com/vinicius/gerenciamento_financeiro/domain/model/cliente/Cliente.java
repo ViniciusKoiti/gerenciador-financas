@@ -2,6 +2,7 @@ package com.vinicius.gerenciamento_financeiro.domain.model.cliente;
 
 import com.vinicius.gerenciamento_financeiro.domain.model.PixInfo;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
+import com.vinicius.gerenciamento_financeiro.domain.model.pessoa.Pessoa;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -18,17 +19,12 @@ import java.util.Objects;
 @Setter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Cliente {
+public class Cliente extends Pessoa {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    private String nome;
-
-    @NotNull
-    private String email;
     @Embedded
     private PixInfo pixInfo;
 

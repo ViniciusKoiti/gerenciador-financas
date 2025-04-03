@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+
+  rabbitmq:
+    build:
+      context: .
+      dockerfile: Dockerfile.rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    hostname: rabbit
+    container_name: meu-rabbit
