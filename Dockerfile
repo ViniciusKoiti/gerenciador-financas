@@ -7,9 +7,9 @@ WORKDIR /app
 COPY pom.xml ./
 COPY src ./src
 
-RUN mvn clean package
+RUN mvn clean verify
 
-# Etapa de runtime corrigida (sem alpine!)
+# Etapa de runtime
 FROM eclipse-temurin:21-jdk
 WORKDIR /app
 COPY --from=build /app/target/gerenciamento-financeiro-0.0.1-SNAPSHOT.jar gerenciamento-financeiro.jar
