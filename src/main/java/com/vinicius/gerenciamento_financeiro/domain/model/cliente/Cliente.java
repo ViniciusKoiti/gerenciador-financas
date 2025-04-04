@@ -1,11 +1,12 @@
 package com.vinicius.gerenciamento_financeiro.domain.model.cliente;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vinicius.gerenciamento_financeiro.domain.model.PixInfo;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.pessoa.Pessoa;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
+import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -30,6 +31,11 @@ public class Cliente extends Pessoa {
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     private List<Transacao> transacoes = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    @JsonIgnore
+    private Usuario usuario;
 
     @Embedded
     private Auditoria auditoria;

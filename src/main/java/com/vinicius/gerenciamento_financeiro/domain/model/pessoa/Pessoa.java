@@ -27,7 +27,10 @@ public abstract class Pessoa {
     @Column(nullable = false, unique = true)
     private Email email;
 
+    @Column
     private String telefone;
+
+    @Column
     private LocalDate dataNascimento;
 
     @Embedded

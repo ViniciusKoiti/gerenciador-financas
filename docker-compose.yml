@@ -1,18 +1,28 @@
-version: '3.8'
-
 services:
   app:
     build:
       context: .
     ports:
       - "8080:8080"
+    depends_on:
+      - rabbitmq
+    networks:
+      - rede-local
 
   rabbitmq:
     build:
       context: .
       dockerfile: Dockerfile.rabbitmq
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "5672:5672"       # Porta AMQP para a aplicação
+      - "15672:15672"     # Painel web do RabbitMQ
     hostname: rabbit
     container_name: meu-rabbit
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - rede-local
+
+networks:
+  rede-local:
