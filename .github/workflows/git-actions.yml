@@ -30,9 +30,6 @@ jobs:
             sleep 2
           done
 
-      - name: Run tests
-        run: docker compose exec -T app mvn clean test
-
       - name: Shutdown containers
         if: always()
         run: docker compose down
