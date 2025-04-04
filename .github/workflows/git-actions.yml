@@ -16,16 +16,37 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
 
-      - name: Build Docker image
-        run: docker build -t gerenciamento-financeiro:dev .
+      - name: Build and start services with Docker Compose
+        run: docker-compose up -d --build
 
-      - name: Run Tests
-        run: docker run gerenciamento-financeiro:dev mvn clean test
+      - name: Wait for RabbitMQ to be healthy
+        run: |
+          echo "Aguardando RabbitMQ ficar pronto..."
+          for i in {1..30}; do
+            if docker exec meu-rabbit rabbitmqctl status > /dev/null 2>&1; then
+              echo "RabbitMQ está pronto!"
+              break
+            fi
+            sleep 2
+          done
+
+      - name: Run tests
+        run: docker-compose exec -T app mvn clean test
+
+      - name: Shutdown containers
+        if: always()
+        run: docker-compose down
 
   deploy:
     needs: build-and-test
     runs-on: ubuntu-latest
 
     steps:
-      - name: Subindo aplicação
-        run: docker run -d -p 8080:8080 gerenciamento-financeiro:dev
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Start app container for deploy
+        run: docker-compose up -d --build app
