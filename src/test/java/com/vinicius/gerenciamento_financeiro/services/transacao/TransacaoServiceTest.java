@@ -80,7 +80,9 @@ public class TransacaoServiceTest {
         TransacaoPost t1 = new TransacaoPost("Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 1L);
         TransacaoPost t2 = new TransacaoPost("Aluguel", new BigDecimal("500"), TipoMovimentacao.DESPESA, LocalDateTime.now(), 1L);
         Usuario usuario = new Usuario(1L);
-        Categoria categoria = Categoria.builder().id(1L).build();
+        Categoria categoria = Categoria.builder()
+                .id(1L).usuario(usuario).
+                build();
         when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
@@ -91,7 +93,7 @@ public class TransacaoServiceTest {
         when(transacaoMapper.toEntity(eq(t2), eq(categoria), eq(usuario), any(Auditoria.class)))
                 .thenReturn(transacaoEntity2);
         List<Transacao> listaTransacoes = Arrays.asList(transacaoEntity1, transacaoEntity2);
-        when(transacaoRepository.buscarTodasTransacoes()).thenReturn(listaTransacoes);
+        when(transacaoRepository.buscarTodasTransacoesPorUsuario(usuario.getId())).thenReturn(listaTransacoes);
         service.adicionarTransacao(t1);
         service.adicionarTransacao(t2);
         BigDecimal saldo = service.calcularSaldo();
@@ -150,11 +152,11 @@ public class TransacaoServiceTest {
                         LocalDateTime.now()
                 )
         );
+        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
 
-        // Configurando o mock para retornar a lista de transações
-        when(transacaoRepository.buscarTransacoesPorCategoriaId(categoriaId)).thenReturn(transacoes);
+        when(transacaoRepository.buscarTransacoesPorCategoriaIdEUsuario(categoriaId,usuario.getId())).thenReturn(transacoes);
         when(transacaoMapper.toResponse(any(Transacao.class))).thenReturn(transacoesResponses.get(0),transacoesResponses.get(1));
-
+        when(categoriaRepository.existsByIdAndUsuarioId(categoriaId,usuario.getId())).thenReturn(true);
         List<TransacaoResponse> resultado = transacaoService.buscarTransacoesPorCategoriaId(categoriaId);
 
         assertNotNull(resultado);
@@ -162,7 +164,7 @@ public class TransacaoServiceTest {
         assertEquals(transacoesResponses.get(0).id(), resultado.get(0).id());
         assertEquals(transacoesResponses.get(1).id(), resultado.get(1).id());
 
-        verify(transacaoRepository, times(1)).buscarTransacoesPorCategoriaId(categoriaId);
+        verify(transacaoRepository, times(1)).buscarTransacoesPorCategoriaIdEUsuario(categoriaId, usuario.getId());
         verify(transacaoMapper, times(2)).toResponse(any(Transacao.class));
     }
 }
