@@ -16,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import com.vinicius.gerenciamento_financeiro.port.in.GerenciarTransacaoUseCase;
 import com.vinicius.gerenciamento_financeiro.port.out.transacao.TransacaoRepository;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class TransacaoService implements GerenciarTransacaoUseCase {
     private final CategoriaRepository categoriaRepository;
     private final UsuarioRepository usuarioRepository;
@@ -41,53 +44,86 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
         this.transacaoMapper = transacaoMapper;
     }
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void adicionarTransacao(TransacaoPost transacaoPost) {
-        Long usuarioId = jwtService.getByAutenticaoUsuarioId();
-        Categoria categoria = categoriaRepository.findById(transacaoPost.categoriaId())
-                .orElseThrow(() -> new IllegalArgumentException("Categoria não encontrada."));
-        Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+        try {
+            Long usuarioId = jwtService.getByAutenticaoUsuarioId();
 
-        Auditoria auditoria = new Auditoria();
-        Transacao transacao = transacaoMapper.toEntity(transacaoPost, categoria,usuario, auditoria);
-        transacaoRepository.salvarTransacao(transacao);
-        notificarTransacaoService.notificarTransacaoAtrasada(transacao);
+            Categoria categoria = categoriaRepository.findById(transacaoPost.categoriaId())
+                    .orElseThrow(() -> new IllegalArgumentException("Categoria não encontrada."));
+
+            Usuario usuario = usuarioRepository.findById(usuarioId)
+                    .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+            if (!categoria.getUsuario().getId().equals(usuarioId)) {
+                throw new SecurityException("Categoria não pertence ao usuário logado");
+            }
+            Auditoria auditoria = new Auditoria();
+            Transacao transacao = transacaoMapper.toEntity(transacaoPost, categoria, usuario, auditoria);
+            transacaoRepository.salvarTransacao(transacao);
+            notificarTransacaoService.notificarTransacaoAtrasada(transacao);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Erro ao processar transação: " + e.getMessage(), e);
+        }
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<TransacaoResponse> obterTodasTransacoes() {
-        return transacaoRepository.buscarTodasTransacoes().
-                stream().map(transacaoMapper::toResponse).collect(Collectors.toList());
+        Long usuarioId = jwtService.getByAutenticaoUsuarioId();
+        return transacaoRepository.buscarTodasTransacoesPorUsuario(usuarioId)
+                .stream()
+                .map(transacaoMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
     public BigDecimal calcularSaldo() {
-        List<Transacao> transacoes = transacaoRepository.buscarTodasTransacoes();
-        BigDecimal saldo = BigDecimal.ZERO;
-        for (Transacao transacao : transacoes) {
-            if (transacao.getTipo() == TipoMovimentacao.RECEITA) {
-                saldo = saldo.add(transacao.getValor());
-            } else if (transacao.getTipo() == TipoMovimentacao.DESPESA) {
-                saldo = saldo.subtract(transacao.getValor());
-            }
-        }
-        return saldo;
+        Long usuarioId = jwtService.getByAutenticaoUsuarioId();
+        List<Transacao> transacoes = transacaoRepository.buscarTodasTransacoesPorUsuario(usuarioId);
+
+        return transacoes.stream()
+                .map(transacao -> {
+                    if (transacao.getTipo() == TipoMovimentacao.RECEITA) {
+                        return transacao.getValor();
+                    } else if (transacao.getTipo() == TipoMovimentacao.DESPESA) {
+                        return transacao.getValor().negate();
+                    }
+                    return BigDecimal.ZERO;
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void atualizarTransacaoCategoria(Long transacaoId, Long categoriaId) {
-        Transacao transacao = transacaoRepository.buscarTransacaoPorId(transacaoId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Transação não encontrada."));
-        Categoria categoria = categoriaRepository.findById(categoriaId)
-                .orElseThrow(() -> new IllegalArgumentException("Categoria não  encontrada."));
+        Long usuarioId = jwtService.getByAutenticaoUsuarioId();
+
+        Transacao transacao = transacaoRepository.buscarTransacaoPorIdEUsuario(transacaoId, usuarioId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Transação não encontrada ou não pertence ao usuário."));
+
+        Categoria categoria = categoriaRepository.findByIdAndUsuarioId(categoriaId, usuarioId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Categoria não encontrada ou não pertence ao usuário."));
+
         Transacao transacaoAtualizada = transacao.atualizarCategoria(categoria, transacao.getAuditoria());
         transacaoRepository.salvarTransacao(transacaoAtualizada);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<TransacaoResponse> buscarTransacoesPorCategoriaId(Long categoriaId) {
-        List<Transacao> transacaos = transacaoRepository.buscarTransacoesPorCategoriaId(categoriaId);
-        return transacaos.stream().map(transacaoMapper::toResponse).collect(Collectors.toList());
+        Long usuarioId = jwtService.getByAutenticaoUsuarioId();
+
+        if (!categoriaRepository.existsByIdAndUsuarioId(categoriaId, usuarioId)) {
+            throw new SecurityException("Categoria não pertence ao usuário logado");
+        }
+
+        List<Transacao> transacoes = transacaoRepository.buscarTransacoesPorCategoriaIdEUsuario(categoriaId, usuarioId);
+        return transacoes.stream()
+                .map(transacaoMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
 }
