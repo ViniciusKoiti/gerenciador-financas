@@ -18,4 +18,7 @@ public interface CategoriaRepository {
     boolean existsByIdAndUsuarioId(Long categoriaId, Long usuarioId);
 
     void deleteById(Long id);
+
+    Optional<Categoria> findByIdAndUsuarioId(Long categoriaId, Long usuarioId);
+    Page<Categoria> findByUsuarioId(Long usuarioId, Pageable pageable);
 }

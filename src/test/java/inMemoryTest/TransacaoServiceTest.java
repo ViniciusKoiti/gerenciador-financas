@@ -5,6 +5,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.TransacaoMapp
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.out.memory.MemoryTransacaoRepository;
+import com.vinicius.gerenciamento_financeiro.adapter.out.transacao.JpaTransacaoRepository;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
@@ -23,6 +24,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -54,6 +56,9 @@ public class TransacaoServiceTest {
     @Mock
     private JwtService jwtService;
 
+    @Mock
+    private JpaTransacaoRepository jpaTransacaoRepository;
+
     private MemoryTransacaoRepository memoryRepository;
     private TransacaoService service;
 
@@ -83,15 +88,14 @@ public class TransacaoServiceTest {
                 .build();
         auditoriaTeste = new Auditoria();
 
-        // Mocks padrão
-        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
-        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioTeste));
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaTeste));
     }
 
     @Test
     @DisplayName("Deve adicionar transação e verificar se foi salva corretamente")
     void deveAdicionarTransacaoComSucesso() {
+        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioTeste));
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaTeste));
         // Arrange
         TransacaoPost transacaoPost = new TransacaoPost(
                 "Salário",
@@ -125,7 +129,10 @@ public class TransacaoServiceTest {
     @Test
     @DisplayName("Deve calcular saldo corretamente com múltiplas transações")
     void deveCalcularSaldoCorretamente() {
-        // Arrange
+        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioTeste));
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaTeste));
+
         TransacaoPost receita = new TransacaoPost(
                 "Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 1L
         );
@@ -154,7 +161,6 @@ public class TransacaoServiceTest {
         assertEquals(new BigDecimal("500"), saldo);
         assertEquals(2, memoryRepository.contarTodas());
 
-        // Verifica se ambas as transações foram salvas
         List<Transacao> todasTransacoes = memoryRepository.buscarTodasTransacoesPorUsuario(1L);
         assertEquals(2, todasTransacoes.size());
 
@@ -164,7 +170,7 @@ public class TransacaoServiceTest {
     @Test
     @DisplayName("Deve isolar transações por usuário")
     void deveIsolararTransacoesPorUsuario() {
-        // Arrange
+
         Usuario usuario2 = new Usuario(2L);
 
         Transacao transacaoUsuario1 = criarTransacaoCompleta(
@@ -174,7 +180,6 @@ public class TransacaoServiceTest {
                 2L, "Transação Usuário 2", new BigDecimal("200"), TipoMovimentacao.DESPESA
         );
 
-        // Define usuário 2 no mock
         transacaoUsuario2 = Transacao.builder()
                 .id(2L)
                 .descricao("Transação Usuário 2")
@@ -187,11 +192,9 @@ public class TransacaoServiceTest {
                 .configuracao(criarConfiguracaoPadrao())
                 .build();
 
-        // Act
         memoryRepository.salvarTransacao(transacaoUsuario1);
         memoryRepository.salvarTransacao(transacaoUsuario2);
 
-        // Assert
         List<Transacao> transacoesUsuario1 = memoryRepository.buscarTodasTransacoesPorUsuario(1L);
         List<Transacao> transacoesUsuario2 = memoryRepository.buscarTodasTransacoesPorUsuario(2L);
 
@@ -200,7 +203,6 @@ public class TransacaoServiceTest {
         assertEquals("Transação Usuário 1", transacoesUsuario1.get(0).getDescricao());
         assertEquals("Transação Usuário 2", transacoesUsuario2.get(0).getDescricao());
 
-        // Verifica isolamento total
         assertEquals(2, memoryRepository.contarTodas());
         assertEquals(1, memoryRepository.contarTransacoesPorUsuario(1L));
         assertEquals(1, memoryRepository.contarTransacoesPorUsuario(2L));
@@ -209,7 +211,8 @@ public class TransacaoServiceTest {
     @Test
     @DisplayName("Deve buscar transações por categoria corretamente")
     void deveBuscarTransacoesPorCategoria() {
-        // Arrange
+
+
         Categoria categoria2 = Categoria.builder()
                 .id(2L)
                 .nome("Categoria 2")
@@ -219,15 +222,12 @@ public class TransacaoServiceTest {
         Transacao transacao1 = criarTransacaoParaCategoria(1L, "Transação Cat 1", categoriaTeste);
         Transacao transacao2 = criarTransacaoParaCategoria(2L, "Transação Cat 2", categoria2);
 
-        when(categoriaRepository.existsByIdAndUsuarioId(1L, 1L)).thenReturn(true);
 
-        // Act
         memoryRepository.salvarTransacao(transacao1);
         memoryRepository.salvarTransacao(transacao2);
 
         List<Transacao> transacoesCategoria1 = memoryRepository.buscarTransacoesPorCategoriaIdEUsuario(1L, 1L);
 
-        // Assert
         assertEquals(1, transacoesCategoria1.size());
         assertEquals("Transação Cat 1", transacoesCategoria1.get(0).getDescricao());
         assertEquals(1L, transacoesCategoria1.get(0).getCategoria().getId());
@@ -236,47 +236,55 @@ public class TransacaoServiceTest {
     @Test
     @DisplayName("Deve lançar exceção quando categoria não encontrada")
     void deveLancarExcecaoQuandoCategoriaNaoEncontrada() {
+        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
+
         // Arrange
         TransacaoPost transacaoPost = new TransacaoPost(
                 "Teste", new BigDecimal("100"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 999L
         );
 
+
+
         when(categoriaRepository.findById(999L)).thenReturn(Optional.empty());
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
                 () -> service.adicionarTransacao(transacaoPost)
         );
 
-        assertEquals("Categoria não encontrada.", exception.getMessage());
+        assertEquals("500 INTERNAL_SERVER_ERROR \"Erro ao processar transação: Categoria não encontrada.\"", exception.getMessage());
         assertEquals(0, memoryRepository.contarTodas());
     }
 
     @Test
     @DisplayName("Deve lançar exceção quando usuário não encontrado")
     void deveLancarExcecaoQuandoUsuarioNaoEncontrado() {
-        // Arrange
+        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaTeste));
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.empty()); // Usuário NÃO encontrado
+
         TransacaoPost transacaoPost = new TransacaoPost(
                 "Teste", new BigDecimal("100"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 1L
         );
 
-        when(usuarioRepository.findById(1L)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
                 () -> service.adicionarTransacao(transacaoPost)
         );
 
-        assertEquals("Usuário não encontrado.", exception.getMessage());
+        assertTrue(exception.getMessage().contains("Usuário não encontrado"));
         assertEquals(0, memoryRepository.contarTodas());
+
+        verify(mapper, never()).toEntity(any(), any(), any(), any());
     }
 
     @Test
     @DisplayName("Deve verificar se notificação é chamada corretamente")
     void deveVerificarNotificacao() {
-        // Arrange
+        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioTeste));
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaTeste));
         TransacaoPost transacaoPost = new TransacaoPost(
                 "Teste", new BigDecimal("100"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 1L
         );
@@ -287,7 +295,6 @@ public class TransacaoServiceTest {
 
         when(mapper.toEntity(any(), any(), any(), any())).thenReturn(transacaoEsperada);
 
-        // Act
         service.adicionarTransacao(transacaoPost);
 
         // Assert
@@ -298,9 +305,6 @@ public class TransacaoServiceTest {
         assertEquals("Teste", transacaoCapturada.getDescricao());
         assertEquals(new BigDecimal("100"), transacaoCapturada.getValor());
     }
-
-    // ========== MÉTODOS AUXILIARES ==========
-
     private Transacao criarTransacaoCompleta(Long id, String descricao, BigDecimal valor, TipoMovimentacao tipo) {
         return Transacao.builder()
                 .id(id)
