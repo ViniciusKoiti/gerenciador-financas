@@ -6,6 +6,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.Tr
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.out.memory.MemoryTransacaoRepository;
 import com.vinicius.gerenciamento_financeiro.adapter.out.transacao.JpaTransacaoRepository;
+import com.vinicius.gerenciamento_financeiro.domain.exception.ResourceNotFoundException;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
@@ -248,8 +249,8 @@ public class TransacaoServiceTest {
         when(categoriaRepository.findById(999L)).thenReturn(Optional.empty());
 
         // Act & Assert
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> service.adicionarTransacao(transacaoPost)
         );
 
@@ -268,8 +269,8 @@ public class TransacaoServiceTest {
                 "Teste", new BigDecimal("100"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 1L
         );
 
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> service.adicionarTransacao(transacaoPost)
         );
 
