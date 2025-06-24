@@ -4,6 +4,8 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtS
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.TransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
+import com.vinicius.gerenciamento_financeiro.domain.exception.InsufficientPermissionException;
+import com.vinicius.gerenciamento_financeiro.domain.exception.ResourceNotFoundException;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
@@ -11,6 +13,7 @@ import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMo
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Transactional
 public class TransacaoService implements GerenciarTransacaoUseCase {
@@ -48,14 +52,16 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
     public void adicionarTransacao(TransacaoPost transacaoPost) {
         try {
             Long usuarioId = jwtService.getByAutenticaoUsuarioId();
+            log.debug("Usuário autenticado: {}", usuarioId);
 
             Categoria categoria = categoriaRepository.findById(transacaoPost.categoriaId())
-                    .orElseThrow(() -> new IllegalArgumentException("Categoria não encontrada."));
-
+                    .orElseThrow(() -> new ResourceNotFoundException("Categoria", transacaoPost.categoriaId()));
             Usuario usuario = usuarioRepository.findById(usuarioId)
-                    .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+                    .orElseThrow(() -> new ResourceNotFoundException("Usuario", usuarioId));
             if (!categoria.getUsuario().getId().equals(usuarioId)) {
-                throw new SecurityException("Categoria não pertence ao usuário logado");
+                log.warn("Tentativa de acesso à categoria {} por usuário não autorizado: {}",
+                        categoria.getId(), usuarioId);
+                throw new InsufficientPermissionException("categoria", "criar transação");
             }
             Auditoria auditoria = new Auditoria();
             Transacao transacao = transacaoMapper.toEntity(transacaoPost, categoria, usuario, auditoria);
