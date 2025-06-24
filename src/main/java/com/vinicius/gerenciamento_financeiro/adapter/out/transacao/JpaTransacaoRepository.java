@@ -41,15 +41,12 @@ public interface JpaTransacaoRepository extends JpaRepository<Transacao, Long> {
     @Query("SELECT t FROM Transacao t JOIN FETCH t.categoria WHERE t.categoria.id = :categoriaId AND t.usuario.id = :usuarioId")
     Page<Transacao> findAllByCategoriaIdAndUsuarioIdWithCategoria(@Param("categoriaId") Long categoriaId, @Param("usuarioId") Long usuarioId, Pageable pageable);
 
-    // Métodos para contagem e estatísticas
     long countByUsuario_id(Long usuarioId);
 
     long countByCategoria_idAndUsuario_id(Long categoriaId, Long usuarioId);
 
-    // Verificação de existência
     boolean existsByIdAndUsuario_id(Long transacaoId, Long usuarioId);
 
-    // Método para buscar transações recentes (útil para dashboard)
     @Query("SELECT t FROM Transacao t WHERE t.usuario.id = :usuarioId ORDER BY t.data DESC")
     Page<Transacao> findRecentByUsuarioId(@Param("usuarioId") Long usuarioId, Pageable pageable);
 }
