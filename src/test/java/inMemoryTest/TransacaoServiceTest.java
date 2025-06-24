@@ -254,7 +254,7 @@ public class TransacaoServiceTest {
                 () -> service.adicionarTransacao(transacaoPost)
         );
 
-        assertEquals("500 INTERNAL_SERVER_ERROR \"Erro ao processar transação: Categoria não encontrada.\"", exception.getMessage());
+        assertEquals("Categoria com ID 999 não encontrado", exception.getMessage());
         assertEquals(0, memoryRepository.contarTodas());
     }
 
@@ -274,7 +274,7 @@ public class TransacaoServiceTest {
                 () -> service.adicionarTransacao(transacaoPost)
         );
 
-        assertTrue(exception.getMessage().contains("Usuário não encontrado"));
+        assertTrue(exception.getMessage().contains("Usuario com ID 1 não encontrado"));
         assertEquals(0, memoryRepository.contarTodas());
 
         verify(mapper, never()).toEntity(any(), any(), any(), any());
