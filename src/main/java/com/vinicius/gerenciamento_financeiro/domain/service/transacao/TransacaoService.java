@@ -4,6 +4,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtS
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.TransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
+import com.vinicius.gerenciamento_financeiro.domain.exception.BusinessRuleViolationException;
 import com.vinicius.gerenciamento_financeiro.domain.exception.InsufficientPermissionException;
 import com.vinicius.gerenciamento_financeiro.domain.exception.ResourceNotFoundException;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
@@ -67,28 +68,40 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
             Transacao transacao = transacaoMapper.toEntity(transacaoPost, categoria, usuario, auditoria);
             transacaoRepository.salvarTransacao(transacao);
             notificarTransacaoService.notificarTransacaoAtrasada(transacao);
+        } catch (ResourceNotFoundException | InsufficientPermissionException | BusinessRuleViolationException e) {
+            log.error("Erro de domínio ao adicionar transação: {}", e.getMessage());
+            throw e;
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Erro ao processar transação: " + e.getMessage(), e);
+            log.error("Erro inesperado ao adicionar transação", e);
+            throw new BusinessRuleViolationException("TRANSACTION_CREATION_ERROR",
+                    "Erro interno ao processar transação: " + e.getMessage());
         }
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<TransacaoResponse> obterTodasTransacoes() {
+        log.debug("Buscando todas as transações do usuário");
+
         Long usuarioId = jwtService.getByAutenticaoUsuarioId();
-        return transacaoRepository.buscarTodasTransacoesPorUsuario(usuarioId)
-                .stream()
+
+        List<Transacao> transacoes = transacaoRepository.buscarTodasTransacoesPorUsuario(usuarioId);
+        log.debug("Encontradas {} transações para o usuário {}", transacoes.size(), usuarioId);
+
+        return transacoes.stream()
                 .map(transacaoMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BigDecimal calcularSaldo() {
+        log.debug("Calculando saldo do usuário");
+
         Long usuarioId = jwtService.getByAutenticaoUsuarioId();
         List<Transacao> transacoes = transacaoRepository.buscarTodasTransacoesPorUsuario(usuarioId);
 
-        return transacoes.stream()
+        BigDecimal saldo = transacoes.stream()
                 .map(transacao -> {
                     if (transacao.getTipo() == TipoMovimentacao.RECEITA) {
                         return transacao.getValor();
@@ -98,23 +111,29 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
                     return BigDecimal.ZERO;
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        log.debug("Saldo calculado: {}", saldo);
+        return saldo;
     }
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void atualizarTransacaoCategoria(Long transacaoId, Long categoriaId) {
+        log.debug("Atualizando categoria da transação {} para categoria {}", transacaoId, categoriaId);
+
         Long usuarioId = jwtService.getByAutenticaoUsuarioId();
 
         Transacao transacao = transacaoRepository.buscarTransacaoPorIdEUsuario(transacaoId, usuarioId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Transação não encontrada ou não pertence ao usuário."));
+                .orElseThrow(() -> new ResourceNotFoundException("Transacao", transacaoId));
 
         Categoria categoria = categoriaRepository.findByIdAndUsuarioId(categoriaId, usuarioId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Categoria não encontrada ou não pertence ao usuário."));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoria", categoriaId));
 
+        // TODO CRIAR VALIDAÇÃO PARA REGRAS
         Transacao transacaoAtualizada = transacao.atualizarCategoria(categoria, transacao.getAuditoria());
         transacaoRepository.salvarTransacao(transacaoAtualizada);
+
+        log.info("Categoria da transação {} atualizada para {}", transacaoId, categoriaId);
     }
 
     @Override
