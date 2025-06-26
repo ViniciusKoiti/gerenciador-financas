@@ -2,7 +2,7 @@ package com.vinicius.gerenciamento_financeiro.domain.model.usuario;
 
 import com.vinicius.gerenciamento_financeiro.domain.model.PixInfo;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
-import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
+import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

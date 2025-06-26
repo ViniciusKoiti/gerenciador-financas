@@ -1,6 +1,5 @@
 package com.vinicius.gerenciamento_financeiro.port.out.cliente;
 
-import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.cliente.Cliente;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

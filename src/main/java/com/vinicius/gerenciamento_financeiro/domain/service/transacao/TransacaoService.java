@@ -8,7 +8,7 @@ import com.vinicius.gerenciamento_financeiro.domain.exception.BusinessRuleViolat
 import com.vinicius.gerenciamento_financeiro.domain.exception.InsufficientPermissionException;
 import com.vinicius.gerenciamento_financeiro.domain.exception.ResourceNotFoundException;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
-import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
+import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
@@ -16,13 +16,11 @@ import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaReposit
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import com.vinicius.gerenciamento_financeiro.port.in.GerenciarTransacaoUseCase;
 import com.vinicius.gerenciamento_financeiro.port.out.transacao.TransacaoRepository;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;

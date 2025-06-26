@@ -1,20 +1,12 @@
 package com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper;
 
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.TransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPut;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
-import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
-import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
-import lombok.AllArgsConstructor;
+import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.Categoria;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", uses = TransacaoMapper.class)
 public interface CategoriaMapper {

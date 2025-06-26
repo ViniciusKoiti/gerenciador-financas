@@ -3,7 +3,6 @@ package com.vinicius.gerenciamento_financeiro.adapter.in.web.controller.categori
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.ApiResponseSistema;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
-import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.port.in.CategoriaUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

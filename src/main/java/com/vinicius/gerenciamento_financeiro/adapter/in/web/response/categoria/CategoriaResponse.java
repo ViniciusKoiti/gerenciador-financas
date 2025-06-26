@@ -1,8 +1,8 @@
 package com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria;
 
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
-import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
-import java.util.List;
+
+import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.Categoria;
+
 public record CategoriaResponse(
         Long id,
         String name,
