@@ -1,6 +1,6 @@
 package com.vinicius.gerenciamento_financeiro.adapter.out.categoria;
 
-import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.Categoria;
+import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,56 +19,56 @@ public class CategoriaPersistenceAdapter implements CategoriaRepository {
     private final JpaCategoriaRepository repository;
 
     @Override
-    public Categoria save(Categoria entity) {
+    public CategoriaJpaEntity save(CategoriaJpaEntity entity) {
         try {
-            Categoria savedCategoria = repository.save(entity);
-            log.debug("Categoria salva com sucesso: ID {}, Nome: {}", savedCategoria.getId(), savedCategoria.getNome());
-            return savedCategoria;
+            CategoriaJpaEntity savedCategoriaJpaEntity = repository.save(entity);
+            log.debug("CategoriaJpaEntity salva com sucesso: ID {}, Nome: {}", savedCategoriaJpaEntity.getId(), savedCategoriaJpaEntity.getNome());
+            return savedCategoriaJpaEntity;
         } catch (Exception e) {
-            log.error("Erro ao salvar categoria: {}", e.getMessage(), e);
+            log.error("Erro ao salvar categoriaJpaEntity: {}", e.getMessage(), e);
             throw e;
         }
     }
 
     @Override
-    public void saveAll(List<Categoria> listaCategoria) {
+    public void saveAll(List<CategoriaJpaEntity> listaCategoriaJpaEntity) {
         try {
-            repository.saveAll(listaCategoria);
-            log.debug("Salvas {} categorias em lote", listaCategoria.size());
+            repository.saveAll(listaCategoriaJpaEntity);
+            log.debug("Salvas {} categoriaJpaEntities em lote", listaCategoriaJpaEntity.size());
         } catch (Exception e) {
-            log.error("Erro ao salvar categorias em lote: {}", e.getMessage(), e);
+            log.error("Erro ao salvar categoriaJpaEntities em lote: {}", e.getMessage(), e);
             throw e;
         }
     }
 
     @Override
-    public Optional<Categoria> findById(Long id) {
-        log.debug("Buscando categoria por ID: {}", id);
+    public Optional<CategoriaJpaEntity> findById(Long id) {
+        log.debug("Buscando categoriaJpaEntity por ID: {}", id);
         return repository.findById(id);
     }
 
     @Override
-    public List<Categoria> findByUsuarioId(Long id) {
-        log.debug("Buscando categorias para usuário: {}", id);
+    public List<CategoriaJpaEntity> findByUsuarioId(Long id) {
+        log.debug("Buscando categoriaJpaEntities para usuário: {}", id);
         return repository.findByUsuarioIdAndAtivaOrderByNome(id);
     }
 
     @Override
-    public List<Categoria> findAll() {
-        log.debug("Buscando todas as categorias");
+    public List<CategoriaJpaEntity> findAll() {
+        log.debug("Buscando todas as categoriaJpaEntities");
         return repository.findAll();
     }
 
     @Override
-    public Page<Categoria> findAll(Pageable pageable) {
-        log.debug("Buscando categorias paginadas: página {}", pageable.getPageNumber());
+    public Page<CategoriaJpaEntity> findAll(Pageable pageable) {
+        log.debug("Buscando categoriaJpaEntities paginadas: página {}", pageable.getPageNumber());
         return repository.findAll(pageable);
     }
 
     @Override
     public boolean existsByIdAndUsuarioId(Long categoriaId, Long usuarioId) {
         boolean exists = repository.existsByUsuarioIdAndId(usuarioId, categoriaId);
-        log.debug("Categoria {} pertence ao usuário {}: {}", categoriaId, usuarioId, exists);
+        log.debug("CategoriaJpaEntity {} pertence ao usuário {}: {}", categoriaId, usuarioId, exists);
         return exists;
     }
 
@@ -76,26 +76,26 @@ public class CategoriaPersistenceAdapter implements CategoriaRepository {
     public void deleteById(Long id) {
         try {
             repository.deleteById(id);
-            log.debug("Categoria deletada: ID {}", id);
+            log.debug("CategoriaJpaEntity deletada: ID {}", id);
         } catch (Exception e) {
-            log.error("Erro ao deletar categoria {}: {}", id, e.getMessage(), e);
+            log.error("Erro ao deletar categoriaJpaEntity {}: {}", id, e.getMessage(), e);
             throw e;
         }
     }
     @Override
-    public Optional<Categoria> findByIdAndUsuarioId(Long categoriaId, Long usuarioId) {
-        log.debug("Buscando categoria {} para usuário: {}", categoriaId, usuarioId);
+    public Optional<CategoriaJpaEntity> findByIdAndUsuarioId(Long categoriaId, Long usuarioId) {
+        log.debug("Buscando categoriaJpaEntity {} para usuário: {}", categoriaId, usuarioId);
         return repository.findByIdAndUsuario_id(categoriaId, usuarioId);
     }
 
     @Override
-    public Page<Categoria> findByUsuarioId(Long usuarioId, Pageable pageable) {
-        log.debug("Buscando categorias paginadas para usuário: {}, página: {}", usuarioId, pageable.getPageNumber());
+    public Page<CategoriaJpaEntity> findByUsuarioId(Long usuarioId, Pageable pageable) {
+        log.debug("Buscando categoriaJpaEntities paginadas para usuário: {}, página: {}", usuarioId, pageable.getPageNumber());
         return repository.findByUsuarioIdAndAtivaOrderByNome(usuarioId, pageable);
     }
 
-    public Optional<Categoria> findByIdAndUsuarioIdAndAtiva(Long categoriaId, Long usuarioId) {
-        log.debug("Buscando categoria ativa {} para usuário: {}", categoriaId, usuarioId);
+    public Optional<CategoriaJpaEntity> findByIdAndUsuarioIdAndAtiva(Long categoriaId, Long usuarioId) {
+        log.debug("Buscando categoriaJpaEntity ativa {} para usuário: {}", categoriaId, usuarioId);
         return repository.findByIdAndUsuarioIdAndAtiva(categoriaId, usuarioId);
     }
 
@@ -106,7 +106,7 @@ public class CategoriaPersistenceAdapter implements CategoriaRepository {
     public long contarCategoriasAtivasPorUsuario(Long usuarioId) {
         return repository.countByUsuario_idAndAtiva(usuarioId, true);
     }
-    public List<Categoria> findCategoriasAtivasPorUsuario(Long usuarioId) {
+    public List<CategoriaJpaEntity> findCategoriasAtivasPorUsuario(Long usuarioId) {
         return repository.findByUsuarioIdAndAtivaOrderByNome(usuarioId);
     }
 }

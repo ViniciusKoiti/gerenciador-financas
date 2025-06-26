@@ -31,8 +31,8 @@ class CategoriaControllerTest {
 
         Long userId = 1L;
         List<CategoriaResponse> mockCategorias = List.of(
-                new CategoriaResponse(1L, "Categoria 1", "Descrição 1", true, "icone1", null),
-                new CategoriaResponse(2L, "Categoria 2", "Descrição 2", true, "icone2", null)
+                new CategoriaResponse(1L, "CategoriaJpaEntity 1", "Descrição 1", true, "icone1", null),
+                new CategoriaResponse(2L, "CategoriaJpaEntity 2", "Descrição 2", true, "icone2", null)
         );
 
         when(categoriaUseCase.findCategoriasByUser(userId)).thenReturn(mockCategorias);
@@ -40,7 +40,7 @@ class CategoriaControllerTest {
         assertEquals(200, response.getStatusCodeValue());
         assertEquals("Categorias obtidas com sucesso.", response.getBody().getMessage());
         assertEquals(2, response.getBody().getData().size());
-        assertEquals("Categoria 1", response.getBody().getData().get(0).name());
+        assertEquals("CategoriaJpaEntity 1", response.getBody().getData().get(0).name());
 
         verify(categoriaUseCase, times(1)).findCategoriasByUser(userId);
     }

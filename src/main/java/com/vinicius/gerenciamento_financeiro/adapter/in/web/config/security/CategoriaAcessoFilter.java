@@ -30,7 +30,7 @@ public class CategoriaAcessoFilter extends OncePerRequestFilter {
             Long categoriaId = Long.valueOf(request.getParameter("categoriaId"));
             boolean pertence = categoriaRepository.existsByIdAndUsuarioId(categoriaId, usuarioId);
             if (!pertence) {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acesso negado: Categoria não pertence ao usuário.");
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acesso negado: CategoriaJpaEntity não pertence ao usuário.");
                 return;
             }
         }

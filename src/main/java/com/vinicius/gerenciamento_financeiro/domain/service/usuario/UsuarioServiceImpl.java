@@ -5,8 +5,8 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario.Logi
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario.UsuarioPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.AuthenticationResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.UsuarioResponse;
+import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
-import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.port.in.LoginUseCase;
 import com.vinicius.gerenciamento_financeiro.port.in.UsuarioService;
@@ -48,8 +48,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         Usuario usuarioSalvo = usuarioRepository.save(usuario);
 
-        List<Categoria> categoriasPadrao = List.of(
-                new Categoria(
+        List<CategoriaJpaEntity> categoriasPadrao = List.of(
+                new CategoriaJpaEntity(
                         null,
                         "A Pagar",
                         "Despesas pendentes",
@@ -61,7 +61,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                         usuarioSalvo,
                         new Auditoria()
                 ),
-                new Categoria(
+                new CategoriaJpaEntity(
                         null,
                         "Pretendidas",
                         "Despesas planejadas",
@@ -73,7 +73,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                         usuarioSalvo,
                         new Auditoria()
                 ),
-                new Categoria(
+                new CategoriaJpaEntity(
                         null,
                         "Prazo",
                         "Despesas com prazo",
@@ -85,7 +85,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                         usuarioSalvo,
                         new Auditoria()
                 ),
-                new Categoria(
+                new CategoriaJpaEntity(
                         null,
                         "Pagas",
                         "Despesas quitadas",

@@ -4,7 +4,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtS
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.CategoriaMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
-import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.Categoria;
+import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.port.in.CategoriaUseCase;
 import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
@@ -31,19 +31,19 @@ public class CategoriaService implements CategoriaUseCase {
 
     public CategoriaResponse save(CategoriaPost entity) {
         if (entity == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria não pode ser nula");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CategoriaJpaEntity não pode ser nula");
         }
         Long usuarioId = jwtService.getByAutenticaoUsuarioId();
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
-        Categoria categoria = new Categoria(entity.name(), entity.description(), entity.icon(), usuario);
-        return categoriaMapper.toResponse(categoriaRepository.save(categoria));
+        CategoriaJpaEntity categoriaJpaEntity = new CategoriaJpaEntity(entity.name(), entity.description(), entity.icon(), usuario);
+        return categoriaMapper.toResponse(categoriaRepository.save(categoriaJpaEntity));
     }
     public CategoriaResponse findById(String id){
         try {
             return categoriaRepository.findById(Long.valueOf(id))
                     .map(categoriaMapper::toResponse)
-                    .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada com id: " + id));
+                    .orElseThrow(() -> new EntityNotFoundException("CategoriaJpaEntity não encontrada com id: " + id));
         } catch (NumberFormatException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID inválido: " + id);
         }
@@ -52,8 +52,8 @@ public class CategoriaService implements CategoriaUseCase {
     @Override
 
     public List<CategoriaResponse> findCategoriasByUser(Long usuarioId){
-        List<Categoria> categorias = categoriaRepository.findByUsuarioId(usuarioId);
-        return categorias.stream().map(categoriaMapper::toResponse).collect(Collectors.toList());
+        List<CategoriaJpaEntity> categoriaJpaEntities = categoriaRepository.findByUsuarioId(usuarioId);
+        return categoriaJpaEntities.stream().map(categoriaMapper::toResponse).collect(Collectors.toList());
     }
 
 
@@ -67,21 +67,21 @@ public class CategoriaService implements CategoriaUseCase {
     @Override
     public void deletarCategoria(String id) {
         try {
-            Categoria categoria = categoriaRepository.findById(Long.valueOf(id))
-                    .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada com id: " + id));
+            CategoriaJpaEntity categoriaJpaEntity = categoriaRepository.findById(Long.valueOf(id))
+                    .orElseThrow(() -> new EntityNotFoundException("CategoriaJpaEntity não encontrada com id: " + id));
 
-            categoriaRepository.deleteById(categoria.getId());
+            categoriaRepository.deleteById(categoriaJpaEntity.getId());
         } catch (NumberFormatException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID inválido: " + id);
         }
     }
     @Override
     public List<CategoriaResponse> findAll() {
-        List<Categoria> categorias = categoriaRepository.findAll();
+        List<CategoriaJpaEntity> categoriaJpaEntities = categoriaRepository.findAll();
         List<CategoriaResponse> categoriaResponses = new ArrayList<>();
-        for (Categoria categoria :
-                categorias) {
-            CategoriaResponse categoriaResponse = categoriaMapper.toResponse(categoria);
+        for (CategoriaJpaEntity categoriaJpaEntity :
+                categoriaJpaEntities) {
+            CategoriaResponse categoriaResponse = categoriaMapper.toResponse(categoriaJpaEntity);
             categoriaResponses.add(categoriaResponse);
         }
         return categoriaResponses;

@@ -1,8 +1,8 @@
 package com.vinicius.gerenciamento_financeiro.domain.model.usuario;
 
+import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.domain.model.PixInfo;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
-import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -47,7 +47,7 @@ public class Usuario implements UserDetails {
     private PixInfo pixInfo;
 
     @OneToMany(mappedBy = "usuario")
-    private Set<Categoria> categorias;
+    private Set<CategoriaJpaEntity> categoriaJpaEntities;
 
     public void setSenha(String senha) {
         this.senha = senha;
@@ -62,18 +62,18 @@ public class Usuario implements UserDetails {
         this.id = id;
     }
 
-    public void addCategoria(Categoria categoria) {
-        if (categorias == null) {
-            categorias = new HashSet<>();
+    public void addCategoria(CategoriaJpaEntity categoriaJpaEntity) {
+        if (categoriaJpaEntities == null) {
+            categoriaJpaEntities = new HashSet<>();
         }
-        categorias.add(categoria);
-        categoria.setUsuario(this);
+        categoriaJpaEntities.add(categoriaJpaEntity);
+        categoriaJpaEntity.setUsuario(this);
     }
 
-    public void removeCategoria(Categoria categoria) {
-        if (categorias != null) {
-            categorias.remove(categoria);
-            categoria.setUsuario(null);
+    public void removeCategoria(CategoriaJpaEntity categoriaJpaEntity) {
+        if (categoriaJpaEntities != null) {
+            categoriaJpaEntities.remove(categoriaJpaEntity);
+            categoriaJpaEntity.setUsuario(null);
         }
     }
 

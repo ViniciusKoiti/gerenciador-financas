@@ -1,7 +1,7 @@
 package com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria;
 
 
-import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.Categoria;
+import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.CategoriaJpaEntity;
 
 public record CategoriaResponse(
         Long id,
@@ -12,14 +12,14 @@ public record CategoriaResponse(
 
         CategoriaResponse categoriaResponseFather
 ) {
-    public static CategoriaResponse fromEntity(Categoria categoria) {
+    public static CategoriaResponse fromEntity(CategoriaJpaEntity categoriaJpaEntity) {
         return new CategoriaResponse(
-                categoria.getId(),
-                categoria.getNome(),
-                categoria.getDescricao(),
-                categoria.isAtiva(),
-                categoria.getIcone(),
-                categoria.getCategoriaPai() != null ? CategoriaResponse.fromEntity(categoria.getCategoriaPai()) : null
+                categoriaJpaEntity.getId(),
+                categoriaJpaEntity.getNome(),
+                categoriaJpaEntity.getDescricao(),
+                categoriaJpaEntity.getAtiva(),
+                categoriaJpaEntity.getIcone(),
+                categoriaJpaEntity.getCategoriaJpaEntityPai() != null ? CategoriaResponse.fromEntity(categoriaJpaEntity.getCategoriaJpaEntityPai()) : null
         );
     }
 }

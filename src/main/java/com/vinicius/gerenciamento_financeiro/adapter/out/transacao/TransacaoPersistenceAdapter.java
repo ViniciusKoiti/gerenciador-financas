@@ -50,13 +50,13 @@ public class TransacaoPersistenceAdapter implements TransacaoRepository {
 
     @Override
     public List<Transacao> buscarTransacoesPorCategoriaIdEUsuario(Long categoriaId, Long usuarioId) {
-        log.debug("Buscando transações da categoria {} para usuário: {}", categoriaId, usuarioId);
+        log.debug("Buscando transações da categoriaJpaEntity {} para usuário: {}", categoriaId, usuarioId);
         return jpaRepository.findAllByCategoriaIdAndUsuarioIdWithCategoria(categoriaId, usuarioId);
     }
 
     @Override
     public Page<Transacao> buscarTransacoesPorCategoriaIdEUsuarioPaginado(Long categoriaId, Long usuarioId, Pageable pageable) {
-        log.debug("Buscando transações paginadas da categoria {} para usuário: {}", categoriaId, usuarioId);
+        log.debug("Buscando transações paginadas da categoriaJpaEntity {} para usuário: {}", categoriaId, usuarioId);
         return jpaRepository.findAllByCategoriaIdAndUsuarioIdWithCategoria(categoriaId, usuarioId, pageable);
     }
 
@@ -100,7 +100,7 @@ public class TransacaoPersistenceAdapter implements TransacaoRepository {
     }
 
     /**
-     * Conta transações de uma categoria específica para o usuário
+     * Conta transações de uma categoriaJpaEntity específica para o usuário
      */
     public long contarTransacoesPorCategoriaEUsuario(Long categoriaId, Long usuarioId) {
         return jpaRepository.countByCategoria_idAndUsuario_id(categoriaId, usuarioId);

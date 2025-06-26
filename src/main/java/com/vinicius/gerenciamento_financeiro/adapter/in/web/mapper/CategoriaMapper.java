@@ -3,8 +3,8 @@ package com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPut;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
+import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
-import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.Categoria;
 import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,8 +14,8 @@ public interface CategoriaMapper {
     @Autowired
     TransacaoMapper transacaoMapper = new TransacaoMapperImpl();
 
-    default Categoria toEntity(CategoriaPost dto) {
-        return Categoria.builder()
+    default CategoriaJpaEntity toEntity(CategoriaPost dto) {
+        return CategoriaJpaEntity.builder()
                 .nome(dto.name())
                 .descricao(dto.description())
                 .icone(dto.icon())
@@ -23,8 +23,8 @@ public interface CategoriaMapper {
                 .build();
     }
 
-    default Categoria toEntity(CategoriaPut dto) {
-        return Categoria.builder()
+    default CategoriaJpaEntity toEntity(CategoriaPut dto) {
+        return CategoriaJpaEntity.builder()
                 .id(dto.id())
                 .nome(dto.nome())
                 .descricao(dto.descricao())
@@ -33,18 +33,18 @@ public interface CategoriaMapper {
                 .build();
     }
 
-    default CategoriaResponse toResponse(Categoria categoria) {
-        if (categoria == null) {
+    default CategoriaResponse toResponse(CategoriaJpaEntity categoriaJpaEntity) {
+        if (categoriaJpaEntity == null) {
             return null;
         }
 
         return new CategoriaResponse(
-                categoria.getId(),
-                categoria.getNome(),
-                categoria.getDescricao(),
-                categoria.isAtiva(),
-                categoria.getIcone(),
-                categoria.getCategoriaPai() != null ? toResponse(categoria.getCategoriaPai()) : null
+                categoriaJpaEntity.getId(),
+                categoriaJpaEntity.getNome(),
+                categoriaJpaEntity.getDescricao(),
+                categoriaJpaEntity.getAtiva(),
+                categoriaJpaEntity.getIcone(),
+                categoriaJpaEntity.getCategoriaJpaEntityPai() != null ? toResponse(categoriaJpaEntity.getCategoriaJpaEntityPai()) : null
         );
     }
 }

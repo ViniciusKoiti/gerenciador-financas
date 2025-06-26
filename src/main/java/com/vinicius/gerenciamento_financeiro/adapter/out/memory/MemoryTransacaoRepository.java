@@ -75,7 +75,7 @@ public class MemoryTransacaoRepository implements TransacaoRepository {
 
     @Override
     public List<Transacao> buscarTransacoesPorCategoriaIdEUsuario(Long categoriaId, Long usuarioId) {
-        log.debug("Buscando transações da categoria {} para usuário: {}", categoriaId, usuarioId);
+        log.debug("Buscando transações da categoriaJpaEntity {} para usuário: {}", categoriaId, usuarioId);
 
         return transacoes.values().stream()
                 .filter(transacao -> Objects.equals(transacao.getUsuario().getId(), usuarioId))
@@ -86,7 +86,7 @@ public class MemoryTransacaoRepository implements TransacaoRepository {
 
     @Override
     public Page<Transacao> buscarTransacoesPorCategoriaIdEUsuarioPaginado(Long categoriaId, Long usuarioId, Pageable pageable) {
-        log.debug("Buscando transações paginadas da categoria {} para usuário: {}", categoriaId, usuarioId);
+        log.debug("Buscando transações paginadas da categoriaJpaEntity {} para usuário: {}", categoriaId, usuarioId);
 
         List<Transacao> todasTransacoes = buscarTransacoesPorCategoriaIdEUsuario(categoriaId, usuarioId);
 

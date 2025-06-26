@@ -3,11 +3,11 @@ package inMemoryTest;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.TransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
+import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.adapter.out.memory.MemoryTransacaoRepository;
 import com.vinicius.gerenciamento_financeiro.adapter.out.transacao.JpaTransacaoRepository;
 import com.vinicius.gerenciamento_financeiro.domain.exception.ResourceNotFoundException;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
-import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
@@ -62,7 +62,7 @@ public class TransacaoServiceTest {
 
     // Dados de teste
     private Usuario usuarioTeste;
-    private Categoria categoriaTeste;
+    private CategoriaJpaEntity categoriaJpaEntityTeste;
     private Auditoria auditoriaTeste;
 
     @BeforeEach
@@ -79,9 +79,9 @@ public class TransacaoServiceTest {
 
         // Configura dados de teste
         usuarioTeste = new Usuario(1L);
-        categoriaTeste = Categoria.builder()
+        categoriaJpaEntityTeste = CategoriaJpaEntity.builder()
                 .id(1L)
-                .nome("Categoria Teste")
+                .nome("CategoriaJpaEntity Teste")
                 .usuario(usuarioTeste)
                 .build();
         auditoriaTeste = new Auditoria();
@@ -93,7 +93,7 @@ public class TransacaoServiceTest {
     void deveAdicionarTransacaoComSucesso() {
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioTeste));
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaTeste));
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaJpaEntityTeste));
         // Arrange
         TransacaoPost transacaoPost = new TransacaoPost(
                 "Salário",
@@ -107,7 +107,7 @@ public class TransacaoServiceTest {
                 1L, "Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA
         );
 
-        when(mapper.toEntity(eq(transacaoPost), eq(categoriaTeste), eq(usuarioTeste), any(Auditoria.class)))
+        when(mapper.toEntity(eq(transacaoPost), eq(categoriaJpaEntityTeste), eq(usuarioTeste), any(Auditoria.class)))
                 .thenReturn(transacaoEsperada);
 
         // Act
@@ -129,7 +129,7 @@ public class TransacaoServiceTest {
     void deveCalcularSaldoCorretamente() {
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioTeste));
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaTeste));
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaJpaEntityTeste));
 
         TransacaoPost receita = new TransacaoPost(
                 "Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 1L
@@ -145,9 +145,9 @@ public class TransacaoServiceTest {
                 2L, "Aluguel", new BigDecimal("500"), TipoMovimentacao.DESPESA
         );
 
-        when(mapper.toEntity(eq(receita), eq(categoriaTeste), eq(usuarioTeste), any(Auditoria.class)))
+        when(mapper.toEntity(eq(receita), eq(categoriaJpaEntityTeste), eq(usuarioTeste), any(Auditoria.class)))
                 .thenReturn(transacaoReceita);
-        when(mapper.toEntity(eq(despesa), eq(categoriaTeste), eq(usuarioTeste), any(Auditoria.class)))
+        when(mapper.toEntity(eq(despesa), eq(categoriaJpaEntityTeste), eq(usuarioTeste), any(Auditoria.class)))
                 .thenReturn(transacaoDespesa);
 
         // Act
@@ -185,7 +185,7 @@ public class TransacaoServiceTest {
                 .tipo(TipoMovimentacao.DESPESA)
                 .data(LocalDateTime.now())
                 .usuario(usuario2)
-                .categoria(categoriaTeste)
+                .categoria(categoriaJpaEntityTeste)
                 .auditoria(auditoriaTeste)
                 .configuracao(criarConfiguracaoPadrao())
                 .build();
@@ -207,18 +207,18 @@ public class TransacaoServiceTest {
     }
 
     @Test
-    @DisplayName("Deve buscar transações por categoria corretamente")
+    @DisplayName("Deve buscar transações por categoriaJpaEntity corretamente")
     void deveBuscarTransacoesPorCategoria() {
 
 
-        Categoria categoria2 = Categoria.builder()
+        CategoriaJpaEntity categoriaJpaEntity2 = CategoriaJpaEntity.builder()
                 .id(2L)
-                .nome("Categoria 2")
+                .nome("CategoriaJpaEntity 2")
                 .usuario(usuarioTeste)
                 .build();
 
-        Transacao transacao1 = criarTransacaoParaCategoria(1L, "Transação Cat 1", categoriaTeste);
-        Transacao transacao2 = criarTransacaoParaCategoria(2L, "Transação Cat 2", categoria2);
+        Transacao transacao1 = criarTransacaoParaCategoria(1L, "Transação Cat 1", categoriaJpaEntityTeste);
+        Transacao transacao2 = criarTransacaoParaCategoria(2L, "Transação Cat 2", categoriaJpaEntity2);
 
 
         memoryRepository.salvarTransacao(transacao1);
@@ -232,7 +232,7 @@ public class TransacaoServiceTest {
     }
 
     @Test
-    @DisplayName("Deve lançar exceção quando categoria não encontrada")
+    @DisplayName("Deve lançar exceção quando categoriaJpaEntity não encontrada")
     void deveLancarExcecaoQuandoCategoriaNaoEncontrada() {
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
 
@@ -251,7 +251,7 @@ public class TransacaoServiceTest {
                 () -> service.adicionarTransacao(transacaoPost)
         );
 
-        assertEquals("Categoria com ID 999 não encontrado", exception.getMessage());
+        assertEquals("CategoriaJpaEntity com ID 999 não encontrado", exception.getMessage());
         assertEquals(0, memoryRepository.contarTodas());
     }
 
@@ -259,7 +259,7 @@ public class TransacaoServiceTest {
     @DisplayName("Deve lançar exceção quando usuário não encontrado")
     void deveLancarExcecaoQuandoUsuarioNaoEncontrado() {
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaTeste));
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaJpaEntityTeste));
         when(usuarioRepository.findById(1L)).thenReturn(Optional.empty()); // Usuário NÃO encontrado
 
         TransacaoPost transacaoPost = new TransacaoPost(
@@ -282,7 +282,7 @@ public class TransacaoServiceTest {
     void deveVerificarNotificacao() {
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioTeste));
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaTeste));
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaJpaEntityTeste));
         TransacaoPost transacaoPost = new TransacaoPost(
                 "Teste", new BigDecimal("100"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 1L
         );
@@ -311,13 +311,13 @@ public class TransacaoServiceTest {
                 .tipo(tipo)
                 .data(LocalDateTime.now())
                 .usuario(usuarioTeste)
-                .categoria(categoriaTeste)
+                .categoria(categoriaJpaEntityTeste)
                 .auditoria(auditoriaTeste)
                 .configuracao(criarConfiguracaoPadrao())
                 .build();
     }
 
-    private Transacao criarTransacaoParaCategoria(Long id, String descricao, Categoria categoria) {
+    private Transacao criarTransacaoParaCategoria(Long id, String descricao, CategoriaJpaEntity categoriaJpaEntity) {
         return Transacao.builder()
                 .id(id)
                 .descricao(descricao)
@@ -325,7 +325,7 @@ public class TransacaoServiceTest {
                 .tipo(TipoMovimentacao.RECEITA)
                 .data(LocalDateTime.now())
                 .usuario(usuarioTeste)
-                .categoria(categoria)
+                .categoria(categoriaJpaEntity)
                 .auditoria(auditoriaTeste)
                 .configuracao(criarConfiguracaoPadrao())
                 .build();

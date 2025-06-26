@@ -7,7 +7,7 @@ O **Sistema de Gerenciamento Financeiro** é uma aplicação web desenvolvida pa
 ### 🎯 Propósito
 
 - **Controle Financeiro Pessoal**: Registro e acompanhamento de receitas e despesas
-- **Categorização Inteligente**: Organização das transações por categorias personalizáveis
+- **Categorização Inteligente**: Organização das transações por categoriaJpaEntities personalizáveis
 - **Análise Visual**: Dashboards e gráficos para análise de padrões financeiros
 - **Gestão de Vencimentos**: Sistema de notificações para contas a pagar
 
@@ -52,20 +52,20 @@ O **Sistema de Gerenciamento Financeiro** é uma aplicação web desenvolvida pa
 - [x] **Criptografia de senhas** com BCrypt
 
 ### 📊 Gestão de Categorias
-- [x] **Criação de categorias personalizadas** por usuário
+- [x] **Criação de categoriaJpaEntities personalizadas** por usuário
 - [x] **Categorias padrão** criadas automaticamente no cadastro
-- [x] **Busca paginada** de categorias
-- [x] **Validação de propriedade** - Usuários só acessam suas categorias
+- [x] **Busca paginada** de categoriaJpaEntities
+- [x] **Validação de propriedade** - Usuários só acessam suas categoriaJpaEntities
 
 ### 💳 Gestão de Transações
 - [x] **Criação de transações** (receitas e despesas)
-- [x] **Associação com categorias** definidas pelo usuário
-- [x] **Busca por categoria** e filtros por usuário
+- [x] **Associação com categoriaJpaEntities** definidas pelo usuário
+- [x] **Busca por categoriaJpaEntity** e filtros por usuário
 - [x] **Cálculo automático de saldo** baseado nas transações
-- [x] **Atualização de categoria** de transações existentes
+- [x] **Atualização de categoriaJpaEntity** de transações existentes
 
 ### 📈 Relatórios e Gráficos
-- [x] **Gráfico por categoria** - Visualização de gastos por categoria
+- [x] **Gráfico por categoriaJpaEntity** - Visualização de gastos por categoriaJpaEntity
 - [x] **Evolução financeira mensal** - Receitas vs despesas ao longo do tempo
 - [x] **Resumo financeiro** - Totalizadores de receitas, despesas e saldo
 
@@ -160,7 +160,7 @@ Motivo: Desenvolvimento paralelo para validação da API
 - [ ] **OFX/QIF**: Importação de extratos bancários
 - [ ] **Open Banking**: Integração com APIs bancárias brasileiras
 - [ ] **CSV customizável**: Upload com mapeamento de campos
-- [ ] **Categorização automática**: IA para sugerir categorias
+- [ ] **Categorização automática**: IA para sugerir categoriaJpaEntities
 
 #### **Relatórios Avançados**
 **Status:** 🟡 Média prioridade  

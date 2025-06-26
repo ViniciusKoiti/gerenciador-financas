@@ -21,7 +21,7 @@ import java.util.List;
 @Getter
 @Setter
 @EntityListeners(AuditingEntityListener.class)
-public class Categoria {
+public class CategoriaJpaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,7 +32,7 @@ public class Categoria {
     private String descricao;
 
     @Column(nullable = false)
-    private boolean ativa = true;
+    private Boolean ativa = true;
 
     private String icone;
 
@@ -42,11 +42,11 @@ public class Categoria {
     @ManyToOne
     @JoinColumn(name = "categoria_pai_id")
     @JsonBackReference
-    private Categoria categoriaPai;
+    private CategoriaJpaEntity categoriaJpaEntityPai;
 
-    @OneToMany(mappedBy = "categoriaPai")
+    @OneToMany(mappedBy = "categoriaJpaEntityPai")
     @JsonManagedReference
-    private List<Categoria> subcategorias;
+    private List<CategoriaJpaEntity> subcategorias;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
@@ -57,9 +57,9 @@ public class Categoria {
     private Auditoria auditoria;
 
 
-    public Categoria(Long id, String nome, String descricao, String icone, Usuario usuario){
+    public CategoriaJpaEntity(Long id, String nome, String descricao, String icone, Usuario usuario){
         if (usuario == null) {
-            throw new IllegalArgumentException("Usuário não pode ser nulo ao criar uma Categoria");
+            throw new IllegalArgumentException("Usuário não pode ser nulo ao criar uma CategoriaJpaEntity");
         }
         this.id = id;
         this.nome = nome;
@@ -68,9 +68,9 @@ public class Categoria {
         this.auditoria = new Auditoria();
         this.usuario = usuario;
     }
-    public Categoria(String nome, String descricao, String icone, Usuario usuario) {
+    public CategoriaJpaEntity(String nome, String descricao, String icone, Usuario usuario) {
         if (usuario == null) {
-            throw new IllegalArgumentException("Usuário não pode ser nulo ao criar uma Categoria");
+            throw new IllegalArgumentException("Usuário não pode ser nulo ao criar uma CategoriaJpaEntity");
         }
         this.id = null;
         this.nome = nome;

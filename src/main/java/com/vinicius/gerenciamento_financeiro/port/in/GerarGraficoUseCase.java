@@ -10,7 +10,7 @@ import java.util.List;
 public interface GerarGraficoUseCase {
 
     /**
-     * Gera gráfico de despesas por categoria
+     * Gera gráfico de despesas por categoriaJpaEntity
      */
     List<GraficoResponse> gerarGraficoPorCategoria(ZonedDateTime dataInicio, ZonedDateTime dataFim);
 

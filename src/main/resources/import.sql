@@ -7,7 +7,7 @@ INSERT INTO categoria (nome, descricao, ativa, icone, usuario_id, criado_em) VAL
 INSERT INTO categoria (nome, descricao, ativa, icone, usuario_id, criado_em) VALUES ('Lazer', 'Gastos com lazer', TRUE, 'party', 1, CURRENT_TIMESTAMP());
 INSERT INTO categoria (nome, descricao, ativa, icone, usuario_id, criado_em) VALUES ('Saúde', 'Gastos com saúde', TRUE, 'health', 1, CURRENT_TIMESTAMP());
 
-    INSERT INTO transacoes (descricao, valor, tipo, data, usuario_id, categoria_id, criado_em) VALUES ('Compra no supermercado', 300.00, 'DESPESA', TIMESTAMP '2024-02-10 14:30:00', 1, 1, CURRENT_TIMESTAMP());
+INSERT INTO transacoes (descricao, valor, tipo, data, usuario_id, categoria_id, criado_em) VALUES ('Compra no supermercado', 300.00, 'DESPESA', TIMESTAMP '2024-02-10 14:30:00', 1, 1, CURRENT_TIMESTAMP());
 INSERT INTO transacoes (descricao, valor, tipo, data, usuario_id, categoria_id, criado_em) VALUES ('Pagamento do aluguel', 1200.00, 'DESPESA', TIMESTAMP '2024-02-05 09:00:00', 1, 3, CURRENT_TIMESTAMP());
 INSERT INTO transacoes (descricao, valor, tipo, data, usuario_id, categoria_id, criado_em) VALUES ('Salário mensal', 5000.00, 'RECEITA', TIMESTAMP '2024-02-01 08:00:00', 1, 1, CURRENT_TIMESTAMP());
 INSERT INTO transacoes (descricao, valor, tipo, data, usuario_id, categoria_id, criado_em) VALUES ('Mensalidade da academia', 120.00, 'DESPESA', TIMESTAMP '2024-02-15 16:45:00', 1, 5, CURRENT_TIMESTAMP());

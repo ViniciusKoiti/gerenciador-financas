@@ -29,7 +29,7 @@ public record TransacaoPost(
         LocalDateTime data,
 
         @JsonProperty("categoryId")
-        @NotNull(message = "O ID da categoria é obrigatório.")
+        @NotNull(message = "O ID da categoriaJpaEntity é obrigatório.")
         Long categoriaId
 ) {
 

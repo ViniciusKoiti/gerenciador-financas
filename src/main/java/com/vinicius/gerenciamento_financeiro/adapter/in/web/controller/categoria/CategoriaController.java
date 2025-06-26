@@ -27,11 +27,11 @@ public class CategoriaController {
 
     private final CategoriaUseCase categoriaUseCase;
 
-    @Operation(summary = "Salva Categoria ")
+    @Operation(summary = "Salva CategoriaJpaEntity ")
     @ApiResponses(value = {
           @ApiResponse(
                   responseCode = "201",
-                  description = "Categoria criada com sucesso",
+                  description = "CategoriaJpaEntity criada com sucesso",
                   content = @Content(
                           mediaType = "application/json",
                           schema = @Schema(implementation = ApiResponseSistema.class)
@@ -51,18 +51,18 @@ public class CategoriaController {
         CategoriaResponse categoria = categoriaUseCase.save(categoriaPost);
         ApiResponseSistema<CategoriaResponse> response = new ApiResponseSistema<>(
                 categoria,
-                "Categoria criada com sucesso.",
+                "CategoriaJpaEntity criada com sucesso.",
                 HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Busca todas as categorias")
+    @Operation(summary = "Busca todas as categoriaJpaEntities")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",description = "Buscar todas as categorias",content = @Content(
+            @ApiResponse(responseCode = "200",description = "Buscar todas as categoriaJpaEntities",content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ApiResponseSistema.class)
             )),
-            @ApiResponse(responseCode = "400",description = "Erro ao buscar as categorias",
+            @ApiResponse(responseCode = "400",description = "Erro ao buscar as categoriaJpaEntities",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ApiResponseSistema.class)
@@ -76,13 +76,13 @@ public class CategoriaController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Busca as categorias de forma paginada")
+    @Operation(summary = "Busca as categoriaJpaEntities de forma paginada")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",description = "Buscou as categorias",content = @Content(
+            @ApiResponse(responseCode = "200",description = "Buscou as categoriaJpaEntities",content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ApiResponseSistema.class)
             )),
-            @ApiResponse(responseCode = "400",description = "Erro ao buscar as categorias",
+            @ApiResponse(responseCode = "400",description = "Erro ao buscar as categoriaJpaEntities",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ApiResponseSistema.class)
@@ -99,13 +99,13 @@ public class CategoriaController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Busca a categoria por ID")
+    @Operation(summary = "Busca a categoriaJpaEntity por ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",description = "Encontrou a categoria ",content = @Content(
+            @ApiResponse(responseCode = "200",description = "Encontrou a categoriaJpaEntity ",content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ApiResponseSistema.class)
             )),
-            @ApiResponse(responseCode = "400",description = "Erro ao buscar as categorias",
+            @ApiResponse(responseCode = "400",description = "Erro ao buscar as categoriaJpaEntities",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ApiResponseSistema.class)
@@ -114,7 +114,7 @@ public class CategoriaController {
                     responseCode = "403",
                     description = "Acesso não autorizado"
             ),
-            @ApiResponse(responseCode = "404",description = "Categoria com esse ID não encontrada",
+            @ApiResponse(responseCode = "404",description = "CategoriaJpaEntity com esse ID não encontrada",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ApiResponseSistema.class)
@@ -123,7 +123,7 @@ public class CategoriaController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponseSistema<CategoriaResponse>> findById(@PathVariable String id) {
         CategoriaResponse categoriaResponse = categoriaUseCase.findById(id);
-        ApiResponseSistema<CategoriaResponse> response = new ApiResponseSistema<>(categoriaResponse, "Categoria obtida com sucesso.", HttpStatus.OK.value());
+        ApiResponseSistema<CategoriaResponse> response = new ApiResponseSistema<>(categoriaResponse, "CategoriaJpaEntity obtida com sucesso.", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }
     @GetMapping("/usuarios/{userId}/categorias")

@@ -69,7 +69,7 @@ public class TransacaoController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Atualiza Categoria da Transação")
+    @Operation(summary = "Atualiza CategoriaJpaEntity da Transação")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Atualizado com sucesso")
     })
