@@ -27,14 +27,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class LoginServiceImplTest {
+class LoginServiceImplTest {
 
     @Mock
     private UsuarioRepository usuarioRepository;
+
     @Mock
     private JwtService jwtService;
+
     @Mock
     private UsuarioMapper usuarioMapper;
+
     @Mock
     private AuthenticationManager authenticationManager;
 
@@ -44,18 +47,27 @@ public class LoginServiceImplTest {
     @Test
     void autenticar_DeveRetornarToken_QuandoCredenciaisValidas() {
         LoginRequest loginRequest = new LoginRequest("test@email.com", "senha123");
-        Usuario usuario = Usuario.builder().id(1L).build();
 
-        UsuarioResponse usuarioResponse = new UsuarioResponse(1L, "Nome", "test@email.com", "senha123");
+        Usuario usuario = Usuario.reconstituir(
+                1L,
+                "Nome Teste",
+                "test@email.com",
+                "senhaHash",
+                null,
+                null);
+
+        UsuarioResponse usuarioResponse = new UsuarioResponse(1L, "Nome Teste", "test@email.com", null);
         String expectedToken = "jwt-token";
 
         when(usuarioRepository.findByEmail(loginRequest.email()))
                 .thenReturn(Optional.of(usuario));
-        when(jwtService.gerarToken(usuario, usuario.getId()))
+        when(jwtService.gerarToken(usuario, usuario.getId().getValue()))
                 .thenReturn(expectedToken);
         when(usuarioMapper.toResponse(usuario))
                 .thenReturn(usuarioResponse);
+
         AuthenticationResponse response = loginService.autenticar(loginRequest);
+
         assertThat(response.token()).isEqualTo(expectedToken);
         assertThat(response.user()).isEqualTo(usuarioResponse);
 
@@ -70,15 +82,17 @@ public class LoginServiceImplTest {
     @Test
     void autenticar_DeveLancarException_QuandoUsuarioNaoEncontrado() {
         LoginRequest loginRequest = new LoginRequest("inexistente@email.com", "senha123");
+
         when(usuarioRepository.findByEmail(loginRequest.email()))
                 .thenReturn(Optional.empty());
+
         assertThatThrownBy(() -> loginService.autenticar(loginRequest))
                 .isInstanceOf(UsernameNotFoundException.class)
                 .hasMessage("Usuário não encontrado");
     }
 
     @Test
-    void autenticarDeveLancarException_QuandoCredenciaisInvalidas(){
+    void autenticar_DeveLancarException_QuandoCredenciaisInvalidas() {
         LoginRequest loginRequest = new LoginRequest("test@email.com", "senhaerrada");
 
         when(authenticationManager.authenticate(any()))
@@ -88,5 +102,4 @@ public class LoginServiceImplTest {
                 .isInstanceOf(BadCredentialsException.class)
                 .hasMessage("Credenciais inválidas");
     }
-
 }

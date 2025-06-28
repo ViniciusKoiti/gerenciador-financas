@@ -3,6 +3,7 @@ package com.vinicius.gerenciamento_financeiro.adapter.out.grafico;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.GraficoResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.ResumoFinanceiroResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.TransacaoPorPeriodoResponse;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.TransacaoJpaEntity;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.port.in.GerarGraficoUseCase;
 import com.vinicius.gerenciamento_financeiro.port.out.grafico.GraficoRepository;
@@ -15,11 +16,11 @@ import java.util.List;
 
 import java.time.ZonedDateTime;
 
-public interface JpaGraficoRepository extends CrudRepository<Transacao, Long> {
+public interface JpaGraficoRepository extends CrudRepository<TransacaoJpaEntity, Long> {
 
     @Query("""
     SELECT new com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.GraficoResponse(t.categoria.nome, SUM(t.valor)) 
-    FROM Transacao t 
+    FROM TransacaoJpaEntity t 
     WHERE (:usuarioId IS NULL OR t.usuario.id = :usuarioId) 
       AND (:dataInicio IS NULL OR t.data >= :dataInicio) 
       AND (:dataFim IS NULL OR t.data <= :dataFim)
@@ -37,7 +38,7 @@ SELECT new com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico
     CONCAT(FUNCTION('MONTH', t.data), '/', FUNCTION('YEAR', t.data)), 
     SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao.RECEITA THEN t.valor ELSE 0 END),
     SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao.DESPESA THEN t.valor ELSE 0 END))
-FROM Transacao t
+FROM TransacaoJpaEntity t
 WHERE t.usuario.id = :usuarioId
   AND t.data >= :dataInicio
   AND t.data <= :dataFim
@@ -56,7 +57,7 @@ SELECT new com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico
     SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao.DESPESA THEN t.valor ELSE 0 END),
     (SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao.RECEITA THEN t.valor ELSE 0 END) - 
      SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao.DESPESA THEN t.valor ELSE 0 END)))
-FROM Transacao t
+FROM TransacaoJpaEntity t
 WHERE t.usuario.id = :usuarioId
   AND (:dataInicio IS NULL OR t.data >= :dataInicio)
   AND (:dataFim IS NULL OR t.data <= :dataFim)

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.TransacaoJpaEntity;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.usuario.entity.UsuarioJpaEntity;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
@@ -38,7 +39,7 @@ public class CategoriaJpaEntity {
     private String icone;
 
     @OneToMany(mappedBy = "categoria", fetch = FetchType.LAZY)
-    private List<Transacao> transacoes;
+    private List<TransacaoJpaEntity> transacoes;
 
     @ManyToOne
     @JoinColumn(name = "categoria_pai_id")

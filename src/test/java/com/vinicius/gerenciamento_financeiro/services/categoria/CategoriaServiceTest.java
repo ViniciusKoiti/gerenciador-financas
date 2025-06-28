@@ -1,21 +1,16 @@
 package com.vinicius.gerenciamento_financeiro.services.categoria;
 
-
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.CategoriaMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
+import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.domain.service.categoria.CategoriaService;
 import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -25,8 +20,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 @ExtendWith(MockitoExtension.class)
-public class CategoriaServiceTest {
+class CategoriaServiceTest {
 
     @Mock
     private CategoriaRepository categoriaRepository;
@@ -52,6 +51,15 @@ public class CategoriaServiceTest {
                 null
         );
 
+        Usuario usuario = Usuario.reconstituir(
+                1L,
+                "João",
+                "joao@teste.com",
+                "senhaHash",
+                null,
+                null
+        );
+
         CategoriaJpaEntity categoriaJpaEntity = CategoriaJpaEntity.builder()
                 .id(1L)
                 .nome("Alimentação")
@@ -60,20 +68,19 @@ public class CategoriaServiceTest {
                 .icone("food-icon")
                 .build();
 
-
         CategoriaResponse expectedResponse = new CategoriaResponse(
                 1L,
-                "Alimentação Modificada",
-                "Modificado",
+                "Alimentação",
+                "Gastos com alimentação",
                 true,
-                "new-icon",
+                "food-icon",
                 null
         );
 
+        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
+        when(usuarioRepository.findById(UsuarioId.of(1L))).thenReturn(Optional.of(usuario));
         when(categoriaRepository.save(any(CategoriaJpaEntity.class))).thenReturn(categoriaJpaEntity);
         when(categoriaMapper.toResponse(any(CategoriaJpaEntity.class))).thenReturn(expectedResponse);
-        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
-        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(new Usuario(1L)));
 
         CategoriaResponse result = categoriaService.save(categoriaPost);
 
@@ -89,8 +96,9 @@ public class CategoriaServiceTest {
                 ResponseStatusException.class,
                 () -> categoriaService.save(null)
         );
+
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
-        assertEquals("CategoriaJpaEntity não pode ser nula", exception.getReason());
+        assertEquals("Categoria não pode ser nula", exception.getReason());
         verifyNoInteractions(categoriaMapper, categoriaRepository);
     }
 
@@ -100,23 +108,51 @@ public class CategoriaServiceTest {
         CategoriaJpaEntity categoriaJpaEntity = CategoriaJpaEntity.builder()
                 .id(id)
                 .nome("Alimentação")
+                .descricao("Gastos com alimentação")
+                .ativa(true)
+                .icone("food-icon")
                 .build();
+
         CategoriaResponse expectedResponse = new CategoriaResponse(
                 id,
                 "Alimentação",
-                "Descrição",
+                "Gastos com alimentação",
                 true,
-                "icon",
+                "food-icon",
                 null
         );
+
         when(categoriaRepository.findById(id)).thenReturn(Optional.of(categoriaJpaEntity));
         when(categoriaMapper.toResponse(categoriaJpaEntity)).thenReturn(expectedResponse);
+
         CategoriaResponse result = categoriaService.findById(id.toString());
+
         assertNotNull(result);
         assertEquals(expectedResponse.id(), result.id());
         assertEquals(expectedResponse.name(), result.name());
         verify(categoriaRepository).findById(id);
         verify(categoriaMapper).toResponse(categoriaJpaEntity);
         verifyNoMoreInteractions(categoriaRepository, categoriaMapper);
+    }
+
+    @Test
+    void save_QuandoUsuarioNaoEncontrado_LancaException() {
+        CategoriaPost categoriaPost = new CategoriaPost(
+                "Alimentação",
+                "Gastos com alimentação",
+                "food-icon",
+                null
+        );
+
+        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
+        when(usuarioRepository.findById(UsuarioId.of(1L))).thenReturn(Optional.empty());
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> categoriaService.save(categoriaPost)
+        );
+
+        assertEquals("Usuário não encontrado: 1", exception.getMessage());
+        verify(categoriaRepository, never()).save(any());
     }
 }
