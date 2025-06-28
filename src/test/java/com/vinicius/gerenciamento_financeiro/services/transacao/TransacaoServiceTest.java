@@ -4,8 +4,8 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtS
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.TransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
-import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.CategoriaJpaEntity;
-import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;

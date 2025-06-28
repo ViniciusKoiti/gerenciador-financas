@@ -1,7 +1,7 @@
 package com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria;
 
 
-import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.CategoriaJpaEntity;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
 
 public record CategoriaResponse(
         Long id,

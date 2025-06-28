@@ -1,4 +1,4 @@
-package com.vinicius.gerenciamento_financeiro.adapter.out.cliente;
+package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente;
 
 import com.vinicius.gerenciamento_financeiro.domain.model.cliente.Cliente;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,6 +1,5 @@
-package com.vinicius.gerenciamento_financeiro.adapter.out.cliente;
+package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente;
 
-import com.vinicius.gerenciamento_financeiro.adapter.out.usuario.JpaUsuarioRepository;
 import com.vinicius.gerenciamento_financeiro.domain.model.cliente.Cliente;
 import com.vinicius.gerenciamento_financeiro.port.out.cliente.ClienteRepository;
 import lombok.RequiredArgsConstructor;

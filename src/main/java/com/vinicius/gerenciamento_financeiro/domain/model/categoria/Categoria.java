@@ -119,7 +119,7 @@ public class Categoria {
 
     public Categoria desativar() {
         if (!this.ativa) {
-            throw new IllegalStateException("CategoriaJpaEntity já está desativada");
+            throw new IllegalStateException("Categoria já está desativada");
         }
 
         if (!podeSerDesativada()) {
@@ -139,10 +139,10 @@ public class Categoria {
 
     private String validarNome(String nome) {
         if (nome == null || nome.trim().isEmpty()) {
-            throw new IllegalArgumentException("Nome da categoriaJpaEntity não pode ser vazio");
+            throw new IllegalArgumentException("Nome da categoria não pode ser vazio");
         }
         if (nome.length() > 50) {
-            throw new IllegalArgumentException("Nome da categoriaJpaEntity não pode ter mais de 50 caracteres");
+            throw new IllegalArgumentException("Nome da categoria não pode ter mais de 50 caracteres");
         }
         return nome.trim();
     }

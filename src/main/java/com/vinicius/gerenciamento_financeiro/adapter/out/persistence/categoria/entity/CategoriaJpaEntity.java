@@ -1,9 +1,9 @@
-package com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity;
+package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import jakarta.persistence.*;

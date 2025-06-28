@@ -1,6 +1,6 @@
 package com.vinicius.gerenciamento_financeiro.domain.model.transacao;
 
-import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoAnexo;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

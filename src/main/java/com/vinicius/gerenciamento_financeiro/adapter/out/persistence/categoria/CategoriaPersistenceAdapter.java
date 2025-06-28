@@ -1,6 +1,6 @@
-package com.vinicius.gerenciamento_financeiro.adapter.out.categoria;
+package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria;
 
-import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.CategoriaJpaEntity;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -3,8 +3,8 @@ package com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPut;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
-import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.CategoriaJpaEntity;
-import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.Auditoria;
 import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -5,7 +5,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtS
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.CategoriaMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
-import com.vinicius.gerenciamento_financeiro.adapter.out.categoria.entity.CategoriaJpaEntity;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.service.categoria.CategoriaService;
 import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
