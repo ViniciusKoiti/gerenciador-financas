@@ -6,6 +6,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario.Logi
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario.UsuarioPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.AuthenticationResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.UsuarioResponse;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
@@ -66,55 +67,46 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     private void criarCategoriasPadrao(Usuario usuario) {
         List<CategoriaJpaEntity> categoriasPadrao = List.of(
-                new CategoriaJpaEntity(
-                        null,
-                        "A Pagar",
-                        "Despesas pendentes",
-                        true,
-                        "icone-apagar",
-                        null,
-                        null,
-                        null,
-                        null,
-                        new Auditoria()
-                ),
-                new CategoriaJpaEntity(
-                        null,
-                        "Pretendidas",
-                        "Despesas planejadas",
-                        true,
-                        "icone-pretendidas",
-                        null,
-                        null,
-                        null,
-                        null,
-                        new Auditoria()
-                ),
-                new CategoriaJpaEntity(
-                        null,
-                        "Prazo",
-                        "Despesas com prazo",
-                        true,
-                        "icone-prazo",
-                        null,
-                        null,
-                        null,
-                        null,
-                        new Auditoria()
-                ),
-                new CategoriaJpaEntity(
-                        null,
-                        "Pagas",
-                        "Despesas quitadas",
-                        true,
-                        "icone-pagas",
-                        null,
-                        null,
-                        null,
-                        null, // usuarioSalvo
-                        new Auditoria()
-                )
+                CategoriaJpaEntity.builder()
+                        .nome("A Pagar")
+                        .descricao("Despesas pendentes")
+                        .ativa(true)
+                        .icone("icone-apagar")
+                        .auditoria(new AuditoriaJpa())
+                        .usuario(null)
+                        .build(),
+
+                CategoriaJpaEntity.builder()
+                        .nome("Pretendidas")
+                        .descricao("Despesas planejadas")
+                        .ativa(true)
+                        .icone("icone-pretendidas")
+                        .auditoria(new AuditoriaJpa())
+                        .usuario(null) // TODO: Ajustar
+                        .build(),
+
+                CategoriaJpaEntity.builder()
+                        .nome("Prazo")
+                        .descricao("Despesas com prazo")
+                        .ativa(true)
+                        .icone("icone-prazo")
+                        .auditoria(new AuditoriaJpa())
+                        .usuario(null) // TODO: Ajustar
+                        .build(),
+
+                CategoriaJpaEntity.builder()
+                        .nome("Pagas")
+                        .descricao("Despesas quitadas")
+                        .ativa(true)
+                        .icone("icone-pagas")
+                        .auditoria(new AuditoriaJpa())
+                        .usuario(null) // TODO: Ajustar
+                        .build()
         );
+
+        // categoriaRepository.saveAll(categoriasPadrao);
+
+        log.info("Categorias padrão criadas para usuário: {}", usuario.getEmail());
 
         categoriaRepository.saveAll(categoriasPadrao);
     }

@@ -1,8 +1,8 @@
 package com.vinicius.gerenciamento_financeiro.domain.model.cliente;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
 import com.vinicius.gerenciamento_financeiro.domain.model.PixInfo;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.pessoa.Pessoa;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
@@ -38,7 +38,7 @@ public class Cliente extends Pessoa {
     private Usuario usuario;
 
     @Embedded
-    private Auditoria auditoria;
+    private AuditoriaJpa auditoria;
 
 
     @Override

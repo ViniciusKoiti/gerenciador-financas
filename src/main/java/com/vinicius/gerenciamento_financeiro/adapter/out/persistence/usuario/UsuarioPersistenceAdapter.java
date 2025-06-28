@@ -1,6 +1,7 @@
 package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.usuario;
 
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
+import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -19,8 +20,8 @@ public class UsuarioPersistenceAdapter implements UsuarioRepository {
     }
 
     @Override
-    public Optional<Usuario> findById(Long id) {
-        return jpaUsuarioRepository.findById(id);
+    public Optional<Usuario> findById(UsuarioId id) {
+        return jpaUsuarioRepository.findById(id.getValue());
     }
 
     @Override
@@ -29,8 +30,8 @@ public class UsuarioPersistenceAdapter implements UsuarioRepository {
     }
 
     @Override
-    public void deleteById(Long id) {
-        jpaUsuarioRepository.deleteById(id);
+    public void deleteById(UsuarioId id) {
+        jpaUsuarioRepository.deleteById(id.getValue());
     }
 
     @Override

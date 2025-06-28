@@ -7,7 +7,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.T
 import com.vinicius.gerenciamento_financeiro.domain.exception.BusinessRuleViolationException;
 import com.vinicius.gerenciamento_financeiro.domain.exception.InsufficientPermissionException;
 import com.vinicius.gerenciamento_financeiro.domain.exception.ResourceNotFoundException;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.Auditoria;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
@@ -62,7 +62,7 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
                         categoriaJpaEntity.getId(), usuarioId);
                 throw new InsufficientPermissionException("categoriaJpaEntity", "criar transação");
             }
-            Auditoria auditoria = new Auditoria();
+            AuditoriaJpa auditoria = new AuditoriaJpa();
             Transacao transacao = transacaoMapper.toEntity(transacaoPost, categoriaJpaEntity, usuario, auditoria);
             transacaoRepository.salvarTransacao(transacao);
             notificarTransacaoService.notificarTransacaoAtrasada(transacao);

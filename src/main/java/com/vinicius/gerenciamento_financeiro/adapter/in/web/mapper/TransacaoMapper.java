@@ -3,7 +3,7 @@ package com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPut;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.Auditoria;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
@@ -34,7 +34,7 @@ public interface TransacaoMapper {
     }
 
     @Named("postToEntity")
-    default Transacao toEntity(TransacaoPost put, CategoriaJpaEntity categoriaJpaEntity, Usuario usuario, Auditoria auditoria) {
+    default Transacao toEntity(TransacaoPost put, CategoriaJpaEntity categoriaJpaEntity, Usuario usuario, AuditoriaJpa auditoria) {
         if (put == null) {
             throw new IllegalArgumentException("Transação existente e dados de atualização não podem ser nulos");
         }

@@ -1,6 +1,6 @@
 package com.vinicius.gerenciamento_financeiro.domain.model.transacao;
 
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.Auditoria;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.domain.model.cliente.Cliente;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
@@ -49,7 +49,7 @@ public class Transacao {
     private ConfiguracaoTransacao configuracao;
 
     @Embedded
-    private Auditoria auditoria;
+    private AuditoriaJpa auditoria;
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")
@@ -74,7 +74,7 @@ public class Transacao {
         return valor.add(valor.multiply(taxa));
     }
 
-    public Transacao atualizarCategoria(CategoriaJpaEntity novaCategoriaJpaEntity, Auditoria auditoria) {
+    public Transacao atualizarCategoria(CategoriaJpaEntity novaCategoriaJpaEntity, AuditoriaJpa auditoria) {
         return Transacao.builder()
                 .id(this.id)
                 .descricao(this.descricao)

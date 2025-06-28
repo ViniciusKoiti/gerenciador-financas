@@ -3,11 +3,11 @@ package inMemoryTest;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.TransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.adapter.out.memory.MemoryTransacaoRepository;
 import com.vinicius.gerenciamento_financeiro.adapter.out.transacao.JpaTransacaoRepository;
 import com.vinicius.gerenciamento_financeiro.domain.exception.ResourceNotFoundException;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
@@ -63,7 +63,7 @@ public class TransacaoServiceTest {
     // Dados de teste
     private Usuario usuarioTeste;
     private CategoriaJpaEntity categoriaJpaEntityTeste;
-    private Auditoria auditoriaTeste;
+    private AuditoriaJpa auditoriaTeste;
 
     @BeforeEach
     void setUp() {
@@ -84,7 +84,7 @@ public class TransacaoServiceTest {
                 .nome("CategoriaJpaEntity Teste")
                 .usuario(usuarioTeste)
                 .build();
-        auditoriaTeste = new Auditoria();
+        auditoriaTeste = new AuditoriaJpa();
 
     }
 
@@ -107,7 +107,7 @@ public class TransacaoServiceTest {
                 1L, "Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA
         );
 
-        when(mapper.toEntity(eq(transacaoPost), eq(categoriaJpaEntityTeste), eq(usuarioTeste), any(Auditoria.class)))
+        when(mapper.toEntity(eq(transacaoPost), eq(categoriaJpaEntityTeste), eq(usuarioTeste), any(AuditoriaJpa.class)))
                 .thenReturn(transacaoEsperada);
 
         // Act
@@ -145,9 +145,9 @@ public class TransacaoServiceTest {
                 2L, "Aluguel", new BigDecimal("500"), TipoMovimentacao.DESPESA
         );
 
-        when(mapper.toEntity(eq(receita), eq(categoriaJpaEntityTeste), eq(usuarioTeste), any(Auditoria.class)))
+        when(mapper.toEntity(eq(receita), eq(categoriaJpaEntityTeste), eq(usuarioTeste), any(AuditoriaJpa.class)))
                 .thenReturn(transacaoReceita);
-        when(mapper.toEntity(eq(despesa), eq(categoriaJpaEntityTeste), eq(usuarioTeste), any(Auditoria.class)))
+        when(mapper.toEntity(eq(despesa), eq(categoriaJpaEntityTeste), eq(usuarioTeste), any(AuditoriaJpa.class)))
                 .thenReturn(transacaoDespesa);
 
         // Act

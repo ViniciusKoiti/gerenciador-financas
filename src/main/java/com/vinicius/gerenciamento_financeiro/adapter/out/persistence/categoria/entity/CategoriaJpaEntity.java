@@ -3,7 +3,8 @@ package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.Auditoria;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.usuario.entity.UsuarioJpaEntity;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import jakarta.persistence.*;
@@ -51,13 +52,13 @@ public class CategoriaJpaEntity {
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     @JsonIgnore
-    private Usuario usuario;
+    private UsuarioJpaEntity usuario;
 
     @Embedded
-    private Auditoria auditoria;
+    private AuditoriaJpa auditoria;
 
 
-    public CategoriaJpaEntity(Long id, String nome, String descricao, String icone, Usuario usuario){
+    public CategoriaJpaEntity(Long id, String nome, String descricao, String icone, UsuarioJpaEntity usuario){
         if (usuario == null) {
             throw new IllegalArgumentException("Usuário não pode ser nulo ao criar uma CategoriaJpaEntity");
         }
@@ -65,10 +66,10 @@ public class CategoriaJpaEntity {
         this.nome = nome;
         this.descricao = descricao;
         this.icone = icone;
-        this.auditoria = new Auditoria();
+        this.auditoria = new AuditoriaJpa();
         this.usuario = usuario;
     }
-    public CategoriaJpaEntity(String nome, String descricao, String icone, Usuario usuario) {
+    public CategoriaJpaEntity(String nome, String descricao, String icone, UsuarioJpaEntity usuario) {
         if (usuario == null) {
             throw new IllegalArgumentException("Usuário não pode ser nulo ao criar uma CategoriaJpaEntity");
         }
@@ -76,7 +77,7 @@ public class CategoriaJpaEntity {
         this.nome = nome;
         this.descricao = descricao;
         this.icone = icone;
-        this.auditoria = new Auditoria();
+        this.auditoria = new AuditoriaJpa();
         this.usuario = usuario;
     }
 

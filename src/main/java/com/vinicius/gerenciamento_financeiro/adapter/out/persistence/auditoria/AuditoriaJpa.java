@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
-public class Auditoria {
+public class AuditoriaJpa {
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

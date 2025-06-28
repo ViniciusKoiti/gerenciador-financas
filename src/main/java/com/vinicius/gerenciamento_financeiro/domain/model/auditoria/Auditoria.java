@@ -87,7 +87,7 @@ public final class Auditoria {
 
     @Override
     public String toString() {
-        return String.format("Auditoria{criadoEm=%s, atualizadoEm=%s}",
+        return String.format("AuditoriaJpa{criadoEm=%s, atualizadoEm=%s}",
                 criadoEm,
                 atualizadoEm != null ? atualizadoEm : "não atualizado");
     }

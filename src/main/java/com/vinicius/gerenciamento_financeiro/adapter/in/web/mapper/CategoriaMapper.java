@@ -4,7 +4,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.Ca
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPut;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.Auditoria;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
 import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,7 +19,7 @@ public interface CategoriaMapper {
                 .nome(dto.name())
                 .descricao(dto.description())
                 .icone(dto.icon())
-                .auditoria(new Auditoria())
+                .auditoria(new AuditoriaJpa())
                 .build();
     }
 
