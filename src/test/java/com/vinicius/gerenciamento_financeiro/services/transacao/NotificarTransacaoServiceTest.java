@@ -1,8 +1,11 @@
 package com.vinicius.gerenciamento_financeiro.services.transacao;
 
 import com.vinicius.gerenciamento_financeiro.adapter.out.messaging.RabbitMQConstants;
+import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
+import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.domain.service.transacao.NotificarTransacaoService;
 import com.vinicius.gerenciamento_financeiro.port.in.NotificarUseCase;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,10 +16,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,26 +38,46 @@ class NotificarTransacaoServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Criando configurações para transações futuras e vencidas
-        Transacao configuracaoFutura = new Transacao();
-        ConfiguracaoTransacao configuracaoTransacaoFutura =  ConfiguracaoTransacao.builder().dataVencimento(LocalDate.from(LocalDateTime.now().plusDays(2))).build();
+        UsuarioId usuarioId = UsuarioId.of(1L);
+        CategoriaId categoriaId = CategoriaId.of(1L);
 
-        Transacao configuracaoVencida = new Transacao();
-        ConfiguracaoTransacao configuracaoTransacaoVencida = ConfiguracaoTransacao.builder().dataVencimento(LocalDate.from(LocalDateTime.now().minusDays(1))).build();
+        ConfiguracaoTransacao configuracaoFutura = ConfiguracaoTransacao.comVencimento(
+                LocalDate.now().plusDays(2)
+        );
 
+        ConfiguracaoTransacao configuracaoVencida = ConfiguracaoTransacao.comVencimento(
+                LocalDate.now().minusDays(1)
+        );
 
-        transacaoFutura = Transacao.builder()
-                .configuracao(configuracaoTransacaoFutura)
-                .build();
+        transacaoFutura = Transacao.reconstituir(
+                1L,
+                "Transação Futura",
+                new BigDecimal("100.00"),
+                TipoMovimentacao.DESPESA,
+                LocalDateTime.now(),
+                usuarioId,
+                categoriaId,
+                configuracaoFutura,
+                null
+        );
 
-        transacaoVencida = Transacao.builder()
-                .configuracao(configuracaoTransacaoVencida)
-                .build();
+        transacaoVencida = Transacao.reconstituir(
+                2L,
+                "Transação Vencida",
+                new BigDecimal("200.00"),
+                TipoMovimentacao.DESPESA,
+                LocalDateTime.now().minusDays(2),
+                usuarioId,
+                categoriaId,
+                configuracaoVencida,
+                null
+        );
     }
 
     @Test
     void deveEnviarNotificacaoComAtraso_QuandoTransacaoAindaNaoVenceu() {
         notificarTransacaoService.notificarTransacaoAtrasada(transacaoFutura);
+
         ArgumentCaptor<Long> delayCaptor = ArgumentCaptor.forClass(Long.class);
         ArgumentCaptor<String> mensagemCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -65,7 +90,7 @@ class NotificarTransacaoServiceTest {
 
         String mensagemEsperada = "Transação programada para " + transacaoFutura.getConfiguracao().getDataVencimento();
         assertEquals(mensagemEsperada, mensagemCaptor.getValue());
-        assert(delayCaptor.getValue() > 0);
+        assertTrue(delayCaptor.getValue() > 0);
     }
 
     @Test
@@ -81,5 +106,26 @@ class NotificarTransacaoServiceTest {
         );
 
         assertEquals("Transação já venceu e será processada agora!", mensagemCaptor.getValue());
+    }
+
+    @Test
+    void naoDeveEnviarNotificacao_QuandoConfiguracaoNula() {
+        Transacao transacaoSemConfiguracao = Transacao.criarNova(
+                "Transação sem configuração",
+                new BigDecimal("50.00"),
+                TipoMovimentacao.RECEITA,
+                LocalDateTime.now(),
+                CategoriaId.of(1L),
+                UsuarioId.of(1L)
+        );
+
+        notificarTransacaoService.notificarTransacaoAtrasada(transacaoSemConfiguracao);
+
+        verify(notificarUseCase).enviarNotificacaoComAtraso(
+                eq(RabbitMQConstants.EXCHANGE_DELAYED_TRANSACOES_VENCIMENTO),
+                eq(RabbitMQConstants.ROUTING_KEY_TRANSCACOES_VENCIMENTO),
+                anyString(),
+                anyLong()
+        );
     }
 }
