@@ -7,11 +7,11 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.T
 import com.vinicius.gerenciamento_financeiro.domain.exception.BusinessRuleViolationException;
 import com.vinicius.gerenciamento_financeiro.domain.exception.InsufficientPermissionException;
 import com.vinicius.gerenciamento_financeiro.domain.exception.ResourceNotFoundException;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
+import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
+import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
 import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class TransacaoService implements GerenciarTransacaoUseCase {
+
     private final CategoriaRepository categoriaRepository;
     private final UsuarioRepository usuarioRepository;
     private final JwtService jwtService;
@@ -37,8 +38,13 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
     private final NotificarTransacaoService notificarTransacaoService;
     private final TransacaoMapper transacaoMapper;
 
-    public TransacaoService(CategoriaRepository categoriaRepository, UsuarioRepository usuarioRepository, JwtService jwtService, @Qualifier("transacaoPersistenceAdapter") TransacaoRepository transacaoRepository,
-                            NotificarTransacaoService notificarTransacaoService, TransacaoMapper transacaoMapper) {
+    public TransacaoService(
+            CategoriaRepository categoriaRepository,
+            UsuarioRepository usuarioRepository,
+            JwtService jwtService,
+            @Qualifier("transacaoPersistenceAdapter") TransacaoRepository transacaoRepository,
+            NotificarTransacaoService notificarTransacaoService,
+            TransacaoMapper transacaoMapper) {
         this.categoriaRepository = categoriaRepository;
         this.usuarioRepository = usuarioRepository;
         this.jwtService = jwtService;
@@ -46,26 +52,33 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
         this.notificarTransacaoService = notificarTransacaoService;
         this.transacaoMapper = transacaoMapper;
     }
+
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void adicionarTransacao(TransacaoPost transacaoPost) {
         try {
-            Long usuarioId = jwtService.getByAutenticaoUsuarioId();
-            log.debug("Usuário autenticado: {}", usuarioId);
+            Long usuarioIdRaw = jwtService.getByAutenticaoUsuarioId();
+            UsuarioId usuarioId = UsuarioId.of(usuarioIdRaw);
+            log.debug("Usuário autenticado: {}", usuarioId.getValue());
 
-            CategoriaJpaEntity categoriaJpaEntity = categoriaRepository.findById(transacaoPost.categoriaId())
-                    .orElseThrow(() -> new ResourceNotFoundException("CategoriaJpaEntity", transacaoPost.categoriaId()));
             Usuario usuario = usuarioRepository.findById(usuarioId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Usuario", usuarioId));
-            if (!categoriaJpaEntity.getUsuario().getId().equals(usuarioId)) {
-                log.warn("Tentativa de acesso à categoriaJpaEntity {} por usuário não autorizado: {}",
-                        categoriaJpaEntity.getId(), usuarioId);
-                throw new InsufficientPermissionException("categoriaJpaEntity", "criar transação");
+                    .orElseThrow(() -> new ResourceNotFoundException("Usuario", usuarioId.getValue()));
+
+            CategoriaId categoriaId = CategoriaId.of(transacaoPost.categoriaId());
+            if (!categoriaRepository.existsByIdAndUsuarioId(categoriaId.getValue(), usuarioId.getValue())) {
+                log.warn("Tentativa de acesso à categoria {} por usuário não autorizado: {}",
+                        categoriaId.getValue(), usuarioId.getValue());
+                throw new InsufficientPermissionException("categoria", "criar transação");
             }
-            AuditoriaJpa auditoria = new AuditoriaJpa();
-            Transacao transacao = transacaoMapper.toEntity(transacaoPost, categoriaJpaEntity, usuario, auditoria);
+
+            Transacao transacao = criarTransacaoDominio(transacaoPost, categoriaId, usuario);
+
             transacaoRepository.salvarTransacao(transacao);
+
             notificarTransacaoService.notificarTransacaoAtrasada(transacao);
+
+            log.info("Transação criada com sucesso para usuário: {}", usuarioId.getValue());
+
         } catch (ResourceNotFoundException | InsufficientPermissionException | BusinessRuleViolationException e) {
             log.error("Erro de domínio ao adicionar transação: {}", e.getMessage());
             throw e;
@@ -81,10 +94,10 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
     public List<TransacaoResponse> obterTodasTransacoes() {
         log.debug("Buscando todas as transações do usuário");
 
-        Long usuarioId = jwtService.getByAutenticaoUsuarioId();
+        Long usuarioIdRaw = jwtService.getByAutenticaoUsuarioId();
+        List<Transacao> transacoes = transacaoRepository.buscarTodasTransacoesPorUsuario(usuarioIdRaw);
 
-        List<Transacao> transacoes = transacaoRepository.buscarTodasTransacoesPorUsuario(usuarioId);
-        log.debug("Encontradas {} transações para o usuário {}", transacoes.size(), usuarioId);
+        log.debug("Encontradas {} transações para o usuário {}", transacoes.size(), usuarioIdRaw);
 
         return transacoes.stream()
                 .map(transacaoMapper::toResponse)
@@ -96,18 +109,11 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
     public BigDecimal calcularSaldo() {
         log.debug("Calculando saldo do usuário");
 
-        Long usuarioId = jwtService.getByAutenticaoUsuarioId();
-        List<Transacao> transacoes = transacaoRepository.buscarTodasTransacoesPorUsuario(usuarioId);
+        Long usuarioIdRaw = jwtService.getByAutenticaoUsuarioId();
+        List<Transacao> transacoes = transacaoRepository.buscarTodasTransacoesPorUsuario(usuarioIdRaw);
 
         BigDecimal saldo = transacoes.stream()
-                .map(transacao -> {
-                    if (transacao.getTipo() == TipoMovimentacao.RECEITA) {
-                        return transacao.getValor();
-                    } else if (transacao.getTipo() == TipoMovimentacao.DESPESA) {
-                        return transacao.getValor().negate();
-                    }
-                    return BigDecimal.ZERO;
-                })
+                .map(this::calcularValorTransacao)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         log.debug("Saldo calculado: {}", saldo);
@@ -117,36 +123,68 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void atualizarTransacaoCategoria(Long transacaoId, Long categoriaId) {
-        log.debug("Atualizando categoriaJpaEntity da transação {} para categoriaJpaEntity {}", transacaoId, categoriaId);
+        log.debug("Atualizando categoria da transação {} para categoria {}", transacaoId, categoriaId);
 
-        Long usuarioId = jwtService.getByAutenticaoUsuarioId();
+        try {
+            Long usuarioIdRaw = jwtService.getByAutenticaoUsuarioId();
+            UsuarioId usuarioId = UsuarioId.of(usuarioIdRaw);
 
-        Transacao transacao = transacaoRepository.buscarTransacaoPorIdEUsuario(transacaoId, usuarioId)
-                .orElseThrow(() -> new ResourceNotFoundException("Transacao", transacaoId));
+            Transacao transacao = transacaoRepository.buscarTransacaoPorIdEUsuario(transacaoId, usuarioIdRaw)
+                    .orElseThrow(() -> new ResourceNotFoundException("Transacao", transacaoId));
 
-        CategoriaJpaEntity categoriaJpaEntity = categoriaRepository.findByIdAndUsuarioId(categoriaId, usuarioId)
-                .orElseThrow(() -> new ResourceNotFoundException("CategoriaJpaEntity", categoriaId));
+            CategoriaId novaCategoriaId = CategoriaId.of(categoriaId);
+            if (!categoriaRepository.existsByIdAndUsuarioId(categoriaId, usuarioIdRaw)) {
+                throw new ResourceNotFoundException("Categoria", categoriaId);
+            }
 
-        // TODO CRIAR VALIDAÇÃO PARA REGRAS
-        Transacao transacaoAtualizada = transacao.atualizarCategoria(categoriaJpaEntity, transacao.getAuditoria());
-        transacaoRepository.salvarTransacao(transacaoAtualizada);
+            Transacao transacaoAtualizada = transacao.atualizarCategoria(novaCategoriaId);
 
-        log.info("CategoriaJpaEntity da transação {} atualizada para {}", transacaoId, categoriaId);
+            transacaoRepository.salvarTransacao(transacaoAtualizada);
+
+            log.info("Categoria da transação {} atualizada para {}", transacaoId, categoriaId);
+
+        } catch (Exception e) {
+            log.error("Erro ao atualizar categoria da transação: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<TransacaoResponse> buscarTransacoesPorCategoriaId(Long categoriaId) {
-        Long usuarioId = jwtService.getByAutenticaoUsuarioId();
+        Long usuarioIdRaw = jwtService.getByAutenticaoUsuarioId();
 
-        if (!categoriaRepository.existsByIdAndUsuarioId(categoriaId, usuarioId)) {
-            throw new SecurityException("CategoriaJpaEntity não pertence ao usuário logado");
+        // Validar que a categoria pertence ao usuário
+        if (!categoriaRepository.existsByIdAndUsuarioId(categoriaId, usuarioIdRaw)) {
+            throw new InsufficientPermissionException("categoria", "listar transações");
         }
 
-        List<Transacao> transacoes = transacaoRepository.buscarTransacoesPorCategoriaIdEUsuario(categoriaId, usuarioId);
+        List<Transacao> transacoes = transacaoRepository.buscarTransacoesPorCategoriaIdEUsuario(categoriaId, usuarioIdRaw);
+
         return transacoes.stream()
                 .map(transacaoMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
+    // ========== MÉTODOS PRIVADOS ==========
+
+    private Transacao criarTransacaoDominio(TransacaoPost transacaoPost, CategoriaId categoriaId, Usuario usuario) {
+
+        return Transacao.criarNova(
+                transacaoPost.descricao(),
+                transacaoPost.valor(),
+                transacaoPost.tipoMovimentacao(),
+                transacaoPost.data(),
+                categoriaId,
+                usuario.getId()
+        );
+    }
+
+    private BigDecimal calcularValorTransacao(Transacao transacao) {
+        return switch (transacao.getTipo()) {
+            case RECEITA -> transacao.getValor();
+            case DESPESA -> transacao.getValor().negate();
+            case TRANSFERENCIA -> BigDecimal.ZERO; // Lógica específica se necessário
+        };
+    }
 }

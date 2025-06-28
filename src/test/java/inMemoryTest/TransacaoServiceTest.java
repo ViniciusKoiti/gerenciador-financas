@@ -6,7 +6,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.Tr
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.adapter.out.memory.MemoryTransacaoRepository;
-import com.vinicius.gerenciamento_financeiro.adapter.out.transacao.JpaTransacaoRepository;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.JpaTransacaoRepository;
 import com.vinicius.gerenciamento_financeiro.domain.exception.ResourceNotFoundException;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;

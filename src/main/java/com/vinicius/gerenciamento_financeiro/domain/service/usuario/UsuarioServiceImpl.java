@@ -1,4 +1,3 @@
-// ETAPA 5: Atualizar domain/service/usuario/UsuarioServiceImpl.java
 package com.vinicius.gerenciamento_financeiro.domain.service.usuario;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.UsuarioMapper;
@@ -8,7 +7,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticaca
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.UsuarioResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
-import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.usuario.entity.UsuarioJpaEntity;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.port.in.LoginUseCase;
@@ -36,78 +35,114 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final LoginUseCase loginUseCase;
     private final UsuarioMapper mapper;
 
+    @Override
     public AuthenticationResponse save(UsuarioPost usuarioPost) {
-        if (usuarioRepository.existsByEmail(usuarioPost.email())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email já cadastrado");
+        try {
+            log.debug("Iniciando cadastro de usuário: {}", usuarioPost.email());
+
+            if (usuarioRepository.existsByEmail(usuarioPost.email())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email já cadastrado");
+            }
+
+            String hashSenha = passwordEncoder.encode(usuarioPost.senha());
+            Usuario usuario = mapper.toEntity(usuarioPost, hashSenha);
+
+            Usuario usuarioSalvo = usuarioRepository.save(usuario);
+            log.info("Usuário cadastrado com sucesso: ID {}", usuarioSalvo.getId().getValue());
+
+            criarCategoriasPadrao(usuarioSalvo);
+
+            LoginRequest login = LoginRequest.builder()
+                    .email(usuarioPost.email())
+                    .senha(usuarioPost.senha())
+                    .build();
+
+            return loginUseCase.autenticar(login);
+
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Erro ao cadastrar usuário: {}", e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Erro interno ao cadastrar usuário");
         }
-
-        String hashSenha = passwordEncoder.encode(usuarioPost.senha());
-
-        Usuario usuario = mapper.toEntity(usuarioPost, hashSenha);
-
-        Usuario usuarioSalvo = usuarioRepository.save(usuario);
-
-        criarCategoriasPadrao(usuarioSalvo);
-
-        LoginRequest login = LoginRequest.builder()
-                .email(usuarioPost.email())
-                .senha(usuarioPost.senha())
-                .build();
-
-        return loginUseCase.autenticar(login);
     }
 
     @Override
     public UsuarioResponse findById(Long id) {
-        UsuarioId usuarioId = UsuarioId.of(id);
-        Usuario usuario = usuarioRepository.findById(usuarioId.getValue())
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
-        return mapper.toResponse(usuario);
+        try {
+            log.debug("Buscando usuário por ID: {}", id);
+
+            UsuarioId usuarioId = UsuarioId.of(id);
+            Usuario usuario = usuarioRepository.findById(usuarioId)
+                    .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+
+            return mapper.toResponse(usuario);
+
+        } catch (UsernameNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Erro ao buscar usuário: {}", e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Erro interno ao buscar usuário");
+        }
     }
 
     private void criarCategoriasPadrao(Usuario usuario) {
-        List<CategoriaJpaEntity> categoriasPadrao = List.of(
-                CategoriaJpaEntity.builder()
-                        .nome("A Pagar")
-                        .descricao("Despesas pendentes")
-                        .ativa(true)
-                        .icone("icone-apagar")
-                        .auditoria(new AuditoriaJpa())
-                        .usuario(null)
-                        .build(),
+        try {
+            log.debug("Criando categorias padrão para usuário: {}", usuario.getId().getValue());
 
-                CategoriaJpaEntity.builder()
-                        .nome("Pretendidas")
-                        .descricao("Despesas planejadas")
-                        .ativa(true)
-                        .icone("icone-pretendidas")
-                        .auditoria(new AuditoriaJpa())
-                        .usuario(null) // TODO: Ajustar
-                        .build(),
+            UsuarioJpaEntity usuarioJpa = UsuarioJpaEntity.builder()
+                    .id(usuario.getId().getValue())
+                    .email(usuario.getEmail())
+                    .nome(usuario.getNome())
+                    .senha(usuario.getHashSenha())
+                    .build();
 
-                CategoriaJpaEntity.builder()
-                        .nome("Prazo")
-                        .descricao("Despesas com prazo")
-                        .ativa(true)
-                        .icone("icone-prazo")
-                        .auditoria(new AuditoriaJpa())
-                        .usuario(null) // TODO: Ajustar
-                        .build(),
+            List<CategoriaJpaEntity> categoriasPadrao = List.of(
+                    CategoriaJpaEntity.builder()
+                            .nome("A Pagar")
+                            .descricao("Despesas pendentes")
+                            .ativa(true)
+                            .icone("icone-apagar")
+                            .auditoria(new AuditoriaJpa())
+                            .usuario(usuarioJpa)
+                            .build(),
 
-                CategoriaJpaEntity.builder()
-                        .nome("Pagas")
-                        .descricao("Despesas quitadas")
-                        .ativa(true)
-                        .icone("icone-pagas")
-                        .auditoria(new AuditoriaJpa())
-                        .usuario(null) // TODO: Ajustar
-                        .build()
-        );
+                    CategoriaJpaEntity.builder()
+                            .nome("Pretendidas")
+                            .descricao("Despesas planejadas")
+                            .ativa(true)
+                            .icone("icone-pretendidas")
+                            .auditoria(new AuditoriaJpa())
+                            .usuario(usuarioJpa)
+                            .build(),
 
-        // categoriaRepository.saveAll(categoriasPadrao);
+                    CategoriaJpaEntity.builder()
+                            .nome("Prazo")
+                            .descricao("Despesas com prazo")
+                            .ativa(true)
+                            .icone("icone-prazo")
+                            .auditoria(new AuditoriaJpa())
+                            .usuario(usuarioJpa)
+                            .build(),
 
-        log.info("Categorias padrão criadas para usuário: {}", usuario.getEmail());
+                    CategoriaJpaEntity.builder()
+                            .nome("Pagas")
+                            .descricao("Despesas quitadas")
+                            .ativa(true)
+                            .icone("icone-pagas")
+                            .auditoria(new AuditoriaJpa())
+                            .usuario(usuarioJpa)
+                            .build()
+            );
 
-        categoriaRepository.saveAll(categoriasPadrao);
+            categoriaRepository.saveAll(categoriasPadrao);
+            log.info("Categorias padrão criadas para usuário: {}", usuario.getEmail());
+
+        } catch (Exception e) {
+            log.error("Erro ao criar categorias padrão para usuário {}: {}",
+                    usuario.getId().getValue(), e.getMessage(), e);
+        }
     }
 }

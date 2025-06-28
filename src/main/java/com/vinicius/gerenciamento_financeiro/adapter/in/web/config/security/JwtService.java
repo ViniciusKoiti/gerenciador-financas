@@ -90,6 +90,6 @@ public class JwtService {
         }
 
         Usuario userDetails = (Usuario) authentication.getPrincipal();
-        return userDetails.getId();
+        return userDetails.getId().getValue();
     }
 }

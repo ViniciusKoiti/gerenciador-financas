@@ -33,7 +33,7 @@ public class LoginServiceImpl implements LoginUseCase {
         Usuario usuario = usuarioRepository.findByEmail(loginRequest.email())
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
-        var token = jwtService.gerarToken(usuario, usuario.getId());
+        var token = jwtService.gerarToken(usuario, usuario.getId().getValue());
         return new AuthenticationResponse(token, mapper.toResponse(usuario));
     }
 

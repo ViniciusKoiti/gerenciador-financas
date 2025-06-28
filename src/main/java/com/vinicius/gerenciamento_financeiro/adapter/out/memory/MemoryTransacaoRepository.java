@@ -35,7 +35,7 @@ public class MemoryTransacaoRepository implements TransacaoRepository {
             }
         }
 
-        transacoes.put(transacao.getId(), transacao);
+        transacoes.put(transacao.getId().getValue(), transacao);
         log.debug("Transação salva em memória: ID {}", transacao.getId());
     }
     @Override
@@ -43,8 +43,8 @@ public class MemoryTransacaoRepository implements TransacaoRepository {
         log.debug("Buscando todas as transações para usuário: {} (total em memória: {})", usuarioId, transacoes.size());
 
         return transacoes.values().stream()
-                .filter(transacao -> Objects.equals(transacao.getUsuario().getId(), usuarioId))
-                .sorted((t1, t2) -> t2.getData().compareTo(t1.getData())) // Ordenar por data descendente
+                .filter(transacao -> Objects.equals(transacao.getUsuarioId().getValue(), usuarioId))
+                .sorted((t1, t2) -> t2.getData().compareTo(t1.getData()))
                 .collect(Collectors.toList());
     }
 
@@ -70,7 +70,7 @@ public class MemoryTransacaoRepository implements TransacaoRepository {
         log.debug("Buscando transação {} para usuário: {}", transacaoId, usuarioId);
 
         return Optional.ofNullable(transacoes.get(transacaoId))
-                .filter(transacao -> Objects.equals(transacao.getUsuario().getId(), usuarioId));
+                .filter(transacao -> Objects.equals(transacao.getUsuarioId().getValue(), usuarioId));
     }
 
     @Override
@@ -78,8 +78,8 @@ public class MemoryTransacaoRepository implements TransacaoRepository {
         log.debug("Buscando transações da categoriaJpaEntity {} para usuário: {}", categoriaId, usuarioId);
 
         return transacoes.values().stream()
-                .filter(transacao -> Objects.equals(transacao.getUsuario().getId(), usuarioId))
-                .filter(transacao -> Objects.equals(transacao.getCategoria().getId(), categoriaId))
+                .filter(transacao -> Objects.equals(transacao.getUsuarioId().getValue(), usuarioId))
+                .filter(transacao -> Objects.equals(transacao.getCategoriaId().getValue(), categoriaId))
                 .sorted((t1, t2) -> t2.getData().compareTo(t1.getData()))
                 .collect(Collectors.toList());
     }
@@ -123,8 +123,8 @@ public class MemoryTransacaoRepository implements TransacaoRepository {
         }
 
         return transacoes.values().stream()
-                .filter(transacao -> transacao.getCategoria() != null)
-                .filter(transacao -> Objects.equals(transacao.getCategoria().getId(), categoriaId))
+                .filter(transacao -> transacao.getCategoriaId() != null)
+                .filter(transacao -> Objects.equals(transacao.getCategoriaId().getValue(), categoriaId))
                 .collect(Collectors.toList());
     }
     public void limparTodas() {
@@ -140,13 +140,13 @@ public class MemoryTransacaoRepository implements TransacaoRepository {
     }
     public long contarTransacoesPorUsuario(Long usuarioId) {
         return transacoes.values().stream()
-                .filter(transacao -> Objects.equals(transacao.getUsuario().getId(), usuarioId))
+                .filter(transacao -> Objects.equals(transacao.getUsuarioId().getValue(), usuarioId))
                 .count();
     }
     public long contarTransacoesPorCategoriaEUsuario(Long categoriaId, Long usuarioId) {
         return transacoes.values().stream()
-                .filter(transacao -> Objects.equals(transacao.getUsuario().getId(), usuarioId))
-                .filter(transacao -> Objects.equals(transacao.getCategoria().getId(), categoriaId))
+                .filter(transacao -> Objects.equals(transacao.getUsuarioId().getValue(), usuarioId))
+                .filter(transacao -> Objects.equals(transacao.getCategoriaId().getValue(), categoriaId))
                 .count();
     }
 
@@ -162,7 +162,7 @@ public class MemoryTransacaoRepository implements TransacaoRepository {
                                                     java.time.LocalDateTime dataInicio,
                                                     java.time.LocalDateTime dataFim) {
         return transacoes.values().stream()
-                .filter(transacao -> Objects.equals(transacao.getUsuario().getId(), usuarioId))
+                .filter(transacao -> Objects.equals(transacao.getCategoriaId().getValue(), usuarioId))
                 .filter(transacao -> transacao.getData().isAfter(dataInicio) || transacao.getData().isEqual(dataInicio))
                 .filter(transacao -> transacao.getData().isBefore(dataFim) || transacao.getData().isEqual(dataFim))
                 .sorted((t1, t2) -> t2.getData().compareTo(t1.getData()))
@@ -174,12 +174,12 @@ public class MemoryTransacaoRepository implements TransacaoRepository {
         stats.put("totalTransacoes", transacoes.size());
         stats.put("proximoId", idGenerator.get());
 
-        Map<Long, Long> transacoesPorUsuario = transacoes.values().stream()
-                .collect(Collectors.groupingBy(
-                        t -> t.getUsuario().getId(),
-                        Collectors.counting()
-                ));
-        stats.put("transacoesPorUsuario", transacoesPorUsuario);
+//        Map<Long, Long> transacoesPorUsuario = transacoes.values().stream()
+//                .collect(Collectors.groupingBy(
+//                        t -> t.getUsuario().getId(),
+//                        Collectors.counting()
+//                ));
+//        stats.put("transacoesPorUsuario", transacoesPorUsuario);
 
         return stats;
     }

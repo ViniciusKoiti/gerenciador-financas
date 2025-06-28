@@ -16,10 +16,9 @@ public final class Usuario implements UserDetails {
     private final String hashSenha;
     private final Auditoria auditoria;
     private final Set<CategoriaId> categoriaIds;
-    private final Integer totalTransacoes;
 
     public Usuario(UsuarioId id, String nome, String email, String hashSenha,
-                   Auditoria auditoria, Set<CategoriaId> categoriaIds, Integer totalTransacoes) {
+                   Auditoria auditoria, Set<CategoriaId> categoriaIds) {
         this.id = id;
         this.nome = nome;
         this.email = email;
@@ -28,7 +27,6 @@ public final class Usuario implements UserDetails {
         this.categoriaIds = categoriaIds != null ?
                 Set.copyOf(categoriaIds) :
                 Collections.emptySet();
-        this.totalTransacoes = totalTransacoes != null ? totalTransacoes : 0;
 
         validarInvariantes();
     }
@@ -42,14 +40,13 @@ public final class Usuario implements UserDetails {
                 validarEmail(email),
                 hashSenha,
                 Auditoria.criarNova(),
-                new HashSet<>(),
-                0
+                new HashSet<>()
         );
     }
 
     public static Usuario reconstituir(Long id, String nome, String email, String hashSenha,
-                                       Auditoria auditoria, Set<CategoriaId> categoriaIds,
-                                       Integer totalTransacoes) {
+                                       Auditoria auditoria, Set<CategoriaId> categoriaIds
+                                       ) {
         if (id == null) {
             throw new IllegalArgumentException("ID não pode ser nulo para reconstituição");
         }
@@ -60,8 +57,7 @@ public final class Usuario implements UserDetails {
                 email,
                 hashSenha,
                 auditoria != null ? auditoria : Auditoria.criarNova(),
-                categoriaIds,
-                totalTransacoes
+                categoriaIds
         );
     }
 
@@ -89,9 +85,6 @@ public final class Usuario implements UserDetails {
         return categoriaIds;
     }
 
-    public Integer getTotalTransacoes() {
-        return totalTransacoes;
-    }
 
     public Usuario atualizarDados(String novoNome, String novoEmail) {
         return new Usuario(
@@ -100,8 +93,7 @@ public final class Usuario implements UserDetails {
                 validarEmail(novoEmail),
                 this.hashSenha,
                 this.auditoria.marcarComoAtualizado(),
-                this.categoriaIds,
-                this.totalTransacoes
+                this.categoriaIds
         );
     }
 
@@ -116,8 +108,7 @@ public final class Usuario implements UserDetails {
                 this.email,
                 novoHashSenha,
                 this.auditoria.marcarComoAtualizado(),
-                this.categoriaIds,
-                this.totalTransacoes
+                this.categoriaIds
         );
     }
 
@@ -139,8 +130,7 @@ public final class Usuario implements UserDetails {
                 this.email,
                 this.hashSenha,
                 this.auditoria.marcarComoAtualizado(),
-                novasCategorias,
-                this.totalTransacoes
+                novasCategorias
         );
     }
 
@@ -158,8 +148,7 @@ public final class Usuario implements UserDetails {
                 this.email,
                 this.hashSenha,
                 this.auditoria.marcarComoAtualizado(),
-                novasCategorias,
-                this.totalTransacoes
+                novasCategorias
         );
     }
 
@@ -170,22 +159,7 @@ public final class Usuario implements UserDetails {
                 this.email,
                 this.hashSenha,
                 this.auditoria.marcarComoAtualizado(),
-                this.categoriaIds,
-                this.totalTransacoes + 1
-        );
-    }
-
-    public Usuario notificarTransacaoRemovida() {
-        int novoTotal = Math.max(0, this.totalTransacoes - 1);
-
-        return new Usuario(
-                this.id,
-                this.nome,
-                this.email,
-                this.hashSenha,
-                this.auditoria.marcarComoAtualizado(),
-                this.categoriaIds,
-                novoTotal
+                this.categoriaIds
         );
     }
 
@@ -195,10 +169,6 @@ public final class Usuario implements UserDetails {
 
     public boolean temCategorias() {
         return !this.categoriaIds.isEmpty();
-    }
-
-    public boolean temTransacoes() {
-        return this.totalTransacoes > 0;
     }
 
     public boolean possuiCategoria(CategoriaId categoriaId) {
@@ -292,9 +262,6 @@ public final class Usuario implements UserDetails {
         if (hashSenha == null || hashSenha.trim().isEmpty()) {
             throw new IllegalStateException("Usuario deve ter senha válida");
         }
-        if (totalTransacoes < 0) {
-            throw new IllegalStateException("Total de transações não pode ser negativo");
-        }
         if (auditoria == null) {
             throw new IllegalStateException("Usuario deve ter auditoria");
         }
@@ -328,7 +295,6 @@ public final class Usuario implements UserDetails {
                 id != null ? id.getValue() : "novo",
                 email,
                 nome,
-                categoriaIds.size(),
-                totalTransacoes);
+                categoriaIds.size());
     }
 }

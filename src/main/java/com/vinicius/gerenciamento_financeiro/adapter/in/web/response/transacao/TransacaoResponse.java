@@ -8,6 +8,7 @@ import lombok.Builder;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
 @Builder
 public record TransacaoResponse(
         Long id,
@@ -21,6 +22,7 @@ public record TransacaoResponse(
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         LocalDateTime createdDate
 ) {
+
     @Builder
     public record ConfiguracaoTransacaoResponse(
             Boolean recorrente,
@@ -33,6 +35,10 @@ public record TransacaoResponse(
     ) {
 
         public static ConfiguracaoTransacaoResponse fromEntity(ConfiguracaoTransacao configuracao) {
+            if (configuracao == null) {
+                return null;
+            }
+
             return ConfiguracaoTransacaoResponse.builder()
                     .recorrente(configuracao.getRecorrente())
                     .periodicidade(configuracao.getPeriodicidade())
@@ -43,7 +49,24 @@ public record TransacaoResponse(
         }
     }
 
-    @Builder
+    public static TransacaoResponse fromEntity(Transacao transacao) {
+        if (transacao == null) {
+            return null;
+        }
+
+        return TransacaoResponse.builder()
+                .id(transacao.getId() != null ? transacao.getId().getValue() : null)
+                .description(transacao.getDescricao())
+                .amount(transacao.getValor())
+                .type(transacao.getTipo().toString())
+                .date(transacao.getData())
+                .paid(transacao.getConfiguracao() != null ? transacao.getConfiguracao().getPago() : false)
+                .config(ConfiguracaoTransacaoResponse.fromEntity(transacao.getConfiguracao()))
+                .createdDate(transacao.getAuditoria() != null ? transacao.getAuditoria().getCriadoEm() : null)
+                .build();
+    }
+
+    @Deprecated
     public static TransacaoResponse of(
             Long id,
             String descricao,
@@ -58,19 +81,5 @@ public record TransacaoResponse(
                 id, descricao, valor, tipo, data,
                 pago, configuracao, dataCriacao
         );
-    }
-
-
-    public static TransacaoResponse fromEntity(Transacao transacao) {
-        return TransacaoResponse.builder()
-                .id(transacao.getId())
-                .description(transacao.getDescricao())
-                .amount(transacao.getValor())
-                .type(transacao.getTipo().toString())
-                .date(transacao.getData())
-                .paid(transacao.getConfiguracao().getPago())
-                .config(transacao.getConfiguracao() != null ? ConfiguracaoTransacaoResponse.fromEntity(transacao.getConfiguracao()) : null)
-                .createdDate(transacao.getAuditoria() != null ? transacao.getAuditoria().getCriadoEm() : null)
-                .build();
     }
 }

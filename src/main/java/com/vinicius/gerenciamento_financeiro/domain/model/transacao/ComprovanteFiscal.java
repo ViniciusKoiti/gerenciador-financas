@@ -1,6 +1,7 @@
 package com.vinicius.gerenciamento_financeiro.domain.model.transacao;
 
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.TransacaoJpaEntity;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoComprovante;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -20,7 +21,7 @@ public class ComprovanteFiscal {
     private Long id;
 
     @OneToOne
-    private Transacao transacao;
+    private TransacaoJpaEntity transacao;
 
     private TipoComprovante tipo;
     private String numeroDocumento;

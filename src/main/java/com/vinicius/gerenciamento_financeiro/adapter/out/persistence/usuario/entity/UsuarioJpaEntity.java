@@ -1,6 +1,8 @@
 package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.usuario.entity;
 
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.TransacaoJpaEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -33,14 +35,14 @@ public class UsuarioJpaEntity implements UserDetails {
     @Column(nullable = false)
     private String nome;
 
-//    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<TransacaoJpaEntity> transacoes = new ArrayList<>();
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<TransacaoJpaEntity> transacoes = new ArrayList<>();
 
     @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
     private Set<CategoriaJpaEntity> categorias = new HashSet<>();
 
-//    @Embedded
-//    private AuditoriaJpa auditoria;
+    @Embedded
+    private AuditoriaJpa auditoria;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
