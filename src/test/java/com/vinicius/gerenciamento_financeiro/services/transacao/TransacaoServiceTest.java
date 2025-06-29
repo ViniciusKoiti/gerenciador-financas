@@ -91,7 +91,7 @@ class TransacaoServiceTest {
 
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(usuarioId.getValue());
         when(usuarioRepository.findById(usuarioId)).thenReturn(Optional.of(usuario));
-        when(categoriaRepository.existsByIdAndUsuarioId(categoriaId.getValue(), usuarioId.getValue()))
+        when(categoriaRepository.existsByIdAndUsuarioId(categoriaId, usuarioId))
                 .thenReturn(true);
 
         transacaoService.adicionarTransacao(transacaoPost);
@@ -134,7 +134,7 @@ class TransacaoServiceTest {
     @Test
     void deveBuscarTransacoesPorCategoriaId() {
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(usuarioId.getValue());
-        when(categoriaRepository.existsByIdAndUsuarioId(categoriaId.getValue(), usuarioId.getValue()))
+        when(categoriaRepository.existsByIdAndUsuarioId(categoriaId, usuarioId))
                 .thenReturn(true);
 
         Transacao transacao1 = Transacao.criarNova(
@@ -196,7 +196,7 @@ class TransacaoServiceTest {
 
         when(transacaoRepository.buscarTransacaoPorIdEUsuario(transacaoId, usuarioId.getValue()))
                 .thenReturn(Optional.of(transacaoExistente));
-        when(categoriaRepository.existsByIdAndUsuarioId(novaCategoriaId, usuarioId.getValue()))
+        when(categoriaRepository.existsByIdAndUsuarioId(CategoriaId.of(novaCategoriaId), usuarioId))
                 .thenReturn(true);
 
         transacaoService.atualizarTransacaoCategoria(transacaoId, novaCategoriaId);
