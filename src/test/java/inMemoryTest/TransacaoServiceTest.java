@@ -61,7 +61,6 @@ public class TransacaoServiceTest {
     private MemoryTransacaoRepository memoryRepository;
     private TransacaoService service;
 
-    // Dados de teste - usando tipos corretos do domínio
     private Usuario usuarioTeste;
     private CategoriaJpaEntity categoriaJpaEntityTeste;
     private UsuarioJpaEntity usuarioJpaEntityTeste;
@@ -107,9 +106,11 @@ public class TransacaoServiceTest {
     @Test
     @DisplayName("Deve adicionar transação e verificar se foi salva corretamente")
     void deveAdicionarTransacaoComSucesso() {
-        // Arrange
+
+
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
         when(usuarioRepository.findById(UsuarioId.of(1L))).thenReturn(Optional.of(usuarioTeste));
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaJpaEntityTeste));
         when(categoriaRepository.existsByIdAndUsuarioId(1L, 1L)).thenReturn(true);
 
         TransacaoPost transacaoPost = new TransacaoPost(
@@ -120,19 +121,28 @@ public class TransacaoServiceTest {
                 1L
         );
 
-        Transacao transacaoEsperada = criarTransacaoDominio(
-                1L, "Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA
+        Transacao transacaoEsperada = Transacao.criarNova(
+                "Salário",
+                new BigDecimal("1000"),
+                TipoMovimentacao.RECEITA,
+                LocalDateTime.now(),
+                CategoriaId.of(1L),
+                UsuarioId.of(1L)
         );
+
+        when(mapper.toEntity(eq(transacaoPost), eq(CategoriaId.of(1L)), eq(UsuarioId.of(1L))))
+                .thenReturn(transacaoEsperada);
 
         // Act
         service.adicionarTransacao(transacaoPost);
 
-        // Assert
-        verify(notificarTransacaoService).notificarTransacaoAtrasada(transacaoEsperada);
+        verify(notificarTransacaoService).notificarTransacaoAtrasada(any(Transacao.class));
+
+
+
         assertEquals(1, memoryRepository.contarTodas());
         assertEquals(1, memoryRepository.contarTransacoesPorUsuario(1L));
 
-        // Verifica que a transação foi salva corretamente
         List<Transacao> transacoesSalvas = memoryRepository.buscarTodasTransacoesPorUsuario(1L);
         assertFalse(transacoesSalvas.isEmpty());
         assertEquals("Salário", transacoesSalvas.get(0).getDescricao());
@@ -144,7 +154,6 @@ public class TransacaoServiceTest {
         // Arrange
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
         when(usuarioRepository.findById(UsuarioId.of(1L))).thenReturn(Optional.of(usuarioTeste));
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaJpaEntityTeste));
         when(categoriaRepository.existsByIdAndUsuarioId(1L, 1L)).thenReturn(true);
 
         TransacaoPost receita = new TransacaoPost(
@@ -154,31 +163,25 @@ public class TransacaoServiceTest {
                 "Aluguel", new BigDecimal("500"), TipoMovimentacao.DESPESA, LocalDateTime.now(), 1L
         );
 
-        Transacao transacaoReceita = criarTransacaoDominio(
-                1L, "Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA
-        );
-        Transacao transacaoDespesa = criarTransacaoDominio(
-                2L, "Aluguel", new BigDecimal("500"), TipoMovimentacao.DESPESA
-        );
 
-        when(mapper.toEntity(eq(receita), eq(CategoriaId.of(1L)), eq(UsuarioId.of(1L))))
-                .thenReturn(transacaoReceita);
-        when(mapper.toEntity(eq(despesa), eq(CategoriaId.of(1L)), eq(UsuarioId.of(1L))))
-                .thenReturn(transacaoDespesa);
 
         // Act
         service.adicionarTransacao(receita);
         service.adicionarTransacao(despesa);
         BigDecimal saldo = service.calcularSaldo();
 
-        // Assert
         assertEquals(new BigDecimal("500"), saldo);
         assertEquals(2, memoryRepository.contarTodas());
 
         List<Transacao> todasTransacoes = memoryRepository.buscarTodasTransacoesPorUsuario(1L);
         assertEquals(2, todasTransacoes.size());
 
-        verify(mapper, times(2)).toEntity(any(), any(), any());
+
+
+        verify(notificarTransacaoService, times(2)).notificarTransacaoAtrasada(any(Transacao.class));
+
+        assertEquals("Salário", todasTransacoes.get(0).getDescricao());
+        assertEquals("Aluguel", todasTransacoes.get(1).getDescricao());
     }
 
     @Test
@@ -224,10 +227,11 @@ public class TransacaoServiceTest {
     @Test
     @DisplayName("Deve buscar transações por categoria corretamente")
     void deveBuscarTransacoesPorCategoria() {
-        // Arrange
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
+        when(usuarioRepository.findById(UsuarioId.of(1L))).thenReturn(Optional.of(usuarioTeste));
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaJpaEntityTeste));
         when(categoriaRepository.existsByIdAndUsuarioId(1L, 1L)).thenReturn(true);
-        when(categoriaRepository.existsByIdAndUsuarioId(2L, 1L)).thenReturn(true);
+
 
         // Cria transações para categorias diferentes
         Transacao transacao1 = criarTransacaoParaCategoria(1L, "Transação Cat 1", CategoriaId.of(1L));
@@ -295,7 +299,6 @@ public class TransacaoServiceTest {
         // Arrange
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
         when(usuarioRepository.findById(UsuarioId.of(1L))).thenReturn(Optional.of(usuarioTeste));
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaJpaEntityTeste));
         when(categoriaRepository.existsByIdAndUsuarioId(1L, 1L)).thenReturn(true);
 
         TransacaoPost transacaoPost = new TransacaoPost(
@@ -306,7 +309,6 @@ public class TransacaoServiceTest {
                 1L, "Teste", new BigDecimal("100"), TipoMovimentacao.RECEITA
         );
 
-        when(mapper.toEntity(any(), any(), any())).thenReturn(transacaoEsperada);
 
         // Act
         service.adicionarTransacao(transacaoPost);

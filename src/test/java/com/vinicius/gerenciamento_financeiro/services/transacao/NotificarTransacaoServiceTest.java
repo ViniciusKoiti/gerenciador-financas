@@ -9,6 +9,7 @@ import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.domain.service.transacao.NotificarTransacaoService;
 import com.vinicius.gerenciamento_financeiro.port.in.NotificarUseCase;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -109,6 +110,7 @@ class NotificarTransacaoServiceTest {
     }
 
     @Test
+    @DisplayName("Não deve enviar notificação com atraso quando configuração tem data passada")
     void naoDeveEnviarNotificacao_QuandoConfiguracaoNula() {
         Transacao transacaoSemConfiguracao = Transacao.criarNova(
                 "Transação sem configuração",
@@ -118,6 +120,7 @@ class NotificarTransacaoServiceTest {
                 CategoriaId.of(1L),
                 UsuarioId.of(1L)
         );
+
 
         notificarTransacaoService.notificarTransacaoAtrasada(transacaoSemConfiguracao);
 
