@@ -3,8 +3,8 @@ package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.usuario.entity.UsuarioJpaEntity;
-import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
-import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoRecorrencia;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoRecorrencia;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;

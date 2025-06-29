@@ -1,7 +1,7 @@
 package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao;
 
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.TransacaoJpaEntity;
-import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

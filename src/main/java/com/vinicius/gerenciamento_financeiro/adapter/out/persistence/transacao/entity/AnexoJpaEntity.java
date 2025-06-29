@@ -1,7 +1,7 @@
-package com.vinicius.gerenciamento_financeiro.domain.model.transacao;
+package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity;
 
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
-import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoAnexo;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoAnexo;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Anexo {
+public class AnexoJpaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,7 +32,7 @@ public class Anexo {
 
     @ManyToOne
     @JoinColumn(name = "comprovante_fiscal_id")
-    private ComprovanteFiscal comprovanteFiscal;
+    private ComprovanteFiscalJpaEntity comprovanteFiscal;
 
     @Embedded
     private AuditoriaJpa auditoria;

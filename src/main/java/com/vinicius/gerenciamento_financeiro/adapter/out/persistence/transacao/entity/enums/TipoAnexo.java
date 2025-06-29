@@ -1,4 +1,4 @@
-package com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums;
+package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums;
 
 public enum TipoAnexo {
     COMPROVANTE,

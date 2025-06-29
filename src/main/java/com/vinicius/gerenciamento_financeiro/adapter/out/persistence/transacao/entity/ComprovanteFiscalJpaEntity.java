@@ -1,8 +1,7 @@
-package com.vinicius.gerenciamento_financeiro.domain.model.transacao;
+package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity;
 
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.TransacaoJpaEntity;
-import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoComprovante;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoComprovante;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ComprovanteFiscal {
+public class ComprovanteFiscalJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +27,7 @@ public class ComprovanteFiscal {
     private String hash;
 
     @OneToMany(mappedBy = "comprovanteFiscal", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Anexo> anexos;
+    private List<AnexoJpaEntity> anexos;
 
     @Embedded
     private AuditoriaJpa auditoria;

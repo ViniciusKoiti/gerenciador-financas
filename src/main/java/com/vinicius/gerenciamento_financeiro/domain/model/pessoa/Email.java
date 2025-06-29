@@ -1,16 +1,13 @@
 package com.vinicius.gerenciamento_financeiro.domain.model.pessoa;
 
-import jakarta.persistence.Embeddable;
-import lombok.EqualsAndHashCode;
+
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+
 
 import java.io.Serializable;
 import java.util.regex.Pattern;
 
-@Embeddable
-@NoArgsConstructor
-@EqualsAndHashCode
+
 public class Email implements Serializable {
 
     private static final Pattern PATTERN_EMAIL =

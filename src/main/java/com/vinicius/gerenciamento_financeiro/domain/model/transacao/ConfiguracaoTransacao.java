@@ -1,6 +1,6 @@
 package com.vinicius.gerenciamento_financeiro.domain.model.transacao;
 
-import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoRecorrencia;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoRecorrencia;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
