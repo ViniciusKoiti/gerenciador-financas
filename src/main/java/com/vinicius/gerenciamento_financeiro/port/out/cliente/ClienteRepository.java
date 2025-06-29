@@ -1,6 +1,6 @@
 package com.vinicius.gerenciamento_financeiro.port.out.cliente;
 
-import com.vinicius.gerenciamento_financeiro.domain.model.cliente.Cliente;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente.entity.ClienteJpaEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -9,13 +9,13 @@ import java.util.Optional;
 
 public interface ClienteRepository {
 
-    Cliente salvarCliente(Cliente cliente);
+    ClienteJpaEntity salvarCliente(ClienteJpaEntity cliente);
 
-    Optional<Cliente> findById(Long id);
+    Optional<ClienteJpaEntity> findById(Long id);
 
-    List<Cliente> findByUsuarioId(Long usuarioId);
+    List<ClienteJpaEntity> findByUsuarioId(Long usuarioId);
 
-    Page<Cliente> findAll(Pageable pageable);
+    Page<ClienteJpaEntity> findAll(Pageable pageable);
 
 
 }
