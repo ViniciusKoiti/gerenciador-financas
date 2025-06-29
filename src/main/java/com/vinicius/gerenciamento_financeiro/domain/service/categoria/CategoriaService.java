@@ -6,6 +6,8 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.Ca
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.usuario.entity.UsuarioJpaEntity;
+import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
+import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
 import com.vinicius.gerenciamento_financeiro.domain.model.pessoa.Email;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
@@ -36,34 +38,28 @@ public class CategoriaService implements CategoriaUseCase {
     private final UsuarioRepository usuarioRepository;
 
     @Override
-    public CategoriaResponse save(CategoriaPost entity) {
-        if (entity == null) {
+    public CategoriaResponse save(CategoriaPost request) {
+        if (request == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria não pode ser nula");
         }
 
         try {
-            Long usuarioId = jwtService.getByAutenticaoUsuarioId();
-            log.debug("Criando categoria para usuário: {}", usuarioId);
+            Long usuarioIdRaw = jwtService.getByAutenticaoUsuarioId();
+            UsuarioId usuarioId = UsuarioId.of(usuarioIdRaw);
+            log.debug("Criando categoria para usuário: {}", usuarioId.getValue());
 
-            Usuario usuario = usuarioRepository.findById(UsuarioId.of(usuarioId))
-                    .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado: " + usuarioId));
+            Usuario usuario = usuarioRepository.findById(usuarioId)
+                    .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado: " + usuarioIdRaw));
 
-            UsuarioJpaEntity usuarioJpa = UsuarioJpaEntity.builder()
-                    .id(usuarioId)
-                    .email(usuario.getEmail().getEndereco())
-                    .nome(usuario.getNome())
-                    .senha(usuario.getHashSenha())
-                    .build();
-
-            CategoriaJpaEntity categoriaJpaEntity = new CategoriaJpaEntity(
-                    entity.name(),
-                    entity.description(),
-                    entity.icon(),
-                    usuarioJpa
+            Categoria categoria = Categoria.criar(
+                    request.name(),
+                    request.description(),
+                    request.icon(),
+                    usuarioId
             );
 
-            CategoriaJpaEntity categoriaSalva = categoriaRepository.save(categoriaJpaEntity);
-            log.debug("Categoria criada com sucesso: ID {}", categoriaSalva.getId());
+            Categoria categoriaSalva = categoriaRepository.save(categoria);
+            log.debug("Categoria criada com sucesso: ID {}", categoriaSalva.getId().getValue());
 
             return categoriaMapper.toResponse(categoriaSalva);
 
@@ -76,8 +72,8 @@ public class CategoriaService implements CategoriaUseCase {
     @Override
     public CategoriaResponse findById(String id) {
         try {
-            Long categoriaId = Long.valueOf(id);
-            log.debug("Buscando categoria por ID: {}", categoriaId);
+            CategoriaId categoriaId = CategoriaId.of(Long.valueOf(id));
+            log.debug("Buscando categoria por ID: {}", categoriaId.getValue());
 
             return categoriaRepository.findById(categoriaId)
                     .map(categoriaMapper::toResponse)
@@ -90,12 +86,13 @@ public class CategoriaService implements CategoriaUseCase {
     }
 
     @Override
-    public List<CategoriaResponse> findCategoriasByUser(Long usuarioId) {
-        log.debug("Buscando categorias para usuário: {}", usuarioId);
+    public List<CategoriaResponse> findCategoriasByUser(Long usuarioIdRaw) {
+        log.debug("Buscando categorias para usuário: {}", usuarioIdRaw);
 
-        List<CategoriaJpaEntity> categoriaJpaEntities = categoriaRepository.findByUsuarioId(usuarioId);
+        UsuarioId usuarioId = UsuarioId.of(usuarioIdRaw);
+        List<Categoria> categorias = categoriaRepository.findByUsuarioId(usuarioId);
 
-        return categoriaJpaEntities.stream()
+        return categorias.stream()
                 .map(categoriaMapper::toResponse)
                 .collect(Collectors.toList());
     }
@@ -104,23 +101,26 @@ public class CategoriaService implements CategoriaUseCase {
     public Page<CategoriaResponse> findAllPaginated(Pageable pageable) {
         log.debug("Buscando categorias paginadas: página {}", pageable.getPageNumber());
 
-        return categoriaRepository.findAll(pageable)
+        Long usuarioIdRaw = jwtService.getByAutenticaoUsuarioId();
+        UsuarioId usuarioId = UsuarioId.of(usuarioIdRaw);
+
+        return categoriaRepository.findByUsuarioId(usuarioId, pageable)
                 .map(categoriaMapper::toResponse);
     }
 
     @Override
     public void deletarCategoria(String id) {
         try {
-            Long categoriaId = Long.valueOf(id);
-            log.debug("Deletando categoria: ID {}", categoriaId);
+            CategoriaId categoriaId = CategoriaId.of(Long.valueOf(id));
+            log.debug("Deletando categoria: ID {}", categoriaId.getValue());
 
-            CategoriaJpaEntity categoriaJpaEntity = categoriaRepository.findById(categoriaId)
+            // ✅ Verificar se categoria existe (usando domínio)
+            categoriaRepository.findById(categoriaId)
                     .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada com id: " + id));
 
-            // TODO: Verificar se categoria pode ser deletada (sem transações associadas)
 
-            categoriaRepository.deleteById(categoriaJpaEntity.getId());
-            log.info("Categoria deletada com sucesso: ID {}", categoriaId);
+            categoriaRepository.deleteById(categoriaId.getValue());
+            log.info("Categoria deletada com sucesso: ID {}", categoriaId.getValue());
 
         } catch (NumberFormatException e) {
             log.error("ID inválido fornecido para deleção: {}", id);
@@ -132,14 +132,13 @@ public class CategoriaService implements CategoriaUseCase {
     public List<CategoriaResponse> findAll() {
         log.debug("Buscando todas as categorias");
 
-        List<CategoriaJpaEntity> categoriaJpaEntities = categoriaRepository.findAll();
-        List<CategoriaResponse> categoriaResponses = new ArrayList<>();
+        Long usuarioIdRaw = jwtService.getByAutenticaoUsuarioId();
+        UsuarioId usuarioId = UsuarioId.of(usuarioIdRaw);
 
-        for (CategoriaJpaEntity categoriaJpaEntity : categoriaJpaEntities) {
-            CategoriaResponse categoriaResponse = categoriaMapper.toResponse(categoriaJpaEntity);
-            categoriaResponses.add(categoriaResponse);
-        }
+        List<Categoria> categorias = categoriaRepository.findByUsuarioId(usuarioId);
 
-        return categoriaResponses;
+        return categorias.stream()
+                .map(categoriaMapper::toResponse)
+                .collect(Collectors.toList());
     }
 }

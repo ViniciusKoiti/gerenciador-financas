@@ -8,6 +8,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticaca
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.usuario.entity.UsuarioJpaEntity;
+import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.port.in.LoginUseCase;
@@ -92,53 +93,38 @@ public class UsuarioServiceImpl implements UsuarioService {
         try {
             log.debug("Criando categorias padrão para usuário: {}", usuario.getId().getValue());
 
-            UsuarioJpaEntity usuarioJpa = UsuarioJpaEntity.builder()
-                    .id(usuario.getId().getValue())
-                    .email(usuario.getEmail().getEndereco())
-                    .nome(usuario.getNome())
-                    .senha(usuario.getHashSenha())
-                    .build();
+            List<Categoria> categoriasPadrao = List.of(
+                    Categoria.criar(
+                            "A Pagar",
+                            "Despesas pendentes",
+                            "icone-apagar",
+                            usuario.getId()
+                    ),
 
-            List<CategoriaJpaEntity> categoriasPadrao = List.of(
-                    CategoriaJpaEntity.builder()
-                            .nome("A Pagar")
-                            .descricao("Despesas pendentes")
-                            .ativa(true)
-                            .icone("icone-apagar")
-                            .auditoria(new AuditoriaJpa())
-                            .usuario(usuarioJpa)
-                            .build(),
+                    Categoria.criar(
+                            "Pretendidas",
+                            "Despesas planejadas",
+                            "icone-pretendidas",
+                            usuario.getId()
+                    ),
 
-                    CategoriaJpaEntity.builder()
-                            .nome("Pretendidas")
-                            .descricao("Despesas planejadas")
-                            .ativa(true)
-                            .icone("icone-pretendidas")
-                            .auditoria(new AuditoriaJpa())
-                            .usuario(usuarioJpa)
-                            .build(),
+                    Categoria.criar(
+                            "Prazo",
+                            "Despesas com prazo",
+                            "icone-prazo",
+                            usuario.getId()
+                    ),
 
-                    CategoriaJpaEntity.builder()
-                            .nome("Prazo")
-                            .descricao("Despesas com prazo")
-                            .ativa(true)
-                            .icone("icone-prazo")
-                            .auditoria(new AuditoriaJpa())
-                            .usuario(usuarioJpa)
-                            .build(),
-
-                    CategoriaJpaEntity.builder()
-                            .nome("Pagas")
-                            .descricao("Despesas quitadas")
-                            .ativa(true)
-                            .icone("icone-pagas")
-                            .auditoria(new AuditoriaJpa())
-                            .usuario(usuarioJpa)
-                            .build()
+                    Categoria.criar(
+                            "Pagas",
+                            "Despesas quitadas",
+                            "icone-pagas",
+                            usuario.getId()
+                    )
             );
 
             categoriaRepository.saveAll(categoriasPadrao);
-            log.info("Categorias padrão criadas para usuário: {}", usuario.getEmail());
+            log.info("Categorias padrão criadas para usuário: {}", usuario.getEmail().getEndereco());
 
         } catch (Exception e) {
             log.error("Erro ao criar categorias padrão para usuário {}: {}",

@@ -166,6 +166,10 @@ public class Categoria {
         return Objects.equals(id, categoria.id);
     }
 
+    public boolean isNova(){
+        return this.id == null;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(id);

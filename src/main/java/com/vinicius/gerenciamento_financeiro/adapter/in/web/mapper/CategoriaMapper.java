@@ -3,48 +3,66 @@ package com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPut;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
+import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
+import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
+import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import org.mapstruct.Mapper;
-import org.springframework.beans.factory.annotation.Autowired;
 
-@Mapper(componentModel = "spring", uses = TransacaoMapper.class)
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Mapper(componentModel = "spring")
 public interface CategoriaMapper {
 
-    @Autowired
-    TransacaoMapper transacaoMapper = new TransacaoMapperImpl();
+    default Categoria toEntity(CategoriaPost request, UsuarioId usuarioId) {
+        if (request == null) {
+            return null;
+        }
 
-    default CategoriaJpaEntity toEntity(CategoriaPost dto) {
-        return CategoriaJpaEntity.builder()
-                .nome(dto.name())
-                .descricao(dto.description())
-                .icone(dto.icon())
-                .auditoria(new AuditoriaJpa())
-                .build();
+        return Categoria.criar(
+                request.name(),
+                request.description(),
+                request.icon(),
+                usuarioId
+        );
     }
 
-    default CategoriaJpaEntity toEntity(CategoriaPut dto) {
-        return CategoriaJpaEntity.builder()
-                .id(dto.id())
-                .nome(dto.nome())
-                .descricao(dto.descricao())
-                .icone(dto.icone())
-                .ativa(dto.ativa())
-                .build();
+    default Categoria toEntity(CategoriaPut request, UsuarioId usuarioId) {
+        if (request == null) {
+            return null;
+        }
+        throw new UnsupportedOperationException(
+                "Use o método de atualização específico no service"
+        );
     }
 
-    default CategoriaResponse toResponse(CategoriaJpaEntity categoriaJpaEntity) {
-        if (categoriaJpaEntity == null) {
+    default CategoriaResponse toResponse(Categoria categoria) {
+        if (categoria == null) {
             return null;
         }
 
         return new CategoriaResponse(
-                categoriaJpaEntity.getId(),
-                categoriaJpaEntity.getNome(),
-                categoriaJpaEntity.getDescricao(),
-                categoriaJpaEntity.getAtiva(),
-                categoriaJpaEntity.getIcone(),
-                categoriaJpaEntity.getCategoriaJpaEntityPai() != null ? toResponse(categoriaJpaEntity.getCategoriaJpaEntityPai()) : null
+                categoria.getId() != null ? categoria.getId().getValue() : null,
+                categoria.getNome(),
+                categoria.getDescricao(),
+                categoria.isAtiva(),
+                categoria.getIcone(),
+                categoria.getCategoriaPaiId() != null ?
+                        new CategoriaResponse(
+                                categoria.getCategoriaPaiId().getValue(),
+                                null, null, true, null, null
+                        ) : null
         );
+    }
+
+    default List<CategoriaResponse> toResponseList(List<Categoria> categorias) {
+        if (categorias == null) {
+            return Collections.emptyList();
+        }
+
+        return categorias.stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
 }

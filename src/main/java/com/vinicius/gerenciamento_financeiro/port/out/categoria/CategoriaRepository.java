@@ -1,24 +1,28 @@
 package com.vinicius.gerenciamento_financeiro.port.out.categoria;
 
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
+import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
+import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
+import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
+import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
 public interface CategoriaRepository {
-    CategoriaJpaEntity save(CategoriaJpaEntity entity);
-    void saveAll(List<CategoriaJpaEntity> listaDeCategoriaJpaEntities);
-    Optional<CategoriaJpaEntity> findById(Long id);
-    List<CategoriaJpaEntity> findAll();
-    List<CategoriaJpaEntity> findByUsuarioId(Long usuarioId);
+    Categoria save(Categoria entity);
+    void saveAll(List<Categoria> listaDeCategoriaJpaEntities);
+    Optional<Categoria> findById(CategoriaId id);
+    List<Categoria> findAll();
+    List<Categoria> findByUsuarioId(UsuarioId usuarioId);
 
-    Page<CategoriaJpaEntity> findAll(Pageable pageable);
+    Page<Categoria> findAll(Pageable pageable);
 
-    boolean existsByIdAndUsuarioId(Long categoriaId, Long usuarioId);
+    boolean existsByIdAndUsuarioId(CategoriaId categoriaId,UsuarioId usuarioId);
 
     void deleteById(Long id);
 
-    Optional<CategoriaJpaEntity> findByIdAndUsuarioId(Long categoriaId, Long usuarioId);
-    Page<CategoriaJpaEntity> findByUsuarioId(Long usuarioId, Pageable pageable);
+    Optional<Categoria> findByIdAndUsuarioId(CategoriaId categoriaId, UsuarioId usuarioId);
+    Page<Categoria> findByUsuarioId(UsuarioId usuarioId, Pageable pageable);
 }

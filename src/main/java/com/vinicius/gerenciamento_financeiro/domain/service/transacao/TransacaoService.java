@@ -64,7 +64,7 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
                     .orElseThrow(() -> new ResourceNotFoundException("Usuario", usuarioId.getValue()));
 
             CategoriaId categoriaId = CategoriaId.of(transacaoPost.categoriaId());
-            if (!categoriaRepository.existsByIdAndUsuarioId(categoriaId.getValue(), usuarioId.getValue())) {
+            if (!categoriaRepository.existsByIdAndUsuarioId(categoriaId, usuarioId)) {
                 log.warn("Tentativa de acesso à categoria {} por usuário não autorizado: {}",
                         categoriaId.getValue(), usuarioId.getValue());
                 throw new InsufficientPermissionException("categoria", "criar transação");
@@ -132,7 +132,7 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
                     .orElseThrow(() -> new ResourceNotFoundException("Transacao", transacaoId));
 
             CategoriaId novaCategoriaId = CategoriaId.of(categoriaId);
-            if (!categoriaRepository.existsByIdAndUsuarioId(categoriaId, usuarioIdRaw)) {
+            if (!categoriaRepository.existsByIdAndUsuarioId(novaCategoriaId, usuarioId)) {
                 throw new ResourceNotFoundException("Categoria", categoriaId);
             }
 
@@ -150,15 +150,17 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TransacaoResponse> buscarTransacoesPorCategoriaId(Long categoriaId) {
+    public List<TransacaoResponse> buscarTransacoesPorCategoriaId(Long id) {
         Long usuarioIdRaw = jwtService.getByAutenticaoUsuarioId();
+        UsuarioId usuarioId = UsuarioId.of(usuarioIdRaw);
+        CategoriaId categoriaId = CategoriaId.of(usuarioIdRaw);
 
         // Validar que a categoria pertence ao usuário
-        if (!categoriaRepository.existsByIdAndUsuarioId(categoriaId, usuarioIdRaw)) {
+        if (!categoriaRepository.existsByIdAndUsuarioId(categoriaId, usuarioId)) {
             throw new InsufficientPermissionException("categoria", "listar transações");
         }
 
-        List<Transacao> transacoes = transacaoRepository.buscarTransacoesPorCategoriaIdEUsuario(categoriaId, usuarioIdRaw);
+        List<Transacao> transacoes = transacaoRepository.buscarTransacoesPorCategoriaIdEUsuario(id, usuarioIdRaw);
 
         return transacoes.stream()
                 .map(transacaoMapper::toResponse)
