@@ -5,6 +5,8 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.CategoriaMapp
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
+import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
+import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.domain.service.categoria.CategoriaService;
@@ -18,7 +20,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -60,13 +64,18 @@ class CategoriaServiceTest {
                 null
         );
 
-        CategoriaJpaEntity categoriaJpaEntity = CategoriaJpaEntity.builder()
-                .id(1L)
-                .nome("Alimentação")
-                .descricao("Gastos com alimentação")
-                .ativa(true)
-                .icone("food-icon")
-                .build();
+        Categoria categoria = Categoria.reconstituir(
+                CategoriaId.of(1L),
+                "Alimentação",
+                "Gastos com alimentação",
+                true,
+                "food-icon",
+                UsuarioId.of(1L),
+                LocalDateTime.now(),
+                null,
+                null,
+                Set.of()
+        );
 
         CategoriaResponse expectedResponse = new CategoriaResponse(
                 1L,
@@ -79,15 +88,15 @@ class CategoriaServiceTest {
 
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
         when(usuarioRepository.findById(UsuarioId.of(1L))).thenReturn(Optional.of(usuario));
-        when(categoriaRepository.save(any(CategoriaJpaEntity.class))).thenReturn(categoriaJpaEntity);
-        when(categoriaMapper.toResponse(any(CategoriaJpaEntity.class))).thenReturn(expectedResponse);
+        when(categoriaRepository.save(any(Categoria.class))).thenReturn(categoria);
+        when(categoriaMapper.toResponse(any(Categoria.class))).thenReturn(expectedResponse);
 
         CategoriaResponse result = categoriaService.save(categoriaPost);
 
         assertNotNull(result);
         assertEquals(expectedResponse.id(), result.id());
         assertEquals(expectedResponse.name(), result.name());
-        verify(categoriaRepository).save(any(CategoriaJpaEntity.class));
+        verify(categoriaRepository).save(any(Categoria.class));
     }
 
     @Test
@@ -104,17 +113,22 @@ class CategoriaServiceTest {
 
     @Test
     void findById_QuandoIdExiste_RetornaCategoriaResponse() {
-        Long id = 1L;
-        CategoriaJpaEntity categoriaJpaEntity = CategoriaJpaEntity.builder()
-                .id(id)
-                .nome("Alimentação")
-                .descricao("Gastos com alimentação")
-                .ativa(true)
-                .icone("food-icon")
-                .build();
+        CategoriaId id = CategoriaId.of(1L);
+        Categoria categoria = Categoria.reconstituir(
+                CategoriaId.of(1L),
+                "Alimentação",
+                "Gastos com alimentação",
+                true,
+                "food-icon",
+                UsuarioId.of(1L),
+                LocalDateTime.now(),
+                null,
+                null,
+                Set.of()
+        );
 
         CategoriaResponse expectedResponse = new CategoriaResponse(
-                id,
+                id.getValue(),
                 "Alimentação",
                 "Gastos com alimentação",
                 true,
@@ -122,8 +136,8 @@ class CategoriaServiceTest {
                 null
         );
 
-        when(categoriaRepository.findById(id)).thenReturn(Optional.of(categoriaJpaEntity));
-        when(categoriaMapper.toResponse(categoriaJpaEntity)).thenReturn(expectedResponse);
+        when(categoriaRepository.findById(id)).thenReturn(Optional.of(categoria));
+        when(categoriaMapper.toResponse(categoria)).thenReturn(expectedResponse);
 
         CategoriaResponse result = categoriaService.findById(id.toString());
 
@@ -131,7 +145,7 @@ class CategoriaServiceTest {
         assertEquals(expectedResponse.id(), result.id());
         assertEquals(expectedResponse.name(), result.name());
         verify(categoriaRepository).findById(id);
-        verify(categoriaMapper).toResponse(categoriaJpaEntity);
+        verify(categoriaMapper).toResponse(categoria);
         verifyNoMoreInteractions(categoriaRepository, categoriaMapper);
     }
 
