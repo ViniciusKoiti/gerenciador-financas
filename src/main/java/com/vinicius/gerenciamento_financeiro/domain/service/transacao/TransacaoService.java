@@ -166,7 +166,6 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
                 .collect(Collectors.toList());
     }
 
-    // ========== MÉTODOS PRIVADOS ==========
 
     private Transacao criarTransacaoDominio(TransacaoPost transacaoPost, CategoriaId categoriaId, Usuario usuario) {
 

@@ -1,6 +1,7 @@
 package com.vinicius.gerenciamento_financeiro.adapter.out.memory;
 
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.TransacaoId;
 import com.vinicius.gerenciamento_financeiro.port.out.transacao.TransacaoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,19 +26,33 @@ public class MemoryTransacaoRepository implements TransacaoRepository {
 
     @Override
     public void salvarTransacao(Transacao transacao) {
-        if (transacao.getId() == null) {
-            try {
-                var field = transacao.getClass().getDeclaredField("id");
-                field.setAccessible(true);
-                field.set(transacao, idGenerator.getAndIncrement());
-            } catch (Exception e) {
-                log.warn("Não foi possível gerar ID automaticamente: {}", e.getMessage());
-            }
+        Transacao transacaoParaSalvar;
+
+        if (transacao.isNova()) {
+            Long novoId = idGenerator.getAndIncrement();
+
+            transacaoParaSalvar = Transacao.reconstituir(
+                    novoId,                              // ✅ ID gerado
+                    transacao.getDescricao(),            // Dados existentes
+                    transacao.getValor(),
+                    transacao.getTipo(),
+                    transacao.getData(),
+                    transacao.getUsuarioId(),
+                    transacao.getCategoriaId(),
+                    transacao.getConfiguracao(),
+                    transacao.getAuditoria()
+            );
+
+            log.debug("Nova transação criada com ID: {}", novoId);
+        } else {
+            transacaoParaSalvar = transacao;
+            log.debug("Transação existente atualizada: ID {}", transacao.getId().getValue());
         }
 
-        transacoes.put(transacao.getId().getValue(), transacao);
-        log.debug("Transação salva em memória: ID {}", transacao.getId());
+        transacoes.put(transacaoParaSalvar.getId().getValue(), transacaoParaSalvar);
+        log.debug("Transação salva em memória: ID {}", transacaoParaSalvar.getId().getValue());
     }
+
     @Override
     public List<Transacao> buscarTodasTransacoesPorUsuario(Long usuarioId) {
         log.debug("Buscando todas as transações para usuário: {} (total em memória: {})", usuarioId, transacoes.size());
@@ -53,16 +68,7 @@ public class MemoryTransacaoRepository implements TransacaoRepository {
         log.debug("Buscando transações paginadas para usuário: {}, página: {}", usuarioId, pageable.getPageNumber());
 
         List<Transacao> todasTransacoes = buscarTodasTransacoesPorUsuario(usuarioId);
-
-        // Implementa paginação manual
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), todasTransacoes.size());
-
-        List<Transacao> paginatedList = start >= todasTransacoes.size() ?
-                Collections.emptyList() :
-                todasTransacoes.subList(start, end);
-
-        return new PageImpl<>(paginatedList, pageable, todasTransacoes.size());
+        return paginarLista(todasTransacoes, pageable);
     }
 
     @Override
@@ -75,7 +81,7 @@ public class MemoryTransacaoRepository implements TransacaoRepository {
 
     @Override
     public List<Transacao> buscarTransacoesPorCategoriaIdEUsuario(Long categoriaId, Long usuarioId) {
-        log.debug("Buscando transações da categoriaJpaEntity {} para usuário: {}", categoriaId, usuarioId);
+        log.debug("Buscando transações da categoria {} para usuário: {}", categoriaId, usuarioId);
 
         return transacoes.values().stream()
                 .filter(transacao -> Objects.equals(transacao.getUsuarioId().getValue(), usuarioId))
@@ -86,19 +92,12 @@ public class MemoryTransacaoRepository implements TransacaoRepository {
 
     @Override
     public Page<Transacao> buscarTransacoesPorCategoriaIdEUsuarioPaginado(Long categoriaId, Long usuarioId, Pageable pageable) {
-        log.debug("Buscando transações paginadas da categoriaJpaEntity {} para usuário: {}", categoriaId, usuarioId);
+        log.debug("Buscando transações paginadas da categoria {} para usuário: {}", categoriaId, usuarioId);
 
         List<Transacao> todasTransacoes = buscarTransacoesPorCategoriaIdEUsuario(categoriaId, usuarioId);
-
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), todasTransacoes.size());
-
-        List<Transacao> paginatedList = start >= todasTransacoes.size() ?
-                Collections.emptyList() :
-                todasTransacoes.subList(start, end);
-
-        return new PageImpl<>(paginatedList, pageable, todasTransacoes.size());
+        return paginarLista(todasTransacoes, pageable);
     }
+
     @Override
     @Deprecated
     public List<Transacao> buscarTodasTransacoes() {
@@ -127,6 +126,16 @@ public class MemoryTransacaoRepository implements TransacaoRepository {
                 .filter(transacao -> Objects.equals(transacao.getCategoriaId().getValue(), categoriaId))
                 .collect(Collectors.toList());
     }
+    private Page<Transacao> paginarLista(List<Transacao> lista, Pageable pageable) {
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), lista.size());
+
+        List<Transacao> paginatedList = start >= lista.size() ?
+                Collections.emptyList() :
+                lista.subList(start, end);
+
+        return new PageImpl<>(paginatedList, pageable, lista.size());
+    }
     public void limparTodas() {
         transacoes.clear();
         idGenerator.set(1);
@@ -149,7 +158,6 @@ public class MemoryTransacaoRepository implements TransacaoRepository {
                 .filter(transacao -> Objects.equals(transacao.getCategoriaId().getValue(), categoriaId))
                 .count();
     }
-
     public boolean removerTransacao(Long transacaoId) {
         boolean removed = transacoes.remove(transacaoId) != null;
         if (removed) {
@@ -157,30 +165,36 @@ public class MemoryTransacaoRepository implements TransacaoRepository {
         }
         return removed;
     }
-
     public List<Transacao> buscarPorPeriodoEUsuario(Long usuarioId,
                                                     java.time.LocalDateTime dataInicio,
                                                     java.time.LocalDateTime dataFim) {
         return transacoes.values().stream()
-                .filter(transacao -> Objects.equals(transacao.getCategoriaId().getValue(), usuarioId))
+                .filter(transacao -> Objects.equals(transacao.getUsuarioId().getValue(), usuarioId))
                 .filter(transacao -> transacao.getData().isAfter(dataInicio) || transacao.getData().isEqual(dataInicio))
                 .filter(transacao -> transacao.getData().isBefore(dataFim) || transacao.getData().isEqual(dataFim))
                 .sorted((t1, t2) -> t2.getData().compareTo(t1.getData()))
                 .collect(Collectors.toList());
     }
-
     public Map<String, Object> obterEstatisticas() {
         Map<String, Object> stats = new HashMap<>();
         stats.put("totalTransacoes", transacoes.size());
         stats.put("proximoId", idGenerator.get());
 
-//        Map<Long, Long> transacoesPorUsuario = transacoes.values().stream()
-//                .collect(Collectors.groupingBy(
-//                        t -> t.getUsuario().getId(),
-//                        Collectors.counting()
-//                ));
-//        stats.put("transacoesPorUsuario", transacoesPorUsuario);
+        // Agrupa transações por usuário
+        Map<Long, Long> transacoesPorUsuario = transacoes.values().stream()
+                .collect(Collectors.groupingBy(
+                        t -> t.getUsuarioId().getValue(),
+                        Collectors.counting()
+                ));
+        stats.put("transacoesPorUsuario", transacoesPorUsuario);
 
         return stats;
+    }
+    public void definirProximoId(Long proximoId) {
+        idGenerator.set(proximoId);
+        log.debug("Próximo ID definido como: {}", proximoId);
+    }
+    public Long obterProximoId() {
+        return idGenerator.get();
     }
 }

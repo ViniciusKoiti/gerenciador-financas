@@ -15,7 +15,8 @@ import java.util.stream.Collectors;
 @Component
 public class CategoriaJpaMapper {
 
-    public CategoriaJpaEntity toJpaEntity(Categoria categoria, UsuarioJpaEntity usuarioJpa) {
+    public CategoriaJpaEntity toJpaEntity
+            (Categoria categoria, UsuarioJpaEntity usuarioJpa) {
         if (categoria == null) {
             return null;
         }
