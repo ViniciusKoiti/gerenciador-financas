@@ -5,6 +5,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.TransacaoMapp
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
+import com.vinicius.gerenciamento_financeiro.domain.model.pessoa.Email;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
@@ -66,7 +67,7 @@ class TransacaoServiceTest {
         usuarioId = UsuarioId.of(1L);
         categoriaId = CategoriaId.of(2L);
 
-        usuario = Usuario.criarNovo("João", "joao@teste.com", "senhaHash");
+        usuario = Usuario.criarNovo("João", new Email("joao@teste.com"), "senhaHash");
         usuario = Usuario.reconstituir(
                 1L,
                 "João",
