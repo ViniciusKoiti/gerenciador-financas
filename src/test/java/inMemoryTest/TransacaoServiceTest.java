@@ -110,7 +110,6 @@ public class TransacaoServiceTest {
 
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
         when(usuarioRepository.findById(UsuarioId.of(1L))).thenReturn(Optional.of(usuarioTeste));
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaJpaEntityTeste));
         when(categoriaRepository.existsByIdAndUsuarioId(1L, 1L)).thenReturn(true);
 
         TransacaoPost transacaoPost = new TransacaoPost(
@@ -129,9 +128,6 @@ public class TransacaoServiceTest {
                 CategoriaId.of(1L),
                 UsuarioId.of(1L)
         );
-
-        when(mapper.toEntity(eq(transacaoPost), eq(CategoriaId.of(1L)), eq(UsuarioId.of(1L))))
-                .thenReturn(transacaoEsperada);
 
         // Act
         service.adicionarTransacao(transacaoPost);
@@ -227,12 +223,6 @@ public class TransacaoServiceTest {
     @Test
     @DisplayName("Deve buscar transações por categoria corretamente")
     void deveBuscarTransacoesPorCategoria() {
-        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
-        when(usuarioRepository.findById(UsuarioId.of(1L))).thenReturn(Optional.of(usuarioTeste));
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaJpaEntityTeste));
-        when(categoriaRepository.existsByIdAndUsuarioId(1L, 1L)).thenReturn(true);
-
-
         // Cria transações para categorias diferentes
         Transacao transacao1 = criarTransacaoParaCategoria(1L, "Transação Cat 1", CategoriaId.of(1L));
         Transacao transacao2 = criarTransacaoParaCategoria(2L, "Transação Cat 2", CategoriaId.of(2L));

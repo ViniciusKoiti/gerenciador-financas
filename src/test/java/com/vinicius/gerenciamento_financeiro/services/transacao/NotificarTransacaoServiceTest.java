@@ -1,6 +1,7 @@
 package com.vinicius.gerenciamento_financeiro.services.transacao;
 
 import com.vinicius.gerenciamento_financeiro.adapter.out.messaging.RabbitMQConstants;
+import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
@@ -24,9 +25,8 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
-class NotificarTransacaoServiceTest {
+class NotificarTransacaoServiceTest{
 
     @Mock
     private NotificarUseCase notificarUseCase;
@@ -34,51 +34,24 @@ class NotificarTransacaoServiceTest {
     @InjectMocks
     private NotificarTransacaoService notificarTransacaoService;
 
-    private Transacao transacaoFutura;
-    private Transacao transacaoVencida;
-
-    @BeforeEach
-    void setUp() {
-        UsuarioId usuarioId = UsuarioId.of(1L);
-        CategoriaId categoriaId = CategoriaId.of(1L);
-
+    @Test
+    @DisplayName("✅ Deve enviar com atraso para transação futura")
+    void deveEnviarNotificacaoComAtraso_QuandoTransacaoFutura() {
+        // Arrange - Data futura
         ConfiguracaoTransacao configuracaoFutura = ConfiguracaoTransacao.comVencimento(
                 LocalDate.now().plusDays(2)
         );
 
-        ConfiguracaoTransacao configuracaoVencida = ConfiguracaoTransacao.comVencimento(
-                LocalDate.now().minusDays(1)
+        Transacao transacaoFutura = Transacao.reconstituir(
+                1L, "Transação Futura", new BigDecimal("100.00"), TipoMovimentacao.DESPESA,
+                LocalDateTime.now(), UsuarioId.of(1L), CategoriaId.of(1L),
+                configuracaoFutura, Auditoria.criarNova()
         );
 
-        transacaoFutura = Transacao.reconstituir(
-                1L,
-                "Transação Futura",
-                new BigDecimal("100.00"),
-                TipoMovimentacao.DESPESA,
-                LocalDateTime.now(),
-                usuarioId,
-                categoriaId,
-                configuracaoFutura,
-                null
-        );
-
-        transacaoVencida = Transacao.reconstituir(
-                2L,
-                "Transação Vencida",
-                new BigDecimal("200.00"),
-                TipoMovimentacao.DESPESA,
-                LocalDateTime.now().minusDays(2),
-                usuarioId,
-                categoriaId,
-                configuracaoVencida,
-                null
-        );
-    }
-
-    @Test
-    void deveEnviarNotificacaoComAtraso_QuandoTransacaoAindaNaoVenceu() {
+        // Act
         notificarTransacaoService.notificarTransacaoAtrasada(transacaoFutura);
 
+        // Assert
         ArgumentCaptor<Long> delayCaptor = ArgumentCaptor.forClass(Long.class);
         ArgumentCaptor<String> mensagemCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -89,31 +62,42 @@ class NotificarTransacaoServiceTest {
                 delayCaptor.capture()
         );
 
-        String mensagemEsperada = "Transação programada para " + transacaoFutura.getConfiguracao().getDataVencimento();
+        String mensagemEsperada = "Transação programada para " + configuracaoFutura.getDataVencimento();
         assertEquals(mensagemEsperada, mensagemCaptor.getValue());
-        assertTrue(delayCaptor.getValue() > 0);
+        assertTrue(delayCaptor.getValue() > 0, "Delay deve ser positivo para transação futura");
     }
 
     @Test
-    void deveEnviarNotificacaoImediata_QuandoTransacaoJaVenceu() {
+    @DisplayName("✅ Deve enviar imediatamente para transação vencida")
+    void deveEnviarNotificacaoImediata_QuandoTransacaoVencida() {
+        // Arrange - Data passada
+        ConfiguracaoTransacao configuracaoVencida = ConfiguracaoTransacao.comVencimento(
+                LocalDate.now().minusDays(1)  // Ontem = vencida
+        );
+
+        Transacao transacaoVencida = Transacao.reconstituir(
+                2L, "Transação Vencida", new BigDecimal("200.00"), TipoMovimentacao.DESPESA,
+                LocalDateTime.now(), UsuarioId.of(1L), CategoriaId.of(1L),
+                configuracaoVencida, Auditoria.criarNova()
+        );
+
+        // Act
         notificarTransacaoService.notificarTransacaoAtrasada(transacaoVencida);
 
-        ArgumentCaptor<String> mensagemCaptor = ArgumentCaptor.forClass(String.class);
-
+        // Assert
         verify(notificarUseCase).enviarNotificacao(
                 eq(RabbitMQConstants.EXCHANGE_DELAYED_TRANSACOES_VENCIMENTO),
                 eq(RabbitMQConstants.ROUTING_KEY_TRANSCACOES_VENCIMENTO),
-                mensagemCaptor.capture()
+                eq("Transação já venceu e será processada agora!")
         );
-
-        assertEquals("Transação já venceu e será processada agora!", mensagemCaptor.getValue());
     }
 
     @Test
-    @DisplayName("Não deve enviar notificação com atraso quando configuração tem data passada")
-    void naoDeveEnviarNotificacao_QuandoConfiguracaoNula() {
-        Transacao transacaoSemConfiguracao = Transacao.criarNova(
-                "Transação sem configuração",
+    @DisplayName("✅ Deve enviar imediatamente para configuração padrão (hoje)")
+    void deveEnviarNotificacaoImediata_QuandoConfiguracaoPadrao() {
+        // Arrange - Configuração padrão (dataVencimento = hoje)
+        Transacao transacaoComConfiguracaoPadrao = Transacao.criarNova(
+                "Transação com configuração padrão",
                 new BigDecimal("50.00"),
                 TipoMovimentacao.RECEITA,
                 LocalDateTime.now(),
@@ -121,14 +105,45 @@ class NotificarTransacaoServiceTest {
                 UsuarioId.of(1L)
         );
 
+        // Act
+        notificarTransacaoService.notificarTransacaoAtrasada(transacaoComConfiguracaoPadrao);
 
-        notificarTransacaoService.notificarTransacaoAtrasada(transacaoSemConfiguracao);
-
-        verify(notificarUseCase).enviarNotificacaoComAtraso(
+        // Assert - Como dataVencimento = hoje, será tratada como vencida
+        verify(notificarUseCase).enviarNotificacao(
                 eq(RabbitMQConstants.EXCHANGE_DELAYED_TRANSACOES_VENCIMENTO),
                 eq(RabbitMQConstants.ROUTING_KEY_TRANSCACOES_VENCIMENTO),
-                anyString(),
-                anyLong()
+                eq("Transação já venceu e será processada agora!")
         );
+    }
+
+    @Test
+    @DisplayName("✅ Deve verificar lógica de cálculo de delay")
+    void deveCalcularDelayCorretamente() {
+        LocalDate dataVencimento = LocalDate.now().plusDays(1); // Amanhã
+        ConfiguracaoTransacao configuracao = ConfiguracaoTransacao.comVencimento(dataVencimento);
+
+        Transacao transacao = Transacao.reconstituir(
+                3L, "Transação Teste Delay", new BigDecimal("75.00"), TipoMovimentacao.DESPESA,
+                LocalDateTime.now(), UsuarioId.of(1L), CategoriaId.of(1L),
+                configuracao, Auditoria.criarNova()
+        );
+
+        // Act
+        notificarTransacaoService.notificarTransacaoAtrasada(transacao);
+
+        // Assert
+        ArgumentCaptor<Long> delayCaptor = ArgumentCaptor.forClass(Long.class);
+        verify(notificarUseCase).enviarNotificacaoComAtraso(
+                anyString(), anyString(), anyString(), delayCaptor.capture()
+        );
+
+        Long delayCalculado = delayCaptor.getValue();
+
+        long umDiaEmMillis = 24 * 60 * 60 * 1000L;
+        long margemErro = 60 * 1000L;
+
+
+        assertTrue(delayCalculado < (umDiaEmMillis + margemErro),
+                "Delay não deve exceder muito 1 dia");
     }
 }
