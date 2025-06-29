@@ -2,6 +2,7 @@ package com.vinicius.gerenciamento_financeiro.domain.model.usuario;
 
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
+import com.vinicius.gerenciamento_financeiro.domain.model.pessoa.Email;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,13 +12,13 @@ import java.util.*;
 public final class Usuario implements UserDetails {
 
     private final UsuarioId id;
-    private final String email;
+    private final Email email;
     private final String nome;
     private final String hashSenha;
     private final Auditoria auditoria;
     private final Set<CategoriaId> categoriaIds;
 
-    public Usuario(UsuarioId id, String nome, String email, String hashSenha,
+    public Usuario(UsuarioId id, String nome, Email email, String hashSenha,
                    Auditoria auditoria, Set<CategoriaId> categoriaIds) {
         this.id = id;
         this.nome = nome;
@@ -31,13 +32,13 @@ public final class Usuario implements UserDetails {
         validarInvariantes();
     }
 
-    public static Usuario criarNovo(String nome, String email, String hashSenha) {
+    public static Usuario criarNovo(String nome, Email email, String hashSenha) {
         validarParametrosCriacao(nome, email, hashSenha);
 
         return new Usuario(
                 null,
                 validarNome(nome),
-                validarEmail(email),
+                email,
                 hashSenha,
                 Auditoria.criarNova(),
                 new HashSet<>()
@@ -54,7 +55,7 @@ public final class Usuario implements UserDetails {
         return new Usuario(
                 UsuarioId.of(id),
                 nome,
-                email,
+                new Email(email),
                 hashSenha,
                 auditoria != null ? auditoria : Auditoria.criarNova(),
                 categoriaIds
@@ -69,7 +70,7 @@ public final class Usuario implements UserDetails {
         return nome;
     }
 
-    public String getEmail() {
+    public Email getEmail() {
         return email;
     }
 
@@ -86,11 +87,11 @@ public final class Usuario implements UserDetails {
     }
 
 
-    public Usuario atualizarDados(String novoNome, String novoEmail) {
+    public Usuario atualizarDados(String novoNome, Email novoEmail) {
         return new Usuario(
                 this.id,
                 validarNome(novoNome),
-                validarEmail(novoEmail),
+                novoEmail,
                 this.hashSenha,
                 this.auditoria.marcarComoAtualizado(),
                 this.categoriaIds
@@ -190,9 +191,8 @@ public final class Usuario implements UserDetails {
         return this.hashSenha;
     }
 
-    @Override
     public String getUsername() {
-        return this.email;
+        return this.email.getEndereco();
     }
 
     @Override
@@ -215,7 +215,7 @@ public final class Usuario implements UserDetails {
         return true;
     }
 
-    private static void validarParametrosCriacao(String nome, String email, String hashSenha) {
+    private static void validarParametrosCriacao(String nome, Email email, String hashSenha) {
         if (hashSenha == null || hashSenha.trim().isEmpty()) {
             throw new IllegalArgumentException("Hash da senha é obrigatório");
         }
@@ -238,24 +238,10 @@ public final class Usuario implements UserDetails {
         return nomeValidado;
     }
 
-    private static String validarEmail(String email) {
-        if (email == null || email.trim().isEmpty()) {
-            throw new IllegalArgumentException("Email não pode ser vazio");
-        }
 
-        String emailValidado = email.toLowerCase().trim();
-
-        if (!emailValidado.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
-            throw new IllegalArgumentException("Email inválido: " + email);
-        }
-
-        return emailValidado;
-    }
 
     private void validarInvariantes() {
-        if (email == null || email.trim().isEmpty()) {
-            throw new IllegalStateException("Usuario deve ter email válido");
-        }
+
         if (nome == null || nome.trim().isEmpty()) {
             throw new IllegalStateException("Usuario deve ter nome válido");
         }

@@ -94,7 +94,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
             UsuarioJpaEntity usuarioJpa = UsuarioJpaEntity.builder()
                     .id(usuario.getId().getValue())
-                    .email(usuario.getEmail())
+                    .email(usuario.getEmail().getEndereco())
                     .nome(usuario.getNome())
                     .senha(usuario.getHashSenha())
                     .build();

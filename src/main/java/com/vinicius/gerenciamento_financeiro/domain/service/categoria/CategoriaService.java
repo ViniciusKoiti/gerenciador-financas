@@ -6,6 +6,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.Ca
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.usuario.entity.UsuarioJpaEntity;
+import com.vinicius.gerenciamento_financeiro.domain.model.pessoa.Email;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.port.in.CategoriaUseCase;
@@ -49,7 +50,7 @@ public class CategoriaService implements CategoriaUseCase {
 
             UsuarioJpaEntity usuarioJpa = UsuarioJpaEntity.builder()
                     .id(usuarioId)
-                    .email(usuario.getEmail())
+                    .email(usuario.getEmail().getEndereco())
                     .nome(usuario.getNome())
                     .senha(usuario.getHashSenha())
                     .build();

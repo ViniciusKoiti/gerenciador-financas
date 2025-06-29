@@ -6,9 +6,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-/**
- * Value Object para configuração de transação - DOMÍNIO PURO
- */
 public final class ConfiguracaoTransacao {
 
     private final Boolean pago;
@@ -35,16 +32,10 @@ public final class ConfiguracaoTransacao {
         validarInvariantes();
     }
 
-    /**
-     * Cria configuração padrão para transações simples
-     */
     public static ConfiguracaoTransacao padrao() {
         return new Builder().build();
     }
 
-    /**
-     * Cria configuração para transação recorrente
-     */
     public static ConfiguracaoTransacao recorrente(TipoRecorrencia tipo, Integer periodicidade) {
         return new Builder()
                 .recorrente(true)
@@ -52,10 +43,6 @@ public final class ConfiguracaoTransacao {
                 .periodicidade(periodicidade)
                 .build();
     }
-
-    /**
-     * Cria configuração para transação parcelada
-     */
     public static ConfiguracaoTransacao parcelada(Integer numeroParcelas) {
         return new Builder()
                 .parcelado(true)
@@ -63,18 +50,12 @@ public final class ConfiguracaoTransacao {
                 .build();
     }
 
-    /**
-     * Cria configuração com data de vencimento específica
-     */
     public static ConfiguracaoTransacao comVencimento(LocalDate dataVencimento) {
         return new Builder()
                 .dataVencimento(dataVencimento)
                 .build();
     }
 
-    /**
-     * Marca esta configuração como paga
-     */
     public ConfiguracaoTransacao marcarComoPaga() {
         if (this.pago) {
             return this; // Já está pago
@@ -87,9 +68,6 @@ public final class ConfiguracaoTransacao {
                 .build();
     }
 
-    /**
-     * Remove o pagamento (marca como não pago)
-     */
     public ConfiguracaoTransacao desmarcarPagamento() {
         if (!this.pago) {
             return this; // Já não está pago
@@ -101,10 +79,6 @@ public final class ConfiguracaoTransacao {
                 .dataPagamento(null)
                 .build();
     }
-
-    /**
-     * Atualiza a data de vencimento
-     */
     public ConfiguracaoTransacao alterarVencimento(LocalDate novaDataVencimento) {
         if (Objects.equals(this.dataVencimento, novaDataVencimento)) {
             return this; // Nada mudou
@@ -115,10 +89,6 @@ public final class ConfiguracaoTransacao {
                 .dataVencimento(novaDataVencimento)
                 .build();
     }
-
-    /**
-     * Verifica se a transação está vencida
-     */
     public boolean estaVencida() {
         if (pago || dataVencimento == null) {
             return false;
@@ -126,16 +96,10 @@ public final class ConfiguracaoTransacao {
         return LocalDate.now().isAfter(dataVencimento);
     }
 
-    /**
-     * Verifica se é uma transação simples (não recorrente, não parcelada)
-     */
     public boolean ehSimples() {
         return !recorrente && !parcelado;
     }
 
-    /**
-     * Calcula próxima data de vencimento para recorrência
-     */
     public LocalDate calcularProximoVencimento() {
         if (!recorrente || tipoRecorrencia == null || dataVencimento == null) {
             return dataVencimento;
@@ -153,7 +117,6 @@ public final class ConfiguracaoTransacao {
         };
     }
 
-    // ========== VALIDAÇÕES ==========
 
     private Integer validarPeriodicidade(Integer periodicidade, Boolean recorrente) {
         if (recorrente && (periodicidade == null || periodicidade <= 0)) {

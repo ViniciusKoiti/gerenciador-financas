@@ -5,6 +5,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario.Logi
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario.UsuarioPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.AuthenticationResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.UsuarioResponse;
+import com.vinicius.gerenciamento_financeiro.domain.model.pessoa.Email;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.domain.service.usuario.UsuarioServiceImpl;
@@ -56,7 +57,7 @@ class UsuarioServiceImplTest {
         UsuarioPost usuarioPost = new UsuarioPost("João", "joao@email.com", "senha123");
         String senhaEncriptada = "senha_encriptada";
 
-        Usuario usuarioNovo = Usuario.criarNovo("João", "joao@email.com", senhaEncriptada);
+        Usuario usuarioNovo = Usuario.criarNovo("João", new Email("joao@email.com"), senhaEncriptada);
         Usuario usuarioSalvo = Usuario.reconstituir(
                 1L,
                 "João",
