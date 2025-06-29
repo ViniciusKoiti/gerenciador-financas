@@ -108,7 +108,7 @@ public class TransacaoServiceTest {
 
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
         when(usuarioRepository.findById(UsuarioId.of(1L))).thenReturn(Optional.of(usuarioTeste));
-        when(categoriaRepository.existsByIdAndUsuarioId(1L, 1L)).thenReturn(true);
+        when(categoriaRepository.existsByIdAndUsuarioId(CategoriaId.of(1L), UsuarioId.of(1L))).thenReturn(true);
 
         TransacaoPost transacaoPost = new TransacaoPost(
                 "Salário",
@@ -148,7 +148,7 @@ public class TransacaoServiceTest {
         // Arrange
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
         when(usuarioRepository.findById(UsuarioId.of(1L))).thenReturn(Optional.of(usuarioTeste));
-        when(categoriaRepository.existsByIdAndUsuarioId(1L, 1L)).thenReturn(true);
+        when(categoriaRepository.existsByIdAndUsuarioId(CategoriaId.of(1L), UsuarioId.of(1L))).thenReturn(true);
 
         TransacaoPost receita = new TransacaoPost(
                 "Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 1L
@@ -243,7 +243,7 @@ public class TransacaoServiceTest {
         // Arrange
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
         when(usuarioRepository.findById(UsuarioId.of(1L))).thenReturn(Optional.of(usuarioTeste));
-        when(categoriaRepository.existsByIdAndUsuarioId(999L, 1L)).thenReturn(false);
+        when(categoriaRepository.existsByIdAndUsuarioId(CategoriaId.of(999L),UsuarioId.of( 1L))).thenReturn(false);
 
         TransacaoPost transacaoPost = new TransacaoPost(
                 "Teste", new BigDecimal("100"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 999L
@@ -287,7 +287,7 @@ public class TransacaoServiceTest {
         // Arrange
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
         when(usuarioRepository.findById(UsuarioId.of(1L))).thenReturn(Optional.of(usuarioTeste));
-        when(categoriaRepository.existsByIdAndUsuarioId(1L, 1L)).thenReturn(true);
+        when(categoriaRepository.existsByIdAndUsuarioId(CategoriaId.of(1L), UsuarioId.of(1L))).thenReturn(true);
 
         TransacaoPost transacaoPost = new TransacaoPost(
                 "Teste", new BigDecimal("100"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 1L
