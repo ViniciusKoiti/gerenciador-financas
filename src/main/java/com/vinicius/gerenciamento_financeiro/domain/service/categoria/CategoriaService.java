@@ -6,13 +6,16 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.Ca
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.usuario.entity.UsuarioJpaEntity;
+import com.vinicius.gerenciamento_financeiro.domain.exception.BusinessRuleViolationException;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
 import com.vinicius.gerenciamento_financeiro.domain.model.pessoa.Email;
+import com.vinicius.gerenciamento_financeiro.domain.model.usuario.ContextoUsuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.port.in.CategoriaUseCase;
 import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
+import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioAutenticadoPort;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +37,7 @@ public class CategoriaService implements CategoriaUseCase {
 
     private final CategoriaRepository categoriaRepository;
     private final CategoriaMapper categoriaMapper;
-    private final JwtService jwtService;
+    private final UsuarioAutenticadoPort usuarioAutenticado;
     private final UsuarioRepository usuarioRepository;
 
     @Override
@@ -44,12 +47,18 @@ public class CategoriaService implements CategoriaUseCase {
         }
 
         try {
-            Long usuarioIdRaw = jwtService.getByAutenticaoUsuarioId();
-            UsuarioId usuarioId = UsuarioId.of(usuarioIdRaw);
+            UsuarioId usuarioId = usuarioAutenticado.obterUsuarioAtual();
+            ContextoUsuario contexto = usuarioAutenticado.obterContextoParaLogs();
+
             log.debug("Criando categoria para usuário: {}", usuarioId.getValue());
 
             Usuario usuario = usuarioRepository.findById(usuarioId)
-                    .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado: " + usuarioIdRaw));
+                    .orElseThrow(() -> new BusinessRuleViolationException("USUARIO_NAO_ENCONTRADO",
+                            "Usuário não encontrado: " + usuarioId.getValue()));
+
+            if (!usuarioAutenticado.temPermissao("categoria", "criar")) {
+                throw new SecurityException("Usuário não tem permissão para criar categorias");
+            }
 
             Categoria categoria = Categoria.criar(
                     request.name(),
@@ -101,8 +110,7 @@ public class CategoriaService implements CategoriaUseCase {
     public Page<CategoriaResponse> findAllPaginated(Pageable pageable) {
         log.debug("Buscando categorias paginadas: página {}", pageable.getPageNumber());
 
-        Long usuarioIdRaw = jwtService.getByAutenticaoUsuarioId();
-        UsuarioId usuarioId = UsuarioId.of(usuarioIdRaw);
+        UsuarioId usuarioId = usuarioAutenticado.obterUsuarioAtual();
 
         return categoriaRepository.findByUsuarioId(usuarioId, pageable)
                 .map(categoriaMapper::toResponse);
@@ -132,8 +140,7 @@ public class CategoriaService implements CategoriaUseCase {
     public List<CategoriaResponse> findAll() {
         log.debug("Buscando todas as categorias");
 
-        Long usuarioIdRaw = jwtService.getByAutenticaoUsuarioId();
-        UsuarioId usuarioId = UsuarioId.of(usuarioIdRaw);
+        UsuarioId usuarioId = usuarioAutenticado.obterUsuarioAtual();
 
         List<Categoria> categorias = categoriaRepository.findByUsuarioId(usuarioId);
 
