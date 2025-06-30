@@ -5,12 +5,14 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.CategoriaMapp
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
+import com.vinicius.gerenciamento_financeiro.domain.exception.BusinessRuleViolationException;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.domain.service.categoria.CategoriaService;
 import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
+import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioAutenticadoPort;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +40,7 @@ class CategoriaServiceTest {
     private CategoriaMapper categoriaMapper;
 
     @Mock
-    private JwtService jwtService;
+    private UsuarioAutenticadoPort usuarioAutenticado;
 
     @Mock
     private UsuarioRepository usuarioRepository;
@@ -86,7 +88,7 @@ class CategoriaServiceTest {
                 null
         );
 
-        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
+        when(usuarioAutenticado.obterUsuarioAtual()).thenReturn(UsuarioId.of(1L));
         when(usuarioRepository.findById(UsuarioId.of(1L))).thenReturn(Optional.of(usuario));
         when(categoriaRepository.save(any(Categoria.class))).thenReturn(categoria);
         when(categoriaMapper.toResponse(any(Categoria.class))).thenReturn(expectedResponse);
@@ -139,7 +141,7 @@ class CategoriaServiceTest {
         when(categoriaRepository.findById(id)).thenReturn(Optional.of(categoria));
         when(categoriaMapper.toResponse(categoria)).thenReturn(expectedResponse);
 
-        CategoriaResponse result = categoriaService.findById(id.toString());
+        CategoriaResponse result = categoriaService.findById(id.getValue().toString());
 
         assertNotNull(result);
         assertEquals(expectedResponse.id(), result.id());
@@ -158,15 +160,15 @@ class CategoriaServiceTest {
                 null
         );
 
-        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
-        when(usuarioRepository.findById(UsuarioId.of(1L))).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        when(usuarioAutenticado.obterUsuarioAtual()).thenReturn(UsuarioId.of(999L));
+
+        BusinessRuleViolationException exception = assertThrows(
+                BusinessRuleViolationException.class,
                 () -> categoriaService.save(categoriaPost)
         );
 
-        assertEquals("Usuário não encontrado: 1", exception.getMessage());
+        assertEquals("Usuário não encontrado: 999", exception.getMessage());
         verify(categoriaRepository, never()).save(any());
     }
 }

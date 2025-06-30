@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Optional;
@@ -84,12 +85,12 @@ class LoginServiceImplTest {
     void autenticar_DeveLancarException_QuandoUsuarioNaoEncontrado() {
         LoginRequest loginRequest = new LoginRequest("inexistente@email.com", "senha123");
 
-        when(usuarioRepository.findByEmail(loginRequest.email()))
-                .thenReturn(Optional.empty());
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new BadCredentialsException("Bad credentials"));
 
         assertThatThrownBy(() -> loginService.autenticar(loginRequest))
-                .isInstanceOf(UsernameNotFoundException.class)
-                .hasMessage("Usuário não encontrado");
+                .isInstanceOf(BadCredentialsException.class)
+                .hasMessage("Bad credentials");
     }
 
     @Test

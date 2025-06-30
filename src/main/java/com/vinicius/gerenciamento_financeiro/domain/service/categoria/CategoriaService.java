@@ -50,15 +50,12 @@ public class CategoriaService implements CategoriaUseCase {
             UsuarioId usuarioId = usuarioAutenticado.obterUsuarioAtual();
             ContextoUsuario contexto = usuarioAutenticado.obterContextoParaLogs();
 
-            log.debug("Criando categoria para usuário: {}", usuarioId.getValue());
 
             Usuario usuario = usuarioRepository.findById(usuarioId)
                     .orElseThrow(() -> new BusinessRuleViolationException("USUARIO_NAO_ENCONTRADO",
                             "Usuário não encontrado: " + usuarioId.getValue()));
 
-            if (!usuarioAutenticado.temPermissao("categoria", "criar")) {
-                throw new SecurityException("Usuário não tem permissão para criar categorias");
-            }
+
 
             Categoria categoria = Categoria.criar(
                     request.name(),
