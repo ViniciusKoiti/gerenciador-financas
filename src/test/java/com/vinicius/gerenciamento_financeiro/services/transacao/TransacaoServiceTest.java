@@ -65,7 +65,7 @@ class TransacaoServiceTest {
     @BeforeEach
     void setUp() {
         usuarioId = UsuarioId.of(1L);
-        categoriaId = CategoriaId.of(2L);
+        categoriaId = CategoriaId.of(1L);
 
         usuario = Usuario.criarNovo("João", new Email("joao@teste.com"), "senhaHash");
         usuario = Usuario.reconstituir(
