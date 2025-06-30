@@ -1,6 +1,7 @@
 package com.vinicius.gerenciamento_financeiro.services.usuario;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.SpringUserDetails;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.UsuarioMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario.LoginRequest;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.AuthenticationResponse;
@@ -61,7 +62,7 @@ class LoginServiceImplTest {
 
         when(usuarioRepository.findByEmail(loginRequest.email()))
                 .thenReturn(Optional.of(usuario));
-        when(jwtService.gerarToken(usuario, usuario.getId().getValue()))
+        when(jwtService.gerarToken(new SpringUserDetails(usuario), usuario.getId().getValue()))
                 .thenReturn(expectedToken);
         when(usuarioMapper.toResponse(usuario))
                 .thenReturn(usuarioResponse);

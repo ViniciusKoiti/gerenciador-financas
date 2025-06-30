@@ -56,6 +56,12 @@ public class JwtService {
         return extrairExpiracao(token).before(new Date());
     }
 
+    public String gerarToken(SpringUserDetails userDetails, Long userId) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        return criarToken(claims, userDetails);
+    }
+
     public String gerarToken(UserDetails userDetails, Long userId) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
@@ -89,7 +95,12 @@ public class JwtService {
             throw new IllegalStateException("Usuário não autenticado.");
         }
 
-        Usuario userDetails = (Usuario) authentication.getPrincipal();
-        return userDetails.getId().getValue();
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof SpringUserDetails springUserDetails) {
+            return springUserDetails.getUsuario().getId().getValue();
+        }
+
+        throw new IllegalStateException("Tipo de principal não suportado: " + principal.getClass());
     }
 }

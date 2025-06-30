@@ -3,13 +3,11 @@ package com.vinicius.gerenciamento_financeiro.domain.model.usuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
 import com.vinicius.gerenciamento_financeiro.domain.model.pessoa.Email;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+
 
 import java.util.*;
 
-public final class Usuario implements UserDetails {
+public final class Usuario  {
 
     private final UsuarioId id;
     private final Email email;
@@ -178,41 +176,6 @@ public final class Usuario implements UserDetails {
 
     public boolean podeAcessarRecurso(UsuarioId proprietarioRecurso) {
         return this.id != null && this.id.equals(proprietarioRecurso);
-    }
-
-    // Métodos UserDetails para Spring Security
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
-    }
-
-    @Override
-    public String getPassword() {
-        return this.hashSenha;
-    }
-
-    public String getUsername() {
-        return this.email.getEndereco();
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
     }
 
     private static void validarParametrosCriacao(String nome, Email email, String hashSenha) {
