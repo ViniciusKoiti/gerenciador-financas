@@ -5,6 +5,7 @@ import lombok.Getter;
 
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 
@@ -35,5 +36,18 @@ public class Email implements Serializable {
     @Override
     public String toString() {
         return endereco;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Email email = (Email) obj;
+        return Objects.equals(this.endereco, email.endereco);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(endereco);
     }
 }

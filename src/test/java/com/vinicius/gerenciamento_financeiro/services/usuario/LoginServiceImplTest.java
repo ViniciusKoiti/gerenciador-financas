@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Optional;
@@ -61,10 +62,22 @@ class LoginServiceImplTest {
         UsuarioResponse usuarioResponse = new UsuarioResponse(1L, "Nome Teste", "test@email.com", null);
         String expectedToken = "jwt-token";
 
-        when(usuarioRepository.findByEmail(loginRequest.email()))
-                .thenReturn(Optional.of(usuario));
-        when(jwtService.gerarToken(new SpringUserDetails(usuario), usuario.getId().getValue()))
+        SpringUserDetails userDetails = new SpringUserDetails(usuario);
+
+        Authentication authenticatedAuth = new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.getAuthorities()
+        );
+
+        // Mock the authentication manager to return the authenticated object
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(authenticatedAuth);
+
+        // Mock JWT service
+        when(jwtService.gerarToken(userDetails, usuario.getId().getValue()))
                 .thenReturn(expectedToken);
+
         when(usuarioMapper.toResponse(usuario))
                 .thenReturn(usuarioResponse);
 
@@ -75,12 +88,15 @@ class LoginServiceImplTest {
 
         verify(authenticationManager).authenticate(
                 argThat(auth ->
-                        auth.getPrincipal().equals(loginRequest.email()) &&
+                        auth instanceof UsernamePasswordAuthenticationToken &&
+                                auth.getPrincipal().equals(loginRequest.email()) &&
                                 auth.getCredentials().equals(loginRequest.senha())
                 )
         );
-    }
 
+        verify(jwtService).gerarToken(userDetails, usuario.getId().getValue());
+        verify(usuarioMapper).toResponse(usuario);
+    }
     @Test
     void autenticar_DeveLancarException_QuandoUsuarioNaoEncontrado() {
         LoginRequest loginRequest = new LoginRequest("inexistente@email.com", "senha123");

@@ -4,6 +4,7 @@ import lombok.Getter;
 
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Cpf implements Serializable {
 
@@ -76,4 +77,18 @@ public class Cpf implements Serializable {
     public String toString() {
         return numero;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Cpf cpf = (Cpf) obj;
+        return Objects.equals(numero, cpf.numero);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(numero);
+    }
+
 }
