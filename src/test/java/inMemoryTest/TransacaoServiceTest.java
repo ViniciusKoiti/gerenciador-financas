@@ -28,6 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -170,12 +171,14 @@ public class TransacaoServiceTest {
         List<Transacao> todasTransacoes = memoryRepository.buscarTodasTransacoesPorUsuario(1L);
         assertEquals(2, todasTransacoes.size());
 
+        todasTransacoes.sort(Comparator.comparing(Transacao::getDescricao));
+
 
 
         verify(notificarTransacaoService, times(2)).notificarTransacaoAtrasada(any(Transacao.class));
 
-        assertEquals("Salário", todasTransacoes.get(0).getDescricao());
-        assertEquals("Aluguel", todasTransacoes.get(1).getDescricao());
+        assertEquals("Aluguel", todasTransacoes.get(0).getDescricao());
+        assertEquals("Salário", todasTransacoes.get(1).getDescricao());
     }
 
     @Test
