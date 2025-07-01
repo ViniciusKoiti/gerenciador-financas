@@ -24,7 +24,7 @@ public class ClienteJpaEntity extends PessoaJpaEntity {
     private Long id;
 
     @Embedded
-    private PixInfo pixInfo;
+    private PixInfoJpa pixInfo;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
@@ -47,4 +47,6 @@ public class ClienteJpaEntity extends PessoaJpaEntity {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+
 }

@@ -23,10 +23,10 @@ public abstract class PessoaJpaEntity {
     private String nome;
 
     @Column(nullable = false, unique = true)
-    private Cpf cpf;
+    private String cpf;
 
     @Column(nullable = false, unique = true)
-    private Email email;
+    private String email;
 
     @Column
     private String telefone;
