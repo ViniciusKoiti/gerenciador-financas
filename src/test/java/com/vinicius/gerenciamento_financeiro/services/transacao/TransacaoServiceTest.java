@@ -80,7 +80,6 @@ class TransacaoServiceTest {
 
     @Test
     void deveAdicionarTransacaoComSucesso() {
-
         TransacaoPost transacaoPost = new TransacaoPost(
                 "Salário",
                 BigDecimal.valueOf(1000),
