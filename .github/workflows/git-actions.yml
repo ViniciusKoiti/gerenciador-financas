@@ -16,8 +16,11 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
 
-      - name: Build and start services with Docker Compose
-        run: docker compose up -d --build
+      - name: Build images first
+        run: docker compose build
+
+      - name: Start services
+        run: docker compose up -d
 
       - name: Wait for RabbitMQ to be healthy
         run: |
