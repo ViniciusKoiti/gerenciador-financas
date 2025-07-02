@@ -7,238 +7,314 @@ O **Sistema de Gerenciamento Financeiro** é uma aplicação web desenvolvida pa
 ### 🎯 Propósito
 
 - **Controle Financeiro Pessoal**: Registro e acompanhamento de receitas e despesas
-- **Categorização Inteligente**: Organização das transações por categoriaJpaEntities personalizáveis
+- **Categorização Inteligente**: Organização das transações por categorias personalizáveis
 - **Análise Visual**: Dashboards e gráficos para análise de padrões financeiros
 - **Gestão de Vencimentos**: Sistema de notificações para contas a pagar
 
+### 🔗 Links Importantes
+
+- **Backend API**: [gerenciador-financas](https://github.com/ViniciusKoiti/gerenciador-financas)
+- **Frontend Web**: [gerenciador-financas-app](https://github.com/ViniciusKoiti/gerenciador-financas-app) *(em desenvolvimento)*
+- **Documentação API**: `/swagger-ui.html` *(quando aplicação estiver rodando)*
+
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 🚀 Quick Start
 
-### Backend
+### Pré-requisitos
+- Java 21+
+- Docker & Docker Compose
+- Maven 3.8+
+
+### Instalação e Execução
+
+```bash
+# Clone o repositório
+git clone https://github.com/ViniciusKoiti/gerenciador-financas.git
+cd gerenciador-financas
+
+# Suba os serviços necessários (RabbitMQ)
+docker-compose up -d
+
+# Execute a aplicação
+./mvnw spring-boot:run
+
+# Acesse a documentação da API
+http://localhost:8080/swagger-ui.html
+```
+
+### Primeiros Passos
+
+1. **Crie um usuário** via endpoint `/api/auth/register`
+2. **Faça login** em `/api/auth/login` para obter o token JWT
+3. **Use o token** no header `Authorization: Bearer {token}`
+4. **Explore a API** através do Swagger UI
+
+---
+
+## 🛠️ Stack Tecnológica
+
+### Backend Core
 - **Java 21** - Linguagem principal
-- **Spring Boot 3.3.4** - Framework principal
-- **Spring Security** - Autenticação e autorização
+- **Spring Boot 3.3.4** - Framework base
+- **Spring Security** - Autenticação e autorização JWT
 - **Spring Data JPA** - Persistência de dados
-- **H2 Database** - Banco de dados em memória (desenvolvimento)
-- **JWT** - Autenticação stateless
-- **MapStruct** - Mapeamento entre camadas
-- **RabbitMQ** - Mensageria para notificações
+- **H2 Database** - Banco em memória *(desenvolvimento)*
+- **MapStruct** - Mapeamento entre DTOs
+- **RabbitMQ** - Mensageria assíncrona
 
-### Infraestrutura e DevOps
+### Arquitetura & Padrões
+- **Hexagonal Architecture** - Ports & Adapters
+- **Domain-Driven Design** - Modelagem rica do domínio
+- **Clean Architecture** - Independência de frameworks
+
+### DevOps & Qualidade
 - **Docker & Docker Compose** - Containerização
-- **GitHub Actions** - CI/CD
-- **Maven** - Gerenciamento de dependências
-- **Swagger/OpenAPI** - Documentação da API
-
-### Testes
-- **JUnit 5** - Framework de testes
-- **Mockito** - Mocks para testes unitários
+- **GitHub Actions** - CI/CD pipeline
+- **JUnit 5 & Mockito** - Testes unitários
 - **TestContainers** - Testes de integração
-
-### Arquitetura
-- **Hexagonal Architecture** - Separação de responsabilidades
-- **Domain-Driven Design (DDD)** - Modelagem do domínio
-- **Ports & Adapters** - Isolamento de dependências externas
-
----
-
-## ✅ Funcionalidades Implementadas
-
-### 🔐 Autenticação e Autorização
-- [x] **Cadastro de usuários** com validação de email único
-- [x] **Login com JWT** - Tokens seguros para autenticação
-- [x] **Controle de acesso** - Usuários só acessam seus próprios dados
-- [x] **Criptografia de senhas** com BCrypt
-
-### 📊 Gestão de Categorias
-- [x] **Criação de categoriaJpaEntities personalizadas** por usuário
-- [x] **Categorias padrão** criadas automaticamente no cadastro
-- [x] **Busca paginada** de categoriaJpaEntities
-- [x] **Validação de propriedade** - Usuários só acessam suas categoriaJpaEntities
-
-### 💳 Gestão de Transações
-- [x] **Criação de transações** (receitas e despesas)
-- [x] **Associação com categoriaJpaEntities** definidas pelo usuário
-- [x] **Busca por categoriaJpaEntity** e filtros por usuário
-- [x] **Cálculo automático de saldo** baseado nas transações
-- [x] **Atualização de categoriaJpaEntity** de transações existentes
-
-### 📈 Relatórios e Gráficos
-- [x] **Gráfico por categoriaJpaEntity** - Visualização de gastos por categoriaJpaEntity
-- [x] **Evolução financeira mensal** - Receitas vs despesas ao longo do tempo
-- [x] **Resumo financeiro** - Totalizadores de receitas, despesas e saldo
-
-### 🔔 Sistema de Notificações
-- [x] **Notificações de vencimento** via RabbitMQ
-- [x] **Processamento assíncrono** com delayed messages
-- [x] **Consumer de mensagens** para processamento de notificações
-
-### 📚 Documentação e Qualidade
-- [x] **Documentação da API** com Swagger/OpenAPI
-- [x] **Testes unitários e de integração** com boa cobertura
-- [x] **Tratamento global de exceções** com respostas padronizadas
-- [x] **Validação de entrada** em todos os endpoints
-
----
-
-## ❌ Funcionalidades Pendentes
-
-### 🏗️ **Melhorias Arquiteturais (Alta Prioridade)**
-
-#### **Pureza da Arquitetura Hexagonal**
-**Status:** 🔴 Pendente  
-**Motivo:** Priorização por velocidade de entrega inicial
-
-- [ ] **Separação completa do domínio**: Remover anotações JPA das entidades de domínio
-- [ ] **Modularização em Maven/Gradle**: Criar módulos separados (domain, application, adapters)
-- [ ] **Use Cases específicos**: Quebrar Services em Use Cases únicos e focados
-- [ ] **Domain Events**: Implementar eventos de domínio para comunicação assíncrona
-
-**Justificativa:** No MVP foi priorizada a entrega rápida. Agora é necessário refatorar para atingir pureza arquitetural e facilitar manutenibilidade a longo prazo.
-
-#### **Implementação de CQRS**
-**Status:** 🟡 Planejado  
-**Motivo:** Decisão arquitetural para melhor performance em consultas
-
-- [ ] **Command side**: Separar operações de escrita
-- [ ] **Query side**: Criar projeções otimizadas para leitura
-- [ ] **Event Sourcing**: Considerar para auditoria completa
-
-### 💾 **Persistência e Performance**
-
-#### **Banco de Dados de Produção**
-**Status:** 🔴 Crítico  
-**Motivo:** Atualmente usando H2 apenas para desenvolvimento
-
-- [ ] **PostgreSQL**: Configurar para produção
-- [ ] **Migrations com Flyway**: Versionamento do schema
-- [ ] **Connection pooling**: Otimização de conexões
-- [ ] **Índices estratégicos**: Performance em consultas frequentes
-
-#### **Cache e Otimizações**
-**Status:** 🟡 Futuro  
-**Motivo:** Prematuridade - aguardando métricas de uso real
-
-- [ ] **Redis**: Cache para consultas frequentes
-- [ ] **Cache de segundo nível**: Hibernate L2 cache
-- [ ] **Paginação otimizada**: Cursor-based pagination para grandes volumes
-
-### 🔒 **Segurança Avançada**
-
-#### **Melhorias de Segurança**
-**Status:** 🟡 Médio prazo  
-**Motivo:** Funcionalidades básicas atendendo demanda atual
-
-- [ ] **Rate limiting**: Proteção contra ataques de força bruta
-- [ ] **Refresh tokens**: Renovação segura de JWT
-- [ ] **2FA**: Autenticação de dois fatores
-- [ ] **Auditoria completa**: Log de todas as operações sensíveis
-
-### 📱 **Interface e Experiência**
-
-#### **Frontend Web**
-
-Status: 🟡 Em desenvolvimento
-Repositório: [gerenciador-financas-app](https://github.com/ViniciusKoiti/gerenciador-financas-app)
-Motivo: Desenvolvimento paralelo para validação da API
-
-#### **API Mobile**
-**Status:** 🟡 Futuro  
-**Motivo:** Validação de mercado pendente
-
-- [ ] **Endpoints otimizados**: Para consumo mobile
-- [ ] **Push notifications**: Notificações nativas
-- [ ] **Sincronização offline**: Para uso sem internet
-
-### 🔄 **Integrações Externas**
-
-#### **Importação de Dados**
-**Status:** 🟡 Planejado  
-**Motivo:** Alinhamento com padrões bancários brasileiros
-
-- [ ] **OFX/QIF**: Importação de extratos bancários
-- [ ] **Open Banking**: Integração com APIs bancárias brasileiras
-- [ ] **CSV customizável**: Upload com mapeamento de campos
-- [ ] **Categorização automática**: IA para sugerir categoriaJpaEntities
-
-#### **Relatórios Avançados**
-**Status:** 🟡 Média prioridade  
-**Motivo:** Funcionalidades básicas atendendo usuários iniciais
-
-- [ ] **Exportação PDF**: Relatórios formatados
-- [ ] **Excel/CSV**: Exportação de dados para análise externa
-- [ ] **Projeções financeiras**: Simulações baseadas em histórico
-- [ ] **Alertas inteligentes**: Notificações baseadas em padrões
-
-### 🚀 **Performance e Escalabilidade**
-
-#### **Observabilidade**
-**Status:** 🟡 Próxima sprint  
-**Motivo:** Necessário para monitoramento em produção
-
-- [ ] **Métricas customizadas**: Micrometer + Prometheus
-- [ ] **Tracing distribuído**: Jaeger/Zipkin
-- [ ] **Logs estruturados**: JSON para análise automatizada
-- [ ] **Health checks**: Monitoramento de dependências
-
-#### **Testes Avançados**
-**Status:** 🟡 Melhoria contínua  
-**Motivo:** Cobertura atual atende, mas pode ser aprimorada
-
-- [ ] **Testes de carga**: JMeter/Gatling
-- [ ] **Testes de contrato**: Pact para APIs
-- [ ] **Mutation testing**: Qualidade dos testes
-- [ ] **Testes arquiteturais**: ArchUnit para validação automática
-
----
-
-## 🚀 Próximos Passos
-
-### **Sprint 1 - Pureza Arquitetural** (2 semanas)
-1. Remover anotações JPA do domínio
-2. Criar entidades JPA separadas nos adapters
-3. Implementar mappers entre domínio e persistência
-
-### **Sprint 2 - Modularização** (2 semanas)
-1. Separar em módulos Maven
-2. Quebrar Services em Use Cases específicos
-3. Implementar testes arquiteturais com ArchUnit
-
-### **Sprint 3 - Banco de Produção** (1 semana)
-1. Configurar PostgreSQL
-2. Ajustar Flyway migrations
-3. Testes de integração com TestContainers
+- **Swagger/OpenAPI** - Documentação automática
 
 ---
 
 ## 📊 Status do Projeto
 
-| Categoria | Progresso | Status |
-|-----------|-----------|--------|
-| **MVP Funcional** | 95% | ✅ Concluído |
-| **Arquitetura Hexagonal** | 75% | 🟡 Em evolução |
-| **Testes e Qualidade** | 80% | ✅ Bom |
-| **Documentação** | 85% | ✅ Bom |
-| **Segurança Básica** | 90% | ✅ Concluído |
-| **Performance** | 60% | 🟡 A melhorar |
-| **Produção Ready** | 70% | 🟡 Quase pronto |
+### Progresso Geral
+
+| Área | Status | Progresso |
+|------|--------|-----------|
+| **Funcionalidades Core** | ✅ Concluído | 95% |
+| **Arquitetura Limpa** | 🟡 Em evolução | 75% |
+| **Cobertura de Testes** | ✅ Bom | 80% |
+| **Documentação** | ✅ Bom | 85% |
+| **Segurança** | ✅ Implementado | 90% |
+| **Performance** | 🟡 A otimizar | 60% |
+| **Production Ready** | 🟡 Em progresso | 70% |
+
+### ✅ Funcionalidades Implementadas
+
+#### 🔐 **Autenticação e Segurança**
+- ✓ Registro com validação de email único
+- ✓ Login JWT com tokens seguros
+- ✓ Autorização baseada em propriedade
+- ✓ Criptografia BCrypt
+
+#### 💳 **Gestão Financeira**
+- ✓ CRUD completo de transações
+- ✓ Categorização customizada
+- ✓ Filtros e busca paginada
+- ✓ Cálculo automático de saldos
+
+#### 📈 **Analytics e Relatórios**
+- ✓ Gráficos por categoria
+- ✓ Evolução temporal de finanças
+- ✓ Resumo financeiro consolidado
+- ✓ Exportação de dados *(básica)*
+
+#### 🔔 **Notificações**
+- ✓ Sistema de notificações via RabbitMQ
+- ✓ Processamento assíncrono
+- ✓ Alertas de vencimento
+
+### 🚧 Funcionalidades em Desenvolvimento
+
+#### **Frontend Web** *(Sprint Atual)*
+- 🔄 Interface React moderna
+- 🔄 Dashboard interativo
+- 🔄 Gráficos com Chart.js
+- 🔄 PWA capabilities
+
+#### **Melhorias Arquiteturais** *(Próxima Sprint)*
+- ⏳ Separação pura de domínio
+- ⏳ Modularização Maven
+- ⏳ Event Sourcing
+- ⏳ CQRS pattern
+
+---
+
+## 🗺️ Roadmap
+
+### Q1 2025 - Fundação
+- [x] MVP Backend funcional
+- [x] Autenticação e autorização
+- [x] API RESTful documentada
+- [ ] Frontend web completo
+- [ ] Deploy em produção
+
+### Q2 2025 - Crescimento
+- [ ] App mobile (React Native)
+- [ ] Integração Open Banking
+- [ ] Import/Export avançado
+- [ ] Machine Learning para categorização
+
+### Q3 2025 - Maturidade
+- [ ] Multi-tenancy
+- [ ] API pública
+- [ ] Marketplace de integrações
+- [ ] Versão Enterprise
+
+---
+
+## 🏗️ Arquitetura
+
+### Estrutura de Pacotes
+
+```
+src/main/java/com/vinicius/gerenciamento_financeiro/
+├── adapter/           # Adapters (entrada/saída)
+│   ├── in/           # Controllers, DTOs
+│   └── out/          # Repositories, clients
+├── application/      # Casos de uso
+│   └── service/      # Implementações
+├── domain/           # Entidades e regras
+│   ├── model/        # Aggregates, VOs
+│   └── exception/    # Exceções de domínio
+└── port/             # Interfaces (portas)
+    ├── in/           # Use cases
+    └── out/          # Gateways
+```
+
+### Fluxo de Dados
+
+```mermaid
+graph LR
+    A[Cliente] --> B[Controller]
+    B --> C[Use Case]
+    C --> D[Domain]
+    C --> E[Port Out]
+    E --> F[Adapter Out]
+    F --> G[Database/External]
+```
+
+---
+
+## 🧪 Testes
+
+### Executar Testes
+
+```bash
+# Todos os testes
+./mvnw test
+
+# Apenas unitários
+./mvnw test -Dtest="*Test"
+
+# Apenas integração
+./mvnw test -Dtest="*IT"
+
+# Com cobertura
+./mvnw clean test jacoco:report
+```
+
+### Estratégia de Testes
+
+- **Unitários**: Lógica de negócio isolada
+- **Integração**: Fluxos completos com TestContainers
+- **Contrato**: Validação de APIs
+- **Carga**: Performance com Gatling *(planejado)*
+
+---
+
+## 🔧 Configuração
+
+### Variáveis de Ambiente
+
+```properties
+# Banco de Dados
+DB_URL=jdbc:h2:mem:testdb
+DB_USER=sa
+DB_PASSWORD=
+
+# JWT
+JWT_SECRET=your-secret-key
+JWT_EXPIRATION=86400000
+
+# RabbitMQ
+RABBITMQ_HOST=localhost
+RABBITMQ_PORT=5672
+RABBITMQ_USER=guest
+RABBITMQ_PASSWORD=guest
+
+# Aplicação
+SERVER_PORT=8080
+SPRING_PROFILES_ACTIVE=dev
+```
+
+### Profiles Disponíveis
+
+- **dev**: Desenvolvimento local com H2
+- **test**: Testes automatizados
+- **prod**: Produção com PostgreSQL *(em implementação)*
+
+---
+
+## 📝 Convenções e Padrões
+
+### Commits
+Seguimos [Conventional Commits](https://www.conventionalcommits.org/):
+- `feat:` Nova funcionalidade
+- `fix:` Correção de bug
+- `docs:` Documentação
+- `refactor:` Refatoração
+- `test:` Testes
+- `chore:` Tarefas gerais
+
+### Branches
+- `main` - Produção estável
+- `develop` - Desenvolvimento integrado
+- `feature/*` - Novas funcionalidades
+- `hotfix/*` - Correções urgentes
+
+### Code Review
+- PRs obrigatórios para main
+- Mínimo 1 aprovação
+- Testes passando
+- SonarQube aprovado *(futuro)*
 
 ---
 
 ## 🤝 Como Contribuir
 
-1. **Fork** o repositório
-2. Crie uma **branch** para sua feature (`git checkout -b feature/nova-funcionalidade`)
-3. **Commit** suas mudanças (`git commit -m 'Adiciona nova funcionalidade'`)
-4. **Push** para a branch (`git push origin feature/nova-funcionalidade`)
-5. Abra um **Pull Request**
+1. **Fork** o projeto
+2. **Clone** seu fork: `git clone https://github.com/seu-usuario/gerenciador-financas.git`
+3. **Branch** nova feature: `git checkout -b feature/minha-feature`
+4. **Commit** suas mudanças: `git commit -m 'feat: adiciona minha feature'`
+5. **Push** para o branch: `git push origin feature/minha-feature`
+6. **Pull Request** com descrição detalhada
 
-## 📞 Contato
-
-- **Desenvolvedor**: Vinicius
-- **Email**: viniciusnakahara@gmail.com
-- **GitHub**: [ViniciusKoiti](https://github.com/ViniciusKoiti/)
+### Guidelines
+- Mantenha a cobertura de testes acima de 80%
+- Siga os padrões de código existentes
+- Documente mudanças significativas
+- Atualize o README quando necessário
 
 ---
 
+## 📞 Suporte e Contato
+
+### Desenvolvedor
+- **Nome**: Vinicius Koiti Nakahara
+- **Email**: viniciusnakahara@gmail.com
+- **GitHub**: [@ViniciusKoiti](https://github.com/ViniciusKoiti)
+- **LinkedIn**: [Adicione seu LinkedIn]
+
+### Comunidade
+- **Issues**: [GitHub Issues](https://github.com/ViniciusKoiti/gerenciador-financas/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/ViniciusKoiti/gerenciador-financas/discussions)
+
+---
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+---
+
+<div align="center">
+  <p>Feito com ❤️ por Vinicius Koiti</p>
+  <p>
+    <a href="https://github.com/ViniciusKoiti/gerenciador-financas">⭐ Star no GitHub</a> •
+    <a href="https://github.com/ViniciusKoiti/gerenciador-financas/issues">🐛 Reportar Bug</a> •
+    <a href="https://github.com/ViniciusKoiti/gerenciador-financas/issues">✨ Solicitar Feature</a>
+  </p>
+</div>
