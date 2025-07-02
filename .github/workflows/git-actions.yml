@@ -16,11 +16,24 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
 
-      - name: Build images first
-        run: docker compose build
+      - name: Build images separately for debugging
+        run: |
+          echo "Building rabbitmq image..."
+          docker compose build rabbitmq
+          echo "Building app image..."
+          docker compose build app
+          echo "Listing all images:"
+          docker images
 
       - name: Start services
         run: docker compose up -d
+
+      - name: Verify containers are running
+        run: |
+          echo "Checking container status..."
+          docker ps
+          echo "Checking rabbitmq logs..."
+          docker logs meu-rabbit || true
 
       - name: Wait for RabbitMQ to be healthy
         run: |
@@ -30,8 +43,23 @@ jobs:
               echo "RabbitMQ está pronto!"
               break
             fi
+            echo "Tentativa $i/30 - RabbitMQ ainda não está pronto..."
             sleep 2
           done
+
+      - name: Test application health
+        run: |
+          echo "Testando se a aplicação está respondendo..."
+          sleep 10  # Aguarda a aplicação subir
+          curl -f http://localhost:8080/actuator/health || echo "Health check falhou"
+
+      - name: Show logs on failure
+        if: failure()
+        run: |
+          echo "=== RabbitMQ Logs ==="
+          docker logs meu-rabbit
+          echo "=== App Logs ==="
+          docker logs $(docker ps -q --filter ancestor=gerenciador-financas-app)
 
       - name: Shutdown containers
         if: always()
@@ -48,5 +76,7 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
 
-      - name: Start app container for deploy
-        run: docker compose up -d --build app
+      - name: Deploy application
+        run: |
+          docker compose build
+          docker compose up -d
