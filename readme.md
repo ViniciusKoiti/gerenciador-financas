@@ -119,7 +119,7 @@ http://localhost:8080/swagger-ui.html
 ### 🚧 Funcionalidades em Desenvolvimento
 
 #### **Frontend Web** *(Sprint Atual)*
-- 🔄 Interface React moderna
+- 🔄 Interface Angular moderna
 - 🔄 Dashboard interativo
 - 🔄 Gráficos com Chart.js
 - 🔄 PWA capabilities
@@ -142,7 +142,7 @@ http://localhost:8080/swagger-ui.html
 - [ ] Deploy em produção
 
 ### Q2 2025 - Crescimento
-- [ ] App mobile (React Native)
+- [ ] App mobile (Flutter)
 - [ ] Integração Open Banking
 - [ ] Import/Export avançado
 - [ ] Machine Learning para categorização
