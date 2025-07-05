@@ -1,4 +1,4 @@
-package com.vinicius.gerenciamento_financeiro;
+package com.vinicius.gerenciamento_financeiro.config;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
