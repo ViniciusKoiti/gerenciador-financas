@@ -20,9 +20,9 @@ public class AnexoJpaEntity {
 
     private String nomeOriginal;
     private String nomeArquivo;
-    private String contentType;
+    private String tipoArquivo;
     private Long tamanho;
-    private String caminho;
+    private String caminhoArquivo;
 
     @Enumerated(EnumType.STRING)
     private TipoAnexo tipo;
