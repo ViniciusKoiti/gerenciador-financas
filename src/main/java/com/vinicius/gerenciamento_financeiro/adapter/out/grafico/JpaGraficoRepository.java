@@ -60,8 +60,8 @@ SELECT new com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico
      SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao.DESPESA THEN t.valor ELSE 0 END)))
 FROM TransacaoJpaEntity t
 WHERE t.usuario.id = :usuarioId
-  AND (:dataInicio IS NULL OR t.data >= :dataInicio)
-  AND (:dataFim IS NULL OR t.data <= :dataFim)
+    AND (CAST(:dataInicio AS TIMESTAMP) IS NULL OR t.data >= :dataInicio)
+    AND (CAST(:dataFim AS TIMESTAMP) IS NULL OR t.data >= :dataFim)
 """)
     ResumoFinanceiroResponse gerarResumoFinanceiro(
             @Param("usuarioId") Long usuarioId,

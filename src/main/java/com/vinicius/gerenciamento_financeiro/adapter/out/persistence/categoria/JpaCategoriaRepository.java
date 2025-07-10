@@ -32,6 +32,11 @@ public interface JpaCategoriaRepository extends JpaRepository<CategoriaJpaEntity
     @Query("SELECT c FROM CategoriaJpaEntity c WHERE c.usuario.id = :usuarioId AND c.ativa = true ORDER BY c.nome ASC")
     Page<CategoriaJpaEntity> findByUsuarioIdAndAtivaOrderByNome(@Param("usuarioId") Long usuarioId, Pageable pageable);
 
-    @Query("SELECT c FROM CategoriaJpaEntity c WHERE c.usuario.id = :usuarioId AND c.ativa = true ORDER BY c.nome ASC")
+    @Query("""
+    SELECT DISTINCT c FROM CategoriaJpaEntity c
+    LEFT JOIN FETCH c.subcategorias
+    WHERE c.usuario.id = :usuarioId AND c.ativa = true
+    ORDER BY c.nome ASC
+""")
     List<CategoriaJpaEntity> findByUsuarioIdAndAtivaOrderByNome(@Param("usuarioId") Long usuarioId);
 }

@@ -10,7 +10,7 @@ services:
       rabbitmq:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/financeiro_db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/financeiro_dev
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
@@ -39,7 +39,7 @@ services:
     networks:
       - rede-local
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U financeiro_user -d financeiro_db"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d financeiro_dev"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -52,8 +52,6 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
-    hostname: rabbit
-    container_name: meu-rabbit
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
@@ -65,10 +63,15 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
 
 volumes:
   postgres_data:
     driver: local
+  rabbitmq_data:
+    driver: local
 
 networks:
   rede-local:
+    driver: bridge

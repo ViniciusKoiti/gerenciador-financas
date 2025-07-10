@@ -154,8 +154,6 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
         Long usuarioIdRaw = jwtService.getByAutenticaoUsuarioId();
         UsuarioId usuarioId = UsuarioId.of(usuarioIdRaw);
         CategoriaId categoriaId = CategoriaId.of(usuarioIdRaw);
-
-        // Validar que a categoria pertence ao usuário
         if (!categoriaRepository.existsByIdAndUsuarioId(categoriaId, usuarioId)) {
             throw new InsufficientPermissionException("categoria", "listar transações");
         }
