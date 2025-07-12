@@ -29,13 +29,13 @@ public class GraficoService implements GerarGraficoUseCase {
     public List<GraficoResponse> gerarGraficoPorCategoria(ZonedDateTime dataInicio, ZonedDateTime dataFim) {
         UsuarioId usuarioId = usuarioAutenticadoPort.obterUsuarioAtual();
 
-        LocalDateTime dataInicial = dataInicio.toLocalDateTime();
+        LocalDateTime dataInicial = LocalDateTime.of(1900, 1, 1, 0, 0);
         LocalDateTime dataFinal = dataFim.toLocalDateTime();
 
         log.debug("Gerando gráfico por categoria: usuário={}, período={} a {}",
                 usuarioId.getValue(), dataInicial, dataFinal);
 
-        return graficoRepository.gerarGraficoPorCategoria(usuarioId.getValue(), dataInicial, dataFinal);
+        return graficoRepository.gerarGraficoPorCategoriaDespesas(usuarioId.getValue(), dataInicial, dataFinal);
     }
 
     @Override

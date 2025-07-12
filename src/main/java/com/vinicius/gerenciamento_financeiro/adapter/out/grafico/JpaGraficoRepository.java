@@ -4,12 +4,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.Gra
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.ResumoFinanceiroResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.TransacaoPorPeriodoResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.TransacaoJpaEntity;
-import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
-import com.vinicius.gerenciamento_financeiro.port.in.GerarGraficoUseCase;
-import com.vinicius.gerenciamento_financeiro.port.out.grafico.GraficoRepository;
-import jakarta.persistence.TemporalType;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.Temporal;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -66,6 +61,39 @@ WHERE t.usuario.id = :usuarioId
     AND (CAST(:dataFim AS TIMESTAMP) IS NULL OR t.data >= :dataFim)
 """)
     ResumoFinanceiroResponse gerarResumoFinanceiro(
+            @Param("usuarioId") Long usuarioId,
+            @Param("dataInicio") LocalDateTime dataInicio,
+            @Param("dataFim") LocalDateTime dataFim
+    );
+
+    @Query("""
+    SELECT new com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.GraficoResponse(t.categoria.nome, SUM(t.valor)) 
+    FROM TransacaoJpaEntity t 
+    WHERE t.usuario.id = :usuarioId 
+      AND t.data >= :dataInicio 
+      AND t.data <= :dataFim
+      AND t.tipo = com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao.RECEITA
+    GROUP BY t.categoria.nome
+    ORDER BY SUM(t.valor) DESC 
+""")
+    List<GraficoResponse> gerarGraficoPorCategoriaReceitas(
+            @Param("usuarioId") Long usuarioId,
+            @Param("dataInicio") LocalDateTime dataInicio,
+            @Param("dataFim") LocalDateTime dataFim
+    );
+
+
+    @Query("""
+    SELECT new com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.GraficoResponse(t.categoria.nome, SUM(t.valor)) 
+    FROM TransacaoJpaEntity t 
+    WHERE t.usuario.id = :usuarioId 
+      AND t.data >= :dataInicio 
+      AND t.data <= :dataFim
+      AND t.tipo = com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao.DESPESA
+    GROUP BY t.categoria.nome
+    ORDER BY SUM(t.valor) DESC 
+""")
+    List<GraficoResponse> gerarGraficoPorCategoriaDespesas(
             @Param("usuarioId") Long usuarioId,
             @Param("dataInicio") LocalDateTime dataInicio,
             @Param("dataFim") LocalDateTime dataFim
