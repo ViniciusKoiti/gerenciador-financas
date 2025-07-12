@@ -7,7 +7,9 @@ import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.e
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.port.in.GerarGraficoUseCase;
 import com.vinicius.gerenciamento_financeiro.port.out.grafico.GraficoRepository;
+import jakarta.persistence.TemporalType;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Temporal;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -22,9 +24,9 @@ public interface JpaGraficoRepository extends CrudRepository<TransacaoJpaEntity,
     @Query("""
     SELECT new com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.GraficoResponse(t.categoria.nome, SUM(t.valor)) 
     FROM TransacaoJpaEntity t 
-    WHERE (:usuarioId IS NULL OR t.usuario.id = :usuarioId) 
-      AND (:dataInicio IS NULL OR t.data >= :dataInicio) 
-      AND (:dataFim IS NULL OR t.data <= :dataFim)
+    WHERE t.usuario.id = :usuarioId 
+      AND t.data >= :dataInicio 
+      AND t.data <= :dataFim
     GROUP BY t.categoria.nome
     ORDER BY SUM(t.valor) desc 
 """)

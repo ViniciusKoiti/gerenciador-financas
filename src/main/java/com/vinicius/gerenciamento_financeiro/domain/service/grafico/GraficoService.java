@@ -23,7 +23,7 @@ import java.util.List;
 public class GraficoService implements GerarGraficoUseCase {
 
     private final GraficoRepository graficoRepository;
-    private final UsuarioAutenticadoPort usuarioAutenticadoPort; // ✅ Usar a porta
+    private final UsuarioAutenticadoPort usuarioAutenticadoPort;
 
     @Override
     public List<GraficoResponse> gerarGraficoPorCategoria(ZonedDateTime dataInicio, ZonedDateTime dataFim) {
