@@ -12,7 +12,7 @@ public interface GerarGraficoUseCase {
     /**
      * Gera gráfico de despesas por categoriaJpaEntity
      */
-    List<GraficoResponse> gerarGraficoPorCategoria(ZonedDateTime dataInicio, ZonedDateTime dataFim);
+    List<GraficoResponse> gerarGraficoTotalPorCategoria(ZonedDateTime dataInicio, ZonedDateTime dataFim);
 
     /**
      * Gera dados de evolução financeira (receitas/despesas) ao longo do tempo
@@ -23,4 +23,6 @@ public interface GerarGraficoUseCase {
      * Gera resumo financeiro com totais de receitas e despesas
      */
     ResumoFinanceiroResponse gerarResumoFinanceiro(ZonedDateTime dataInicio, ZonedDateTime dataFim);
+
+    List<GraficoResponse> gerarGraficoTotalPorCategoriaDespesa(ZonedDateTime dataInicio, ZonedDateTime dataFim);
 }

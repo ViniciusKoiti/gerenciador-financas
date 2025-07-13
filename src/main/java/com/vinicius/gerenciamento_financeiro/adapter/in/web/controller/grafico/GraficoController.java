@@ -31,12 +31,12 @@ public class GraficoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "")
     })
-    @GetMapping("/categoria")
+    @GetMapping("/categoria/despesas")
     public ResponseEntity<ApiResponseSistema<List<GraficoResponse>>> graficoPorCategoria(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime dataInicio,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime dataFim
     ){
-        List<GraficoResponse> linhasDoGraficoPorCategoria = graficoService.gerarGraficoPorCategoria(dataInicio, dataFim);
+        List<GraficoResponse> linhasDoGraficoPorCategoria = graficoService.gerarGraficoTotalPorCategoria(dataInicio, dataFim);
         ApiResponseSistema<List<GraficoResponse>> response = new ApiResponseSistema<>(linhasDoGraficoPorCategoria, "Transações obtidas com sucesso.", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }

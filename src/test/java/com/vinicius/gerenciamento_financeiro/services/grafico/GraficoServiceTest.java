@@ -78,7 +78,7 @@ class GraficoServiceTest {
                     .thenReturn(graficoResponseEsperado);
 
             // Act
-            List<GraficoResponse> resultado = graficoService.gerarGraficoPorCategoria(dataInicio, dataFim);
+            List<GraficoResponse> resultado = graficoService.gerarGraficoTotalPorCategoria(dataInicio, dataFim);
 
             // Assert
             assertNotNull(resultado);
@@ -99,7 +99,7 @@ class GraficoServiceTest {
                     .thenReturn(Collections.emptyList());
 
             // Act
-            List<GraficoResponse> resultado = graficoService.gerarGraficoPorCategoria(dataInicio, dataFim);
+            List<GraficoResponse> resultado = graficoService.gerarGraficoTotalPorCategoria(dataInicio, dataFim);
 
             // Assert
             assertNotNull(resultado);
@@ -118,7 +118,7 @@ class GraficoServiceTest {
                     .thenReturn(Collections.emptyList());
 
             // Act
-            graficoService.gerarGraficoPorCategoria(dataInicio, dataFim);
+            graficoService.gerarGraficoTotalPorCategoria(dataInicio, dataFim);
 
             // Assert
             verify(graficoRepository).gerarGraficoPorCategoria(
@@ -285,7 +285,7 @@ class GraficoServiceTest {
                     .thenReturn(Collections.emptyList());
 
             // Act
-            graficoService.gerarGraficoPorCategoria(dataInicioUTC, dataFimUTC);
+            graficoService.gerarGraficoTotalPorCategoria(dataInicioUTC, dataFimUTC);
 
             // Assert
             verify(graficoRepository).gerarGraficoPorCategoria(
@@ -331,7 +331,7 @@ class GraficoServiceTest {
                     .thenReturn(Collections.emptyList());
 
             // Act
-            graficoService.gerarGraficoPorCategoria(dataInicio, dataFim);
+            graficoService.gerarGraficoTotalPorCategoria(dataInicio, dataFim);
 
             // Assert
             verify(graficoRepository, times(1)).gerarGraficoPorCategoria(any(), any(), any());
@@ -348,7 +348,7 @@ class GraficoServiceTest {
 
             // Act & Assert
             assertThrows(UsuarioNaoAutenticadoException.class,
-                    () -> graficoService.gerarGraficoPorCategoria(dataInicio, dataFim));
+                    () -> graficoService.gerarGraficoTotalPorCategoria(dataInicio, dataFim));
 
             // Verifica que o repository não foi chamado
             verify(graficoRepository, never()).gerarGraficoPorCategoria(any(), any(), any());
@@ -381,7 +381,7 @@ class GraficoServiceTest {
                     .thenReturn(Collections.emptyList());
 
             // Act
-            graficoService.gerarGraficoPorCategoria(dataInicio, dataFim);
+            graficoService.gerarGraficoTotalPorCategoria(dataInicio, dataFim);
 
             // Assert - Verifica se os mesmos dados do usuário são passados para o repository
             verify(usuarioAutenticadoPort).obterUsuarioAtual();

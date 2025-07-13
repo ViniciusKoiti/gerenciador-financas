@@ -26,7 +26,7 @@ public class GraficoService implements GerarGraficoUseCase {
     private final UsuarioAutenticadoPort usuarioAutenticadoPort;
 
     @Override
-    public List<GraficoResponse> gerarGraficoPorCategoria(ZonedDateTime dataInicio, ZonedDateTime dataFim) {
+    public List<GraficoResponse> gerarGraficoTotalPorCategoria(ZonedDateTime dataInicio, ZonedDateTime dataFim) {
         UsuarioId usuarioId = usuarioAutenticadoPort.obterUsuarioAtual();
 
         LocalDateTime dataInicial = LocalDateTime.of(1900, 1, 1, 0, 0);
@@ -62,5 +62,18 @@ public class GraficoService implements GerarGraficoUseCase {
                 usuarioId.getValue(), dataInicial, dataFinal);
 
         return graficoRepository.gerarResumoFinanceiro(usuarioId.getValue(), dataInicial, dataFinal);
+    }
+
+    @Override
+    public List<GraficoResponse> gerarGraficoTotalPorCategoriaDespesa(ZonedDateTime dataInicio, ZonedDateTime dataFim) {
+        UsuarioId usuarioId = usuarioAutenticadoPort.obterUsuarioAtual();
+
+        LocalDateTime dataInicial = LocalDateTime.of(1900, 1, 1, 0, 0);
+        LocalDateTime dataFinal = dataFim.toLocalDateTime();
+
+        log.debug("Gerando gráfico por categoria: usuário={}, período={} a {}",
+                usuarioId.getValue(), dataInicial, dataFinal);
+
+        return graficoRepository.gerarGraficoPorCategoriaDespesas(usuarioId.getValue(), dataInicial, dataFinal);
     }
 }
