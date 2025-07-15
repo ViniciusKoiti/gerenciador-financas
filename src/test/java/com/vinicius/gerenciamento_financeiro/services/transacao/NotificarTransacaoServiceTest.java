@@ -44,7 +44,7 @@ class NotificarTransacaoServiceTest{
         Transacao transacaoFutura = Transacao.reconstituir(
                 1L, "Transação Futura", new BigDecimal("100.00"), TipoMovimentacao.DESPESA,
                 LocalDateTime.now(), UsuarioId.of(1L), CategoriaId.of(1L),
-                configuracaoFutura, Auditoria.criarNova()
+                configuracaoFutura, Auditoria.criarNova(), "Vini"
         );
 
         // Act
@@ -77,7 +77,7 @@ class NotificarTransacaoServiceTest{
         Transacao transacaoVencida = Transacao.reconstituir(
                 2L, "Transação Vencida", new BigDecimal("200.00"), TipoMovimentacao.DESPESA,
                 LocalDateTime.now(), UsuarioId.of(1L), CategoriaId.of(1L),
-                configuracaoVencida, Auditoria.criarNova()
+                configuracaoVencida, Auditoria.criarNova(), "Vini"
         );
 
         // Act
@@ -124,7 +124,7 @@ class NotificarTransacaoServiceTest{
         Transacao transacao = Transacao.reconstituir(
                 3L, "Transação Teste Delay", new BigDecimal("75.00"), TipoMovimentacao.DESPESA,
                 LocalDateTime.now(), UsuarioId.of(1L), CategoriaId.of(1L),
-                configuracao, Auditoria.criarNova()
+                configuracao, Auditoria.criarNova(), "Vini"
         );
 
         // Act

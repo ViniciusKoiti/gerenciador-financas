@@ -3,17 +3,24 @@ package com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import org.mapstruct.Mapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring")
-public interface TransacaoMapper {
+@Component
+public class TransacaoMapper {
+    @Autowired
+    protected ConfiguracaoTransacaoMapper configuracaoMapper;
 
-    default Transacao toEntity(TransacaoPost transacaoPost, CategoriaId categoriaId, UsuarioId usuarioId) {
+    public Transacao toEntity(TransacaoPost transacaoPost, CategoriaId categoriaId, UsuarioId usuarioId) {
         if (transacaoPost == null) {
             throw new IllegalArgumentException("TransacaoPost não pode ser nulo");
         }
+
+        ConfiguracaoTransacao configuracao = configuracaoMapper.toDomain(transacaoPost.configuracao());
 
         return Transacao.criarNova(
                 transacaoPost.descricao(),
@@ -21,11 +28,15 @@ public interface TransacaoMapper {
                 transacaoPost.tipoMovimentacao(),
                 transacaoPost.data(),
                 categoriaId,
-                usuarioId
+                usuarioId,
+                configuracao,
+                transacaoPost.observacoes()
         );
     }
 
-    default TransacaoResponse toResponse(Transacao transacao) {
+
+
+    public TransacaoResponse toResponse(Transacao transacao) {
         return TransacaoResponse.fromEntity(transacao);
     }
 }

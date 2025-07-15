@@ -32,15 +32,16 @@ public class MemoryTransacaoRepository implements TransacaoRepository {
             Long novoId = idGenerator.getAndIncrement();
 
             transacaoParaSalvar = Transacao.reconstituir(
-                    novoId,                              // ✅ ID gerado
-                    transacao.getDescricao(),            // Dados existentes
+                    novoId,
+                    transacao.getDescricao(),
                     transacao.getValor(),
                     transacao.getTipo(),
                     transacao.getData(),
                     transacao.getUsuarioId(),
                     transacao.getCategoriaId(),
                     transacao.getConfiguracao(),
-                    transacao.getAuditoria()
+                    transacao.getAuditoria(),
+                    transacao.getObservacoes()
             );
 
             log.debug("Nova transação criada com ID: {}", novoId);

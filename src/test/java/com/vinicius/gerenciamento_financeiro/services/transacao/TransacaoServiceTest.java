@@ -190,7 +190,8 @@ class TransacaoServiceTest {
                 usuarioId,
                 categoriaId,
                 null,
-                null
+                null,
+                "Teste"
         );
 
         when(transacaoRepository.buscarTransacaoPorIdEUsuario(transacaoId, usuarioId.getValue()))

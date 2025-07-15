@@ -26,6 +26,7 @@ public class TransacaoJpaMapper {
                 .valor(transacao.getValor())
                 .tipo(transacao.getTipo())
                 .data(transacao.getData())
+                .observacao(transacao.getObservacoes())
                 .usuario(usuarioJpa)
                 .categoria(categoriaJpa)
                 .auditoria(mapAuditoriaToJpa(transacao.getAuditoria()))
@@ -35,7 +36,6 @@ public class TransacaoJpaMapper {
 
         return jpaEntity;
     }
-
     public Transacao toDomainEntity(TransacaoJpaEntity jpaEntity) {
         if (jpaEntity == null) {
             return null;
@@ -54,7 +54,8 @@ public class TransacaoJpaMapper {
                     UsuarioId.of(jpaEntity.getUsuario().getId()),
                     CategoriaId.of(jpaEntity.getCategoria().getId()),
                     configuracao,
-                    auditoria
+                    auditoria,
+                    jpaEntity.getObservacao()
             );
         } else {
             return Transacao.criarNova(
@@ -63,8 +64,10 @@ public class TransacaoJpaMapper {
                     jpaEntity.getTipo(),
                     jpaEntity.getData(),
                     CategoriaId.of(jpaEntity.getCategoria().getId()),
-                    UsuarioId.of(jpaEntity.getUsuario().getId())
-            );
+                    UsuarioId.of(jpaEntity.getUsuario().getId()),
+                    configuracao,
+                    jpaEntity.getObservacao()
+                            );
         }
     }
 

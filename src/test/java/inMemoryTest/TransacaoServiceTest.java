@@ -202,7 +202,8 @@ public class TransacaoServiceTest {
                 UsuarioId.of(2L),
                 CategoriaId.of(1L),
                 ConfiguracaoTransacao.padrao(),
-                Auditoria.criarNova()
+                Auditoria.criarNova(),
+                "teste"
         );
 
         memoryRepository.salvarTransacao(transacaoUsuario1);
@@ -326,7 +327,8 @@ public class TransacaoServiceTest {
                     UsuarioId.of(1L),
                     CategoriaId.of(1L),
                     ConfiguracaoTransacao.padrao(),
-                    Auditoria.criarNova()
+                    Auditoria.criarNova(),
+                    "Tete"
             );
         } else {
             return Transacao.criarNova(
@@ -350,7 +352,8 @@ public class TransacaoServiceTest {
                 UsuarioId.of(1L),
                 categoriaId,
                 ConfiguracaoTransacao.padrao(),
-                Auditoria.criarNova()
+                Auditoria.criarNova(),
+                "Teste"
         );
     }
 }

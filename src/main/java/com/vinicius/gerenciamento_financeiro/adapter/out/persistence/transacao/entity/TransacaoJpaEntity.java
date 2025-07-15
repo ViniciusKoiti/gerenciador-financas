@@ -80,6 +80,9 @@ public class TransacaoJpaEntity {
     @Embedded
     private AuditoriaJpa auditoria;
 
+    @Column(name = "observacao")
+    private String observacao;
+
     public void marcarComoPaga() {
         this.pago = true;
         this.dataPagamento = LocalDateTime.now();
