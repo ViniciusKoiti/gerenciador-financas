@@ -1,6 +1,7 @@
 package inMemoryTest;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.ConfiguracaoTransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.TransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.out.memory.MemoryTransacaoRepository;
@@ -57,6 +58,10 @@ public class TransacaoServiceTest {
     @Mock
     private JwtService jwtService;
 
+    @Mock
+    private ConfiguracaoTransacaoMapper configuracaoMapper;
+
+
     private MemoryTransacaoRepository memoryRepository;
     private TransacaoService service;
 
@@ -71,6 +76,7 @@ public class TransacaoServiceTest {
                 categoriaRepository,
                 usuarioRepository,
                 jwtService,
+                configuracaoMapper,
                 memoryRepository,
                 notificarTransacaoService,
                 mapper

@@ -1,12 +1,14 @@
 package com.vinicius.gerenciamento_financeiro.domain.service.transacao;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.ConfiguracaoTransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.TransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
 import com.vinicius.gerenciamento_financeiro.domain.exception.BusinessRuleViolationException;
 import com.vinicius.gerenciamento_financeiro.domain.exception.InsufficientPermissionException;
 import com.vinicius.gerenciamento_financeiro.domain.exception.ResourceNotFoundException;
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
@@ -33,6 +35,8 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
     private final CategoriaRepository categoriaRepository;
     private final UsuarioRepository usuarioRepository;
     private final JwtService jwtService;
+
+    private final ConfiguracaoTransacaoMapper configuracaoTransacaoMapper;
     private final TransacaoRepository transacaoRepository;
     private final NotificarTransacaoService notificarTransacaoService;
     private final TransacaoMapper transacaoMapper;
@@ -41,12 +45,14 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
             CategoriaRepository categoriaRepository,
             UsuarioRepository usuarioRepository,
             JwtService jwtService,
+            ConfiguracaoTransacaoMapper configuracaoTransacaoMapper,
             @Qualifier("transacaoPersistenceAdapter") TransacaoRepository transacaoRepository,
             NotificarTransacaoService notificarTransacaoService,
             TransacaoMapper transacaoMapper) {
         this.categoriaRepository = categoriaRepository;
         this.usuarioRepository = usuarioRepository;
         this.jwtService = jwtService;
+        this.configuracaoTransacaoMapper = configuracaoTransacaoMapper;
         this.transacaoRepository = transacaoRepository;
         this.notificarTransacaoService = notificarTransacaoService;
         this.transacaoMapper = transacaoMapper;
@@ -70,8 +76,18 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
                 throw new InsufficientPermissionException("categoria", "criar transação");
             }
 
-            Transacao transacao = criarTransacaoDominio(transacaoPost, categoriaId, usuario);
+            ConfiguracaoTransacao configuracaoTransacao = configuracaoTransacaoMapper.toDomain(transacaoPost.configuracao());
 
+            Transacao transacao = Transacao.criarNova(
+                    transacaoPost.descricao(),
+                    transacaoPost.valor(),
+                    transacaoPost.tipoMovimentacao(),
+                    transacaoPost.data(),
+                    categoriaId,
+                    usuario.getId(),
+                    configuracaoTransacao,
+                    transacaoPost.observacoes()
+            );
             transacaoRepository.salvarTransacao(transacao);
 
             notificarTransacaoService.notificarTransacaoAtrasada(transacao);
@@ -163,19 +179,6 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
         return transacoes.stream()
                 .map(transacaoMapper::toResponse)
                 .collect(Collectors.toList());
-    }
-
-
-    private Transacao criarTransacaoDominio(TransacaoPost transacaoPost, CategoriaId categoriaId, Usuario usuario) {
-
-        return Transacao.criarNova(
-                transacaoPost.descricao(),
-                transacaoPost.valor(),
-                transacaoPost.tipoMovimentacao(),
-                transacaoPost.data(),
-                categoriaId,
-                usuario.getId()
-        );
     }
 
     private BigDecimal calcularValorTransacao(Transacao transacao) {
