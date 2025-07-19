@@ -33,13 +33,13 @@ jobs:
           echo "Checking container status..."
           docker ps
           echo "Checking rabbitmq logs..."
-          docker logs meu-rabbit || true
+          docker logs localhost || true
 
       - name: Wait for RabbitMQ to be healthy
         run: |
           echo "Aguardando RabbitMQ ficar pronto..."
           for i in {1..30}; do
-            if docker exec meu-rabbit rabbitmqctl status > /dev/null 2>&1; then
+            if docker exec localhost rabbitmqctl status > /dev/null 2>&1; then
               echo "RabbitMQ está pronto!"
               break
             fi
@@ -57,7 +57,7 @@ jobs:
         if: failure()
         run: |
           echo "=== RabbitMQ Logs ==="
-          docker logs meu-rabbit
+          docker logs localhost
           echo "=== App Logs ==="
           docker logs $(docker ps -q --filter ancestor=gerenciador-financas-app)
 
