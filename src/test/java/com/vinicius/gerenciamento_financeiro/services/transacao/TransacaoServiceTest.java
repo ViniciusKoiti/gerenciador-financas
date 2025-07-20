@@ -1,11 +1,14 @@
 package com.vinicius.gerenciamento_financeiro.services.transacao;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.ConfiguracaoTransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.TransacaoMapper;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.ConfiguracaoTransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
 import com.vinicius.gerenciamento_financeiro.domain.model.pessoa.Email;
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
@@ -53,6 +56,9 @@ class TransacaoServiceTest {
     private TransacaoRepository transacaoRepository;
 
     @Mock
+    private ConfiguracaoTransacaoMapper configuracaoTransacaoMapper;
+
+    @Mock
     private NotificarTransacaoService notificarTransacaoService;
 
     @Mock
@@ -86,12 +92,15 @@ class TransacaoServiceTest {
                 TipoMovimentacao.RECEITA,
                 LocalDateTime.now(),
                 categoriaId.getValue()
+
         );
 
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(usuarioId.getValue());
         when(usuarioRepository.findById(usuarioId)).thenReturn(Optional.of(usuario));
         when(categoriaRepository.existsByIdAndUsuarioId(categoriaId, usuarioId))
                 .thenReturn(true);
+        when(configuracaoTransacaoMapper.toDomain(ConfiguracaoTransacaoPost.padrao())).thenReturn(ConfiguracaoTransacao.padrao());
+
 
         transacaoService.adicionarTransacao(transacaoPost);
 
