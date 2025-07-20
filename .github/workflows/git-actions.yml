@@ -1,6 +1,5 @@
 name: main/dev
 
-
 on:
   push:
     branches:
@@ -33,14 +32,21 @@ jobs:
         run: |
           echo "Checking container status..."
           docker ps
-          echo "Checking rabbitmq logs..."
-          docker logs $(docker compose ps -q rabbitmq) || true
+          echo "Checking docker compose services..."
+          docker compose ps
 
       - name: Wait for RabbitMQ to be healthy
         run: |
           echo "Aguardando RabbitMQ ficar pronto..."
+          RABBITMQ_CONTAINER=$(docker compose ps -q rabbitmq)
+          if [ -z "$RABBITMQ_CONTAINER" ]; then
+            echo "Erro: Container RabbitMQ não encontrado"
+            docker compose ps
+            exit 1
+          fi
+          
           for i in {1..30}; do
-            if docker exec $(docker compose ps -q rabbitmq) rabbitmqctl status > /dev/null 2>&1; then
+            if docker exec $RABBITMQ_CONTAINER rabbitmqctl status > /dev/null 2>&1; then
               echo "RabbitMQ está pronto!"
               break
             fi
@@ -57,10 +63,40 @@ jobs:
       - name: Show logs on failure
         if: failure()
         run: |
+          echo "=== Container Status ==="
+          docker compose ps
+          echo "=== All Running Containers ==="
+          docker ps -a
+          
           echo "=== RabbitMQ Logs ==="
-          docker logs $(docker compose ps -q rabbitmq)
+          RABBITMQ_CONTAINER=$(docker compose ps -q rabbitmq)
+          if [ -n "$RABBITMQ_CONTAINER" ]; then
+            docker logs $RABBITMQ_CONTAINER
+          else
+            echo "RabbitMQ container not found, checking by name pattern..."
+            # Try to find container by name pattern
+            RABBITMQ_CONTAINER=$(docker ps -a --filter "name=rabbitmq" --format "{{.ID}}" | head -1)
+            if [ -n "$RABBITMQ_CONTAINER" ]; then
+              docker logs $RABBITMQ_CONTAINER
+            else
+              echo "No RabbitMQ container found"
+            fi
+          fi
+          
           echo "=== App Logs ==="
-          docker logs $(docker compose ps -q app)
+          APP_CONTAINER=$(docker compose ps -q app)
+          if [ -n "$APP_CONTAINER" ]; then
+            docker logs $APP_CONTAINER
+          else
+            echo "App container not found, checking by name pattern..."
+            # Try to find container by name pattern
+            APP_CONTAINER=$(docker ps -a --filter "name=app" --format "{{.ID}}" | head -1)
+            if [ -n "$APP_CONTAINER" ]; then
+              docker logs $APP_CONTAINER
+            else
+              echo "No App container found"
+            fi
+          fi
 
       - name: Shutdown containers
         if: always()
