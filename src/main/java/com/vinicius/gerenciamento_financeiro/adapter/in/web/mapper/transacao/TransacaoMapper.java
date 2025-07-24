@@ -1,4 +1,4 @@
-package com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper;
+package com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
@@ -6,14 +6,15 @@ import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
-import org.mapstruct.Mapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TransacaoMapper {
-    @Autowired
-    protected ConfiguracaoTransacaoMapper configuracaoMapper;
+    private final ConfiguracaoTransacaoMapper configuracaoMapper;
+
+    public TransacaoMapper(ConfiguracaoTransacaoMapper configuracaoMapper) {
+        this.configuracaoMapper = configuracaoMapper;
+    }
 
     public Transacao toEntity(TransacaoPost transacaoPost, CategoriaId categoriaId, UsuarioId usuarioId) {
         if (transacaoPost == null) {

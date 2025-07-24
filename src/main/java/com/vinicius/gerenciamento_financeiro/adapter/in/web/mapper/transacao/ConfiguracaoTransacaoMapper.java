@@ -1,4 +1,4 @@
-package com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper;
+package com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.ConfiguracaoTransacaoPost;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;

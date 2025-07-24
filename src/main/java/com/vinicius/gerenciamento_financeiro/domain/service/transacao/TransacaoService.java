@@ -1,8 +1,8 @@
 package com.vinicius.gerenciamento_financeiro.domain.service.transacao;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.ConfiguracaoTransacaoMapper;
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.TransacaoMapper;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao.ConfiguracaoTransacaoMapper;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao.TransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
 import com.vinicius.gerenciamento_financeiro.domain.exception.BusinessRuleViolationException;

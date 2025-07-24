@@ -1,8 +1,8 @@
 package com.vinicius.gerenciamento_financeiro.services.transacao;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.ConfiguracaoTransacaoMapper;
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.TransacaoMapper;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao.ConfiguracaoTransacaoMapper;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao.TransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.ConfiguracaoTransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
