@@ -27,7 +27,7 @@ public class CategoriaController {
 
     private final CategoriaUseCase categoriaUseCase;
 
-    @Operation(summary = "Salva CategoriaJpaEntity ")
+    @Operation(summary = "Salva Categoria ")
     @ApiResponses(value = {
           @ApiResponse(
                   responseCode = "201",

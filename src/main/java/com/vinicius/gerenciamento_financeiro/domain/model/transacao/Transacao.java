@@ -3,12 +3,12 @@ package com.vinicius.gerenciamento_financeiro.domain.model.transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao;
+import com.vinicius.gerenciamento_financeiro.domain.model.cliente.ClienteId;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
-
 
 public final class Transacao {
 
@@ -18,10 +18,10 @@ public final class Transacao {
     private final TipoMovimentacao tipo;
     private final LocalDateTime data;
     private final UsuarioId usuarioId;
+    private final ClienteId clienteId;
     private final CategoriaId categoriaId;
     private final ConfiguracaoTransacao configuracao;
     private final Auditoria auditoria;
-
     private final String observacoes;
 
     private Transacao(Builder builder) {
@@ -32,6 +32,7 @@ public final class Transacao {
         this.data = Objects.requireNonNull(builder.data, "Data não pode ser nula");
         this.usuarioId = Objects.requireNonNull(builder.usuarioId, "UsuarioId não pode ser nulo");
         this.categoriaId = Objects.requireNonNull(builder.categoriaId, "CategoriaId não pode ser nulo");
+        this.clienteId = builder.clienteId; // ClienteId pode ser nulo
         this.configuracao = builder.configuracao != null ? builder.configuracao : ConfiguracaoTransacao.padrao();
         this.auditoria = builder.auditoria != null ? builder.auditoria : Auditoria.criarNova();
         this.observacoes = builder.observacoes;
@@ -39,7 +40,7 @@ public final class Transacao {
 
     public static Transacao criarNova(String descricao, BigDecimal valor, TipoMovimentacao tipo,
                                       LocalDateTime data, CategoriaId categoriaId, UsuarioId usuarioId,
-                                      ConfiguracaoTransacao configuracao, String observacoes) {
+                                      ClienteId clienteId, ConfiguracaoTransacao configuracao, String observacoes) {
         return new Builder()
                 .descricao(descricao)
                 .valor(valor)
@@ -47,19 +48,30 @@ public final class Transacao {
                 .data(data)
                 .categoriaId(categoriaId)
                 .usuarioId(usuarioId)
+                .clienteId(clienteId)
                 .configuracao(configuracao != null ? configuracao : ConfiguracaoTransacao.padrao())
-                .auditoria(Auditoria.criarNova()).observacao(observacoes)
+                .auditoria(Auditoria.criarNova())
+                .observacao(observacoes)
                 .build();
     }
 
     public static Transacao criarNova(String descricao, BigDecimal valor, TipoMovimentacao tipo,
                                       LocalDateTime data, CategoriaId categoriaId, UsuarioId usuarioId) {
         return criarNova(descricao, valor, tipo, data, categoriaId, usuarioId,
-                ConfiguracaoTransacao.padrao(), null);
+                null, ConfiguracaoTransacao.padrao(), null);
     }
+
+    public static Transacao criarNova(String descricao, BigDecimal valor, TipoMovimentacao tipo,
+                                      LocalDateTime data, CategoriaId categoriaId, UsuarioId usuarioId,
+                                      ConfiguracaoTransacao configuracao, String observacoes) {
+        return criarNova(descricao, valor, tipo, data, categoriaId, usuarioId,
+                null, configuracao, observacoes);
+    }
+
     public static Transacao reconstituir(Long id, String descricao, BigDecimal valor, TipoMovimentacao tipo,
                                          LocalDateTime data, UsuarioId usuarioId, CategoriaId categoriaId,
-                                         ConfiguracaoTransacao configuracao, Auditoria auditoria,  String observacoes) {
+                                         ClienteId clienteId, ConfiguracaoTransacao configuracao,
+                                         Auditoria auditoria, String observacoes) {
         return new Builder()
                 .id(TransacaoId.of(id))
                 .descricao(descricao)
@@ -68,10 +80,18 @@ public final class Transacao {
                 .data(data)
                 .usuarioId(usuarioId)
                 .categoriaId(categoriaId)
+                .clienteId(clienteId)
                 .configuracao(configuracao)
                 .auditoria(auditoria)
                 .observacao(observacoes)
                 .build();
+    }
+
+    public static Transacao reconstituir(Long id, String descricao, BigDecimal valor, TipoMovimentacao tipo,
+                                         LocalDateTime data, UsuarioId usuarioId, CategoriaId categoriaId,
+                                         ConfiguracaoTransacao configuracao, Auditoria auditoria, String observacoes) {
+        return reconstituir(id, descricao, valor, tipo, data, usuarioId, categoriaId,
+                null, configuracao, auditoria, observacoes);
     }
 
     public Transacao atualizarCategoria(CategoriaId novaCategoriaId) {
@@ -99,7 +119,6 @@ public final class Transacao {
         return this.valor.add(taxa);
     }
 
-
     public boolean estaVencida() {
         if (configuracao.getDataVencimento() == null) {
             return false;
@@ -107,12 +126,9 @@ public final class Transacao {
         return LocalDateTime.now().isAfter(configuracao.getDataVencimento().atStartOfDay());
     }
 
-
-
     public boolean estaPaga() {
         return configuracao.getDataPagamento() != null;
     }
-
 
     public Transacao marcarComoPaga() {
         if (estaPaga()) {
@@ -148,20 +164,18 @@ public final class Transacao {
         };
     }
 
+    // Getters
     public TransacaoId getId() { return id; }
     public String getDescricao() { return descricao; }
     public BigDecimal getValor() { return valor; }
     public TipoMovimentacao getTipo() { return tipo; }
     public LocalDateTime getData() { return data; }
     public UsuarioId getUsuarioId() { return usuarioId; }
+    public ClienteId getClienteId() { return clienteId; }
     public CategoriaId getCategoriaId() { return categoriaId; }
     public ConfiguracaoTransacao getConfiguracao() { return configuracao; }
     public Auditoria getAuditoria() { return auditoria; }
-
-
-    public String getObservacoes() {
-        return observacoes;
-    }
+    public String getObservacoes() { return observacoes; }
 
     private String validarDescricao(String descricao) {
         if (descricao == null || descricao.trim().isEmpty()) {
@@ -224,9 +238,9 @@ public final class Transacao {
         private LocalDateTime data;
         private UsuarioId usuarioId;
         private CategoriaId categoriaId;
+        private ClienteId clienteId;
         private ConfiguracaoTransacao configuracao;
         private Auditoria auditoria;
-
         private String observacoes;
 
         public Builder id(TransacaoId id) { this.id = id; return this; }
@@ -236,10 +250,11 @@ public final class Transacao {
         public Builder data(LocalDateTime data) { this.data = data; return this; }
         public Builder usuarioId(UsuarioId usuarioId) { this.usuarioId = usuarioId; return this; }
         public Builder categoriaId(CategoriaId categoriaId) { this.categoriaId = categoriaId; return this; }
+        public Builder clienteId(ClienteId clienteId) { this.clienteId = clienteId; return this; }
         public Builder configuracao(ConfiguracaoTransacao configuracao) { this.configuracao = configuracao; return this; }
         public Builder auditoria(Auditoria auditoria) { this.auditoria = auditoria; return this; }
+        public Builder observacao(String observacoes) { this.observacoes = observacoes; return this; }
 
-        public Builder observacao(String observacoes) {this.observacoes = observacoes; return this; }
         public Builder from(Transacao transacao) {
             this.id = transacao.id;
             this.descricao = transacao.descricao;
@@ -247,6 +262,7 @@ public final class Transacao {
             this.tipo = transacao.tipo;
             this.data = transacao.data;
             this.usuarioId = transacao.usuarioId;
+            this.clienteId = transacao.clienteId;
             this.categoriaId = transacao.categoriaId;
             this.configuracao = transacao.configuracao;
             this.auditoria = transacao.auditoria;
