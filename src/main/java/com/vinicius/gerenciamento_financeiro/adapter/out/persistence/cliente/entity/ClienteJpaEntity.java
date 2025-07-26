@@ -26,6 +26,9 @@ public class ClienteJpaEntity extends PessoaJpaEntity {
     @Embedded
     private PixInfoJpa pixInfo;
 
+    @Column(name="ativo")
+    private Boolean ativo;
+
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     @JsonIgnore

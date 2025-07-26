@@ -32,7 +32,6 @@ public class ClienteSpecification {
             if (cpf == null || cpf.trim().isEmpty()) {
                 return criteriaBuilder.conjunction();
             }
-            // Remove formatação do CPF para busca
             String cpfLimpo = cpf.replaceAll("[^0-9]", "");
             return criteriaBuilder.like(
                     root.get("cpf"),

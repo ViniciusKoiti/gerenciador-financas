@@ -53,4 +53,28 @@ public class ClienteFiltroMapper {
                 filtro.dataNascimentoFim().orElse(null)
         );
     }
+
+    public ClienteFiltro comBuscaGeral(String buscaGeral) {
+        if (buscaGeral == null || buscaGeral.trim().isEmpty()) {
+            return ClienteFiltro.vazio();
+        }
+
+        ClienteFiltroRequest request = ClienteFiltroRequest.builder()
+                .buscaGeral(buscaGeral)
+                .build();
+
+        return toDomain(request);
+    }
+
+    public ClienteFiltro comStatusAtivo(Boolean ativo) {
+        if (ativo == null) {
+            return ClienteFiltro.vazio();
+        }
+
+        ClienteFiltroRequest request = ClienteFiltroRequest.builder()
+                .ativo(ativo)
+                .build();
+
+        return toDomain(request);
+    }
 }

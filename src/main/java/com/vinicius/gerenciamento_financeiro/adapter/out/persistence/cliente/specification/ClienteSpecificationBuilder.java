@@ -2,20 +2,27 @@ package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente.sp
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.cliente.ClienteFiltroRequest;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente.entity.ClienteJpaEntity;
-import com.vinicius.gerenciamento_financeiro.domain.exception.ClienteException;
-import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
+/**
+ * Builder de Specifications - APENAS camada de infraestrutura.
+ * Trabalha exclusivamente com DTOs e entidades JPA.
+ * NÃO conhece objetos de domínio.
+ */
 @Component
 public class ClienteSpecificationBuilder {
 
-    public Specification<ClienteJpaEntity> buildSpecification(UsuarioId usuarioId, ClienteFiltroRequest filtros) {
-        validarParametros(usuarioId, filtros);
+    public Specification<ClienteJpaEntity> build(Long usuarioId, ClienteFiltroRequest filtros) {
+        // ✅ Validações básicas de infraestrutura
+        if (usuarioId == null) {
+            throw new IllegalArgumentException("UsuarioId não pode ser nulo");
+        }
 
-        Specification<ClienteJpaEntity> spec = ClienteSpecification.temUsuarioId(usuarioId.getValue());
+        // ✅ Sempre começar com filtro obrigatório do usuário
+        Specification<ClienteJpaEntity> spec = ClienteSpecification.temUsuarioId(usuarioId);
 
-
+        // Se não há filtros, retorna apenas o filtro de usuário
         if (filtros == null || !filtros.temFiltros()) {
             return spec;
         }
@@ -23,17 +30,21 @@ public class ClienteSpecificationBuilder {
         return adicionarFiltros(spec, filtros);
     }
 
+
     private Specification<ClienteJpaEntity> adicionarFiltros(
             Specification<ClienteJpaEntity> spec,
             ClienteFiltroRequest filtros) {
 
         if (filtros.temBuscaGeral()) {
-            return spec.and(ClienteSpecification.nomeOuEmail(filtros.buscaGeral()))
-                    .and(aplicarFiltrosComplementares(filtros));
+            spec = spec.and(ClienteSpecification.nomeOuEmail(filtros.buscaGeral()));
+            spec = adicionarFiltrosComplementares(spec, filtros);
+        } else {
+            spec = aplicarTodosFiltros(spec, filtros);
         }
 
-        return aplicarTodosFiltros(spec, filtros);
+        return spec;
     }
+
 
     private Specification<ClienteJpaEntity> aplicarTodosFiltros(
             Specification<ClienteJpaEntity> spec,
@@ -69,8 +80,9 @@ public class ClienteSpecificationBuilder {
         return spec;
     }
 
-    private Specification<ClienteJpaEntity> aplicarFiltrosComplementares(ClienteFiltroRequest filtros) {
-        Specification<ClienteJpaEntity> spec = (root, query, builder) -> null;
+    private Specification<ClienteJpaEntity> adicionarFiltrosComplementares(
+            Specification<ClienteJpaEntity> spec,
+            ClienteFiltroRequest filtros) {
 
         if (temValor(filtros.cpf())) {
             spec = spec.and(ClienteSpecification.cpfContains(filtros.cpf()));
@@ -87,32 +99,43 @@ public class ClienteSpecificationBuilder {
             ));
         }
 
+        if (temValor(filtros.telefone())) {
+            spec = spec.and(ClienteSpecification.telefoneContains(filtros.telefone()));
+        }
+
         return spec;
     }
 
-    private void validarParametros(UsuarioId usuarioId, ClienteFiltroRequest filtros) {
+
+
+    public Specification<ClienteJpaEntity> apenasUsuario(Long usuarioId) {
         if (usuarioId == null) {
-            throw ClienteException.filtrosInvalidos("UsuarioId não pode ser nulo");
+            throw new IllegalArgumentException("UsuarioId não pode ser nulo");
         }
-
-        if (filtros != null && filtros.temBuscaGeral() && filtros.buscaGeral().trim().length() < 2) {
-            throw ClienteException.filtrosInvalidos("Busca geral deve ter pelo menos 2 caracteres");
-        }
-
-        if (filtros != null && temPeriodoNascimento(filtros)) {
-            validarPeriodoNascimento(filtros);
-        }
+        return ClienteSpecification.temUsuarioId(usuarioId);
     }
 
-    private void validarPeriodoNascimento(ClienteFiltroRequest filtros) {
-        if (filtros.dataNascimentoInicio() != null &&
-                filtros.dataNascimentoFim() != null &&
-                filtros.dataNascimentoInicio().isAfter(filtros.dataNascimentoFim())) {
-
-            throw ClienteException.filtrosInvalidos(
-                    "Data de início não pode ser posterior à data de fim"
-            );
+    public Specification<ClienteJpaEntity> buscaRapida(Long usuarioId, String texto) {
+        if (usuarioId == null) {
+            throw new IllegalArgumentException("UsuarioId não pode ser nulo");
         }
+
+        Specification<ClienteJpaEntity> spec = ClienteSpecification.temUsuarioId(usuarioId);
+
+        if (texto != null && !texto.trim().isEmpty()) {
+            spec = spec.and(ClienteSpecification.nomeOuEmail(texto));
+        }
+
+        return spec;
+    }
+
+    public Specification<ClienteJpaEntity> apenasAtivos(Long usuarioId) {
+        if (usuarioId == null) {
+            throw new IllegalArgumentException("UsuarioId não pode ser nulo");
+        }
+
+        return ClienteSpecification.temUsuarioId(usuarioId)
+                .and(ClienteSpecification.ativo(true));
     }
 
     private boolean temValor(String valor) {

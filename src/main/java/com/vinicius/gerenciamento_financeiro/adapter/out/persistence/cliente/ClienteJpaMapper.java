@@ -34,7 +34,6 @@ public class ClienteJpaMapper {
                 .usuario(criarUsuarioJpaMinimo(cliente.getUsuarioId()))
                 .auditoria(mapAuditoriaToJpa(cliente.getAuditoria()))
                 .build();
-        // Campos da classe pai PessoaJpaEntity
         clienteJpa.setNome(cliente.getNome());
         clienteJpa.setCpf(cliente.getCpf().getNumero());
         clienteJpa.setEmail(cliente.getEmail().getEndereco());

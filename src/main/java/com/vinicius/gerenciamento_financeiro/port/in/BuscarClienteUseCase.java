@@ -1,5 +1,6 @@
 package com.vinicius.gerenciamento_financeiro.port.in;
 
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.cliente.ClienteFiltroRequest;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.cliente.ClienteResponse;
 import com.vinicius.gerenciamento_financeiro.domain.model.cliente.Cliente;
 import com.vinicius.gerenciamento_financeiro.domain.model.cliente.ClienteId;
@@ -15,11 +16,12 @@ public interface BuscarClienteUseCase {
     Optional<ClienteResponse> findById(ClienteId id);
 
     boolean existsByIdAndUsuarioId(ClienteId clienteId, UsuarioId usuarioId);
-    Optional<ClienteResponse> findByIdAndUsuarioId(ClienteId clienteId, UsuarioId usuarioId);
 
-    List<ClienteResponse> findByUsuarioId(UsuarioId usuarioId);
+    Page<ClienteResponse> findPageClienteComFiltros(ClienteFiltroRequest filtroRequest, Pageable pageable);
 
+    Page<ClienteResponse> findPageCliente(Pageable pageable);
 
+    List<ClienteResponse> findAllClienteComFiltros(ClienteFiltroRequest filtroRequest);
 
 
 }

@@ -1,7 +1,11 @@
 package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente;
 
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.cliente.ClienteFiltroMapper;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.cliente.ClienteFiltroRequest;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente.entity.ClienteJpaEntity;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente.specification.ClienteSpecificationBuilder;
 import com.vinicius.gerenciamento_financeiro.domain.model.cliente.Cliente;
+import com.vinicius.gerenciamento_financeiro.domain.model.cliente.ClienteFiltro;
 import com.vinicius.gerenciamento_financeiro.domain.model.cliente.ClienteId;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.port.out.cliente.ClienteRepository;
@@ -9,12 +13,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -23,6 +27,8 @@ public class ClientePersistenceAdapter implements ClienteRepository {
 
     private final JpaClienteRepository jpaClienteRepository;
     private final ClienteJpaMapper clienteJpaMapper;
+    private final ClienteFiltroMapper filtroMapper;
+    private final ClienteSpecificationBuilder specificationBuilder;
 
     @Override
     @Transactional
@@ -72,9 +78,53 @@ public class ClientePersistenceAdapter implements ClienteRepository {
         return jpaClienteRepository.findByUsuarioId(usuarioId.getValue())
                 .stream()
                 .map(clienteJpaMapper::toDomainEntity)
-                .collect(Collectors.toList());
+                .toList();
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public List<Cliente> findByUsuarioIdComFiltro(UsuarioId usuarioId, ClienteFiltro filtro) {
+        log.debug("Buscando clientes com filtro para usuário: {}", usuarioId.getValue());
+        log.debug("Filtros aplicados - temFiltros: {}, temBuscaGeral: {}",
+                filtro.temFiltros(), filtro.temBuscaGeral());
+
+        ClienteFiltroRequest filtroRequest = filtroMapper.toRequest(filtro);
+
+        Specification<ClienteJpaEntity> specification = specificationBuilder.build(
+                usuarioId.getValue(),
+                filtroRequest
+        );
+
+        List<ClienteJpaEntity> entities = jpaClienteRepository.findAll(specification);
+
+        log.debug("Encontrados {} clientes com filtros", entities.size());
+
+        return entities.stream()
+                .map(clienteJpaMapper::toDomainEntity)
+                .toList();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Cliente> findByUsuarioIdComFiltro(UsuarioId usuarioId, ClienteFiltro filtro, Pageable pageable) {
+        log.debug("Buscando clientes paginados com filtro para usuário: {} - página: {}",
+                usuarioId.getValue(), pageable.getPageNumber());
+        log.debug("Filtros aplicados - temFiltros: {}, temBuscaGeral: {}",
+                filtro.temFiltros(), filtro.temBuscaGeral());
+
+        ClienteFiltroRequest filtroRequest = filtroMapper.toRequest(filtro);
+
+        Specification<ClienteJpaEntity> specification = specificationBuilder.build(
+                usuarioId.getValue(),
+                filtroRequest
+        );
+
+        Page<ClienteJpaEntity> entities = jpaClienteRepository.findAll(specification, pageable);
+
+        log.debug("Encontrados {} clientes paginados (total: {})",
+                entities.getNumberOfElements(), entities.getTotalElements());
+
+        return entities.map(clienteJpaMapper::toDomainEntity);
+    }
     @Override
     @Transactional(readOnly = true)
     public Page<Cliente> findAll(Pageable pageable) {
@@ -120,6 +170,40 @@ public class ClientePersistenceAdapter implements ClienteRepository {
         return jpaClienteRepository.findByIdAndUsuarioId(clienteId.getValue(), usuarioId.getValue())
                 .map(clienteJpaMapper::toDomainEntity);
     }
+    @Transactional(readOnly = true)
+    public long countByUsuarioId(UsuarioId usuarioId) {
+        log.debug("Contando clientes do usuário: {}", usuarioId.getValue());
 
+        return jpaClienteRepository.countByUsuarioId(usuarioId.getValue());
+    }
+    @Transactional(readOnly = true)
+    public boolean existsByCpfAndUsuarioId(String cpf, UsuarioId usuarioId) {
+        log.debug("Verificando CPF {} para usuário: {}", cpf, usuarioId.getValue());
 
+        return jpaClienteRepository.existsByCpfAndUsuarioId(cpf, usuarioId.getValue());
+    }
+    @Transactional(readOnly = true)
+    public boolean existsByEmailAndUsuarioId(String email, UsuarioId usuarioId) {
+        log.debug("Verificando email {} para usuário: {}", email, usuarioId.getValue());
+
+        return jpaClienteRepository.existsByEmailAndUsuarioId(email, usuarioId.getValue());
+    }
+    @Transactional(readOnly = true)
+    public List<Cliente> findByUsuarioIdAndNome(UsuarioId usuarioId, String nome) {
+        log.debug("Buscando clientes por nome '{}' para usuário: {}", nome, usuarioId.getValue());
+
+        return jpaClienteRepository.findByUsuarioIdAndNomeContaining(usuarioId.getValue(), nome)
+                .stream()
+                .map(clienteJpaMapper::toDomainEntity)
+                .toList();
+    }
+    @Transactional(readOnly = true)
+    public List<Cliente> findByUsuarioIdOrderByNome(UsuarioId usuarioId) {
+        log.debug("Buscando clientes ordenados por nome para usuário: {}", usuarioId.getValue());
+
+        return jpaClienteRepository.findByUsuarioIdOrderByNome(usuarioId.getValue())
+                .stream()
+                .map(clienteJpaMapper::toDomainEntity)
+                .toList();
+    }
 }
