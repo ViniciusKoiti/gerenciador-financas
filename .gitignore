@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+# BMAD (local only)
+.claude
+.bmad-core
+web-bundles
+docs/
+AGENTS.md
+CLAUDE.md

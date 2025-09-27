@@ -41,6 +41,6 @@ public interface JpaClienteRepository extends
     @Query("SELECT COUNT(c) FROM ClienteJpaEntity c WHERE c.usuario.id = :usuarioId AND c.ativo = true")
     long countByUsuarioIdAndAtivoTrue(@Param("usuarioId") Long usuarioId);
 
-    @Query("SELECT COUNT(c) FROM ClienteJpaEntity c WHERE c.usuarioId = :usuarioId AND c.ativo = false")
+    @Query("SELECT COUNT(c) FROM ClienteJpaEntity c WHERE c.usuario.id = :usuarioId AND c.ativo = false")
     long countByUsuarioIdAndAtivoFalse(@Param("usuarioId") Long usuarioId);
 }
