@@ -172,7 +172,7 @@ public class MontanteMonetario {
         return valor;
     }
 
-    public MoedaId getCurrencyId() {
+    public MoedaId getMoedaId() {
         return moedaId;
     }
 
