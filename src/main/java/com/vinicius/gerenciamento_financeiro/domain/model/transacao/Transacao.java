@@ -45,7 +45,7 @@ public final class Transacao {
         this.data = Objects.requireNonNull(b.data, "Data não pode ser nula");
         this.usuarioId = Objects.requireNonNull(b.usuarioId, "UsuarioId não pode ser nulo");
         this.categoriaId = Objects.requireNonNull(b.categoriaId, "CategoriaId não pode ser nulo");
-        this.clienteId = b.clienteId; // opcional
+        this.clienteId = b.clienteId;
         this.configuracao = b.configuracao != null ? b.configuracao : ConfiguracaoTransacao.padrao();
         this.auditoria = b.auditoria != null ? b.auditoria : Auditoria.criarNova();
         this.observacoes = b.observacoes;
@@ -90,6 +90,34 @@ public final class Transacao {
                 .clienteId(clienteId)
                 .configuracao(configuracao != null ? configuracao : ConfiguracaoTransacao.padrao())
                 .auditoria(Auditoria.criarNova())
+                .observacao(observacoes)
+                .build();
+    }
+
+    public static Transacao reconstituir(
+            Long id,
+            String descricao,
+            MontanteMonetario montante,
+            TipoMovimentacao tipo,
+            LocalDateTime data,
+            UsuarioId usuarioId,
+            CategoriaId categoriaId,
+            ClienteId clienteId,
+            ConfiguracaoTransacao configuracao,
+            Auditoria auditoria,
+            String observacoes
+    ) {
+        return new Builder()
+                .id(id != null ? TransacaoId.of(id) : null)
+                .descricao(descricao)
+                .montante(montante)
+                .tipo(tipo)
+                .data(data)
+                .usuarioId(usuarioId)
+                .categoriaId(categoriaId)
+                .clienteId(clienteId)
+                .configuracao(configuracao)
+                .auditoria(auditoria)
                 .observacao(observacoes)
                 .build();
     }
