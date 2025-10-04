@@ -2,7 +2,7 @@ package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.
 
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.moeda.entity.MoedaJpaEntity;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente.entity.ClienteJpaEntity;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.usuario.entity.UsuarioJpaEntity;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoRecorrencia;
@@ -50,6 +50,10 @@ public class TransacaoJpaEntity {
     @JoinColumn(name = "categoria_id", nullable = false)
     private CategoriaJpaEntity categoria;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cliente_id", nullable = false)
+    private ClienteJpaEntity cliente;
+
     @Column(name = "pago")
     private Boolean pago = false;
 
@@ -80,7 +84,7 @@ public class TransacaoJpaEntity {
 
     @Embedded
     private AuditoriaJpa auditoria;
-    
+
     @Embedded
     private MontanteMonetarioJpaEntity montante;
 

@@ -30,24 +30,58 @@ public record TransacaoPost(
         LocalDateTime data,
 
         @JsonProperty("categoryId")
-        @NotNull(message = "O ID da categoriaJpaEntity é obrigatório.")
+        @NotNull(message = "O ID da categoria é obrigatório.")
         Long categoriaId,
+
         @JsonProperty("observations")
         String observacoes,
+
+        @JsonProperty("currencyId")
+        Long moedaId,
+
+        @JsonProperty("clientId")
+        Long clienteId,
 
         @JsonProperty("configuration")
         @Valid
         ConfiguracaoTransacaoPost configuracao
 ) {
 
-
+    // Construtor mínimo: apenas campos obrigatórios
     public TransacaoPost(String descricao, BigDecimal valor, TipoMovimentacao tipoMovimentacao,
                          LocalDateTime data, Long categoriaId) {
-        this(descricao, valor, tipoMovimentacao, data, categoriaId, null, ConfiguracaoTransacaoPost.padrao());
+        this(descricao, valor, tipoMovimentacao, data, categoriaId,
+                null,  // observacoes
+                null,  // moedaId
+                null,  // clienteId
+                ConfiguracaoTransacaoPost.padrao());
+    }
+
+    // Construtor com moeda específica
+    public TransacaoPost(String descricao, BigDecimal valor, TipoMovimentacao tipoMovimentacao,
+                         LocalDateTime data, Long categoriaId, Long moedaId) {
+        this(descricao, valor, tipoMovimentacao, data, categoriaId,
+                null,  // observacoes
+                moedaId,
+                null,  // clienteId
+                ConfiguracaoTransacaoPost.padrao());
+    }
+
+    // Construtor com moeda E cliente
+    public TransacaoPost(String descricao, BigDecimal valor, TipoMovimentacao tipoMovimentacao,
+                         LocalDateTime data, Long categoriaId, Long moedaId, Long clienteId) {
+        this(descricao, valor, tipoMovimentacao, data, categoriaId,
+                null,  // observacoes
+                moedaId,
+                clienteId,
+                ConfiguracaoTransacaoPost.padrao());
     }
 
     public ConfiguracaoTransacaoPost configuracao() {
         return configuracao != null ? configuracao : ConfiguracaoTransacaoPost.padrao();
     }
 
+    public Long getMoedaIdOuPadrao() {
+        return moedaId != null ? moedaId : 1L;
+    }
 }

@@ -1,7 +1,13 @@
 package com.vinicius.gerenciamento_financeiro.adapter.out.memory;
 
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao;
+import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
+import com.vinicius.gerenciamento_financeiro.domain.model.cliente.ClienteId;
+import com.vinicius.gerenciamento_financeiro.domain.model.moeda.MontanteMonetario;
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.TransacaoId;
+import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.port.out.transacao.TransacaoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +17,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -31,14 +38,20 @@ public class MemoryTransacaoRepository implements TransacaoRepository {
         if (transacao.isNova()) {
             Long novoId = idGenerator.getAndIncrement();
 
+            MontanteMonetario montanteMonetario = MontanteMonetario.of(
+                    transacao.getValorEfetivo().getValor(),
+                    transacao.getValorEfetivo().getMoedaId()
+            );
+
             transacaoParaSalvar = Transacao.reconstituir(
-                    novoId,
+                    TransacaoId.of(novoId),
                     transacao.getDescricao(),
-                    transacao.getValor(),
+                    montanteMonetario,
                     transacao.getTipo(),
                     transacao.getData(),
                     transacao.getUsuarioId(),
                     transacao.getCategoriaId(),
+                    transacao.getClienteId(),
                     transacao.getConfiguracao(),
                     transacao.getAuditoria(),
                     transacao.getObservacoes()

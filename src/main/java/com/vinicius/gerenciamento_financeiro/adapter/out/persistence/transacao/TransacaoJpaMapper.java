@@ -2,6 +2,7 @@ package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao;
 
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente.entity.ClienteJpaEntity;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.moeda.entity.MoedaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.MontanteMonetarioJpaEntity;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.TransacaoJpaEntity;
@@ -14,7 +15,9 @@ import com.vinicius.gerenciamento_financeiro.domain.model.moeda.MoedaId;
 import com.vinicius.gerenciamento_financeiro.domain.model.moeda.MontanteMonetario;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.TransacaoId;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -22,23 +25,44 @@ import java.time.LocalDateTime;
 @Component
 public class TransacaoJpaMapper {
 
-    public TransacaoJpaEntity toJpaEntity(
-            Transacao transacao,
-            UsuarioJpaEntity usuarioJpa,
-            CategoriaJpaEntity categoriaJpa,
-            MoedaJpaEntity moedaJpa) {
+    private final EntityManager entityManager;
 
-        if (transacao == null) {
-            return null;
-        }
+    public TransacaoJpaMapper(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
-        // Cria o MontanteMonetarioJpaEntity
-        MontanteMonetarioJpaEntity montanteJpa = new MontanteMonetarioJpaEntity(
-                transacao.getMontante().getValor(),
-                moedaJpa
+    public TransacaoJpaEntity toJpaEntity(Transacao transacao) {
+        if (transacao == null) return null;
+
+        UsuarioJpaEntity usuarioRef = entityManager.getReference(
+                UsuarioJpaEntity.class,
+                transacao.getUsuarioId().getValue()
         );
 
-        TransacaoJpaEntity jpaEntity = TransacaoJpaEntity.builder()
+        CategoriaJpaEntity categoriaRef = entityManager.getReference(
+                CategoriaJpaEntity.class,
+                transacao.getCategoriaId().getValue()
+        );
+
+        MoedaJpaEntity moedaRef = entityManager.getReference(
+                MoedaJpaEntity.class,
+                transacao.getMontante().getMoedaId().getValor()
+        );
+
+        MontanteMonetarioJpaEntity montanteJpa = new MontanteMonetarioJpaEntity(
+                transacao.getMontante().getValor(),
+                moedaRef
+        );
+
+        ClienteJpaEntity clienteRef = null;
+        if (transacao.getClienteId() != null) {
+            clienteRef = entityManager.getReference(
+                    ClienteJpaEntity.class,
+                    transacao.getClienteId().getValue()
+            );
+        }
+
+        return TransacaoJpaEntity.builder()
                 .id(transacao.getId() != null ? transacao.getId().getValue() : null)
                 .descricao(transacao.getDescricao())
                 .valor(transacao.getValor())
@@ -46,85 +70,40 @@ public class TransacaoJpaMapper {
                 .tipo(transacao.getTipo())
                 .data(transacao.getData())
                 .observacao(transacao.getObservacoes())
-                .usuario(usuarioJpa)
-                .categoria(categoriaJpa)
+                .usuario(usuarioRef)
+                .categoria(categoriaRef)
+                .cliente(clienteRef)
                 .auditoria(mapAuditoriaToJpa(transacao.getAuditoria()))
                 .build();
-
-        mapConfiguracaoToJpa(transacao.getConfiguracao(), jpaEntity);
-
-        return jpaEntity;
     }
 
-    public Transacao toDomainEntity(TransacaoJpaEntity jpaEntity) {
-        if (jpaEntity == null) {
-            return null;
-        }
-
-        ConfiguracaoTransacao configuracao = mapConfiguracaoToDomain(jpaEntity);
-        Auditoria auditoria = mapAuditoriaToDomain(jpaEntity.getAuditoria());
+    public Transacao toDomainEntity(TransacaoJpaEntity jpa) {
+        if (jpa == null) return null;
 
         MontanteMonetario montante = MontanteMonetario.of(
-                jpaEntity.getMontante().getValor(),
-                MoedaId.of(jpaEntity.getMontante().getMoeda().getCodigo())
+                jpa.getMontante().getValor(),
+                MoedaId.of(jpa.getMontante().getMoeda().getCodigo())
         );
 
-        if (jpaEntity.getId() != null) {
-            return Transacao.reconstituir(
-                    jpaEntity.getId(),
-                    jpaEntity.getDescricao(),
-                    montante,
-                    jpaEntity.getTipo(),
-                    jpaEntity.getData(),
-                    UsuarioId.of(jpaEntity.getUsuario().getId()),
-                    CategoriaId.of(jpaEntity.getCategoria().getId()),
-                    ClienteId.of(jpaEntity.getUsuario().getId()),
-                    configuracao,
-                    auditoria,
-                    jpaEntity.getObservacao()
-            );
-        } else {
-            return Transacao.criarNova(
-                    jpaEntity.getDescricao(),
-                    montante,
-                    jpaEntity.getTipo(),
-                    jpaEntity.getData(),
-                    CategoriaId.of(jpaEntity.getCategoria().getId()),
-                    UsuarioId.of(jpaEntity.getUsuario().getId()),
-                    ClienteId.of(jpaEntity.getUsuario().getId()),
-                    configuracao,
-                    jpaEntity.getObservacao()
-            );
-        }
-    }
+        ClienteId clienteId = jpa.getCliente() != null
+                ? ClienteId.of(jpa.getCliente().getId())
+                : null;
 
-    public void updateJpaEntity(
-            TransacaoJpaEntity jpaEntity,
-            Transacao transacao,
-            MoedaJpaEntity moedaJpa) {
-
-        if (jpaEntity == null || transacao == null) {
-            return;
-        }
-
-        jpaEntity.setDescricao(transacao.getDescricao());
-        jpaEntity.setValor(transacao.getValor());
-
-        MontanteMonetarioJpaEntity montanteJpa = new MontanteMonetarioJpaEntity(
-                transacao.getMontante().getValor(),
-                moedaJpa
+        return Transacao.reconstituir(
+                TransacaoId.of(jpa.getId()), // ✅ Value Object, não Long
+                jpa.getDescricao(),
+                montante,
+                jpa.getTipo(),
+                jpa.getData(),
+                UsuarioId.of(jpa.getUsuario().getId()),
+                CategoriaId.of(jpa.getCategoria().getId()),
+                clienteId, // ✅ ClienteId correto ou null
+                mapConfiguracaoToDomain(jpa),
+                mapAuditoriaToDomain(jpa.getAuditoria()),
+                jpa.getObservacao()
         );
-        jpaEntity.setMontante(montanteJpa);
-
-        jpaEntity.setTipo(transacao.getTipo());
-        jpaEntity.setData(transacao.getData());
-
-        mapConfiguracaoToJpa(transacao.getConfiguracao(), jpaEntity);
-
-        if (jpaEntity.getAuditoria() == null) {
-            jpaEntity.setAuditoria(new AuditoriaJpa());
-        }
     }
+
 
     private void mapConfiguracaoToJpa(ConfiguracaoTransacao config, TransacaoJpaEntity jpaEntity) {
         if (config == null) {

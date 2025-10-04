@@ -1,5 +1,6 @@
 package inMemoryTest;
 
+import ch.qos.logback.core.net.server.Client;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao.ConfiguracaoTransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao.TransacaoMapper;
@@ -10,9 +11,13 @@ import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.usuario.ent
 import com.vinicius.gerenciamento_financeiro.domain.exception.ResourceNotFoundException;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
+import com.vinicius.gerenciamento_financeiro.domain.model.cliente.Cliente;
+import com.vinicius.gerenciamento_financeiro.domain.model.cliente.ClienteId;
+import com.vinicius.gerenciamento_financeiro.domain.model.moeda.MontanteMonetario;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao;
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.TransacaoId;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.domain.service.transacao.NotificarTransacaoService;
@@ -127,7 +132,7 @@ public class TransacaoServiceTest {
 
         Transacao transacaoEsperada = Transacao.criarNova(
                 "Salário",
-                new BigDecimal("1000"),
+                MontanteMonetario.ofBRL(new BigDecimal("1000")),
                 TipoMovimentacao.RECEITA,
                 LocalDateTime.now(),
                 CategoriaId.of(1L),
@@ -200,13 +205,14 @@ public class TransacaoServiceTest {
         );
 
         Transacao transacaoUsuario2 = Transacao.reconstituir(
-                2L,
+                TransacaoId.of(2L),
                 "Transação Usuário 2",
-                new BigDecimal("200"),
+                MontanteMonetario.ofBRL(new BigDecimal("200")),
                 TipoMovimentacao.DESPESA,
                 LocalDateTime.now(),
                 UsuarioId.of(2L),
                 CategoriaId.of(1L),
+                ClienteId.of(1L),
                 ConfiguracaoTransacao.padrao(),
                 Auditoria.criarNova(),
                 "teste"
@@ -325,13 +331,14 @@ public class TransacaoServiceTest {
     private Transacao criarTransacaoDominio(Long id, String descricao, BigDecimal valor, TipoMovimentacao tipo) {
         if (id != null) {
             return Transacao.reconstituir(
-                    id,
+                    TransacaoId.of(id),
                     descricao,
-                    valor,
+                    MontanteMonetario.ofBRL(valor),
                     tipo,
                     LocalDateTime.now(),
                     UsuarioId.of(1L),
                     CategoriaId.of(1L),
+                    ClienteId.of(1L),
                     ConfiguracaoTransacao.padrao(),
                     Auditoria.criarNova(),
                     "Tete"
@@ -339,7 +346,7 @@ public class TransacaoServiceTest {
         } else {
             return Transacao.criarNova(
                     descricao,
-                    valor,
+                    MontanteMonetario.ofBRL(valor),
                     tipo,
                     LocalDateTime.now(),
                     CategoriaId.of(1L),
@@ -350,13 +357,14 @@ public class TransacaoServiceTest {
 
     private Transacao criarTransacaoParaCategoria(Long id, String descricao, CategoriaId categoriaId) {
         return Transacao.reconstituir(
-                id,
+                TransacaoId.of(id),
                 descricao,
-                new BigDecimal("100"),
+                MontanteMonetario.ofBRL(new BigDecimal("100")),
                 TipoMovimentacao.RECEITA,
                 LocalDateTime.now(),
                 UsuarioId.of(1L),
                 categoriaId,
+                ClienteId.of(1L),
                 ConfiguracaoTransacao.padrao(),
                 Auditoria.criarNova(),
                 "Teste"

@@ -27,32 +27,21 @@ public class TransacaoPersistenceAdapter implements TransacaoRepository {
     @Override
     @Transactional
     public void salvarTransacao(Transacao transacao) {
-        try {
-            log.debug("Salvando transação: {}", transacao.getDescricao());
+        TransacaoJpaEntity jpaEntity = transacao.isNova()
+                ? transacaoJpaMapper.toJpaEntity(transacao)
+                : atualizarExistente(transacao);
 
-            TransacaoJpaEntity jpaEntity;
+        jpaRepository.save(jpaEntity);
+    }
 
-            if (transacao.isNova()) {
-                UsuarioJpaEntity usuarioJpa = criarUsuarioJpaMinimo(transacao.getUsuarioId().getValue());
-                CategoriaJpaEntity categoriaJpa = criarCategoriaJpaMinimo(transacao.getCategoriaId().getValue());
+    private TransacaoJpaEntity atualizarExistente(Transacao transacao) {
+        TransacaoJpaEntity jpa = jpaRepository.findById(transacao.getId().getValue())
+                .orElseThrow(() -> new IllegalStateException(
+                        "Transação não encontrada: " + transacao.getId().getValue()
+                ));
 
-                jpaEntity = transacaoJpaMapper.toJpaEntity(transacao, usuarioJpa, categoriaJpa);
-                log.debug("Criando nova transação");
-            } else {
-                jpaEntity = jpaRepository.findById(transacao.getId().getValue())
-                        .orElseThrow(() -> new IllegalStateException("Transação não encontrada para atualização: " + transacao.getId().getValue()));
-
-                transacaoJpaMapper.updateJpaEntity(jpaEntity, transacao);
-                log.debug("Atualizando transação existente: ID {}", transacao.getId().getValue());
-            }
-
-            TransacaoJpaEntity savedEntity = jpaRepository.save(jpaEntity);
-            log.debug("Transação salva com sucesso: ID {}", savedEntity.getId());
-
-        } catch (Exception e) {
-            log.error("Erro ao salvar transação: {}", e.getMessage(), e);
-            throw e;
-        }
+        transacaoJpaMapper.toDomainEntity(jpa);
+        return jpa;
     }
 
     @Override

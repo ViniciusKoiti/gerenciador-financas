@@ -6,11 +6,15 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao.Tra
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.ConfiguracaoTransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
+import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
+import com.vinicius.gerenciamento_financeiro.domain.model.cliente.ClienteId;
+import com.vinicius.gerenciamento_financeiro.domain.model.moeda.MontanteMonetario;
 import com.vinicius.gerenciamento_financeiro.domain.model.pessoa.Email;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao;
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.TransacaoId;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.domain.service.transacao.NotificarTransacaoService;
@@ -114,7 +118,7 @@ class TransacaoServiceTest {
 
         Transacao receita = Transacao.criarNova(
                 "Salário",
-                new BigDecimal("1000"),
+                MontanteMonetario.ofBRL(new BigDecimal("1000")),
                 TipoMovimentacao.RECEITA,
                 LocalDateTime.now(),
                 categoriaId,
@@ -123,7 +127,7 @@ class TransacaoServiceTest {
 
         Transacao despesa = Transacao.criarNova(
                 "Aluguel",
-                new BigDecimal("500"),
+                MontanteMonetario.ofBRL(new BigDecimal("500")),
                 TipoMovimentacao.DESPESA,
                 LocalDateTime.now(),
                 categoriaId,
@@ -147,7 +151,7 @@ class TransacaoServiceTest {
 
         Transacao transacao1 = Transacao.criarNova(
                 "Compra no mercado",
-                BigDecimal.valueOf(50),
+                MontanteMonetario.ofBRL(BigDecimal.valueOf(50)),
                 TipoMovimentacao.DESPESA,
                 LocalDateTime.now(),
                 categoriaId,
@@ -156,7 +160,7 @@ class TransacaoServiceTest {
 
         Transacao transacao2 = Transacao.criarNova(
                 "Jantar",
-                BigDecimal.valueOf(30),
+                MontanteMonetario.ofBRL(BigDecimal.valueOf(30)),
                 TipoMovimentacao.DESPESA,
                 LocalDateTime.now(),
                 categoriaId,
@@ -191,13 +195,14 @@ class TransacaoServiceTest {
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(usuarioId.getValue());
 
         Transacao transacaoExistente = Transacao.reconstituir(
-                transacaoId,
+                TransacaoId.of(transacaoId),
                 "Transação existente",
-                new BigDecimal("100"),
+                MontanteMonetario.ofBRL(BigDecimal.valueOf(30)),
                 TipoMovimentacao.DESPESA,
                 LocalDateTime.now(),
                 usuarioId,
                 categoriaId,
+                null,
                 null,
                 null,
                 "Teste"

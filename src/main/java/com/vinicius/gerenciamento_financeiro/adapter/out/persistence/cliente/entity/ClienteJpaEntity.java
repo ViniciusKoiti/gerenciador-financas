@@ -3,7 +3,6 @@ package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente.en
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.usuario.entity.UsuarioJpaEntity;
-import com.vinicius.gerenciamento_financeiro.domain.model.PixInfo;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.pessoa.entity.PessoaJpaEntity;
 import jakarta.persistence.*;
 import lombok.*;

@@ -95,7 +95,7 @@ public final class Transacao {
     }
 
     public static Transacao reconstituir(
-            Long id,
+            TransacaoId id,
             String descricao,
             MontanteMonetario montante,
             TipoMovimentacao tipo,
@@ -108,7 +108,7 @@ public final class Transacao {
             String observacoes
     ) {
         return new Builder()
-                .id(id != null ? TransacaoId.of(id) : null)
+                .id(id)
                 .descricao(descricao)
                 .montante(montante)
                 .tipo(tipo)

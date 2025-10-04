@@ -5,9 +5,13 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao.Con
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao.TransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao;
 import com.vinicius.gerenciamento_financeiro.domain.exception.BusinessRuleViolationException;
 import com.vinicius.gerenciamento_financeiro.domain.exception.InsufficientPermissionException;
 import com.vinicius.gerenciamento_financeiro.domain.exception.ResourceNotFoundException;
+import com.vinicius.gerenciamento_financeiro.domain.model.cliente.ClienteId;
+import com.vinicius.gerenciamento_financeiro.domain.model.moeda.MoedaId;
+import com.vinicius.gerenciamento_financeiro.domain.model.moeda.MontanteMonetario;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
@@ -24,6 +28,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -78,13 +83,23 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
 
             ConfiguracaoTransacao configuracaoTransacao = configuracaoTransacaoMapper.toDomain(transacaoPost.configuracao());
 
+
+            MontanteMonetario montanteMonetario = MontanteMonetario.of(
+                    transacaoPost.valor(),
+                    MoedaId.of(String.valueOf(transacaoPost.moedaId()))
+            );
+
+
+
+
             Transacao transacao = Transacao.criarNova(
                     transacaoPost.descricao(),
-                    transacaoPost.valor(),
+                    montanteMonetario,
                     transacaoPost.tipoMovimentacao(),
                     transacaoPost.data(),
                     categoriaId,
                     usuario.getId(),
+                    ClienteId.of(transacaoPost.clienteId()),
                     configuracaoTransacao,
                     transacaoPost.observacoes()
             );
