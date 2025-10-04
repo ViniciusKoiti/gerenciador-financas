@@ -37,7 +37,7 @@ public record TransacaoPost(
         String observacoes,
 
         @JsonProperty("currencyId")
-        Long moedaId,
+        String moedaId,
 
         @JsonProperty("clientId")
         Long clienteId,
@@ -52,14 +52,14 @@ public record TransacaoPost(
                          LocalDateTime data, Long categoriaId) {
         this(descricao, valor, tipoMovimentacao, data, categoriaId,
                 null,  // observacoes
-                null,  // moedaId
+                "BRL",  // moedaId
                 null,  // clienteId
                 ConfiguracaoTransacaoPost.padrao());
     }
 
     // Construtor com moeda específica
     public TransacaoPost(String descricao, BigDecimal valor, TipoMovimentacao tipoMovimentacao,
-                         LocalDateTime data, Long categoriaId, Long moedaId) {
+                         LocalDateTime data, Long categoriaId, String moedaId) {
         this(descricao, valor, tipoMovimentacao, data, categoriaId,
                 null,  // observacoes
                 moedaId,
@@ -69,7 +69,7 @@ public record TransacaoPost(
 
     // Construtor com moeda E cliente
     public TransacaoPost(String descricao, BigDecimal valor, TipoMovimentacao tipoMovimentacao,
-                         LocalDateTime data, Long categoriaId, Long moedaId, Long clienteId) {
+                         LocalDateTime data, Long categoriaId, String moedaId, Long clienteId) {
         this(descricao, valor, tipoMovimentacao, data, categoriaId,
                 null,  // observacoes
                 moedaId,
@@ -81,7 +81,7 @@ public record TransacaoPost(
         return configuracao != null ? configuracao : ConfiguracaoTransacaoPost.padrao();
     }
 
-    public Long getMoedaIdOuPadrao() {
-        return moedaId != null ? moedaId : 1L;
+    public String getMoedaIdOuPadrao() {
+        return moedaId != null ? moedaId : "BRL";
     }
 }

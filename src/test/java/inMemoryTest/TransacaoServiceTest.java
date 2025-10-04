@@ -127,6 +127,8 @@ public class TransacaoServiceTest {
                 new BigDecimal("1000"),
                 TipoMovimentacao.RECEITA,
                 LocalDateTime.now(),
+                1L,
+                "BRL",
                 1L
         );
 
@@ -136,7 +138,10 @@ public class TransacaoServiceTest {
                 TipoMovimentacao.RECEITA,
                 LocalDateTime.now(),
                 CategoriaId.of(1L),
-                UsuarioId.of(1L)
+                UsuarioId.of(1L),
+                ClienteId.of(1L),
+                ConfiguracaoTransacao.padrao(),
+                ""
         );
 
         // Act
@@ -163,10 +168,10 @@ public class TransacaoServiceTest {
         when(categoriaRepository.existsByIdAndUsuarioId(CategoriaId.of(1L), UsuarioId.of(1L))).thenReturn(true);
 
         TransacaoPost receita = new TransacaoPost(
-                "Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 1L
+                "Salário", new BigDecimal("1000"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 1L, "BRL", 1L
         );
         TransacaoPost despesa = new TransacaoPost(
-                "Aluguel", new BigDecimal("500"), TipoMovimentacao.DESPESA, LocalDateTime.now(), 1L
+                "Aluguel", new BigDecimal("-500"), TipoMovimentacao.DESPESA, LocalDateTime.now(), 1L, "BRL", 1L
         );
 
 
@@ -306,7 +311,7 @@ public class TransacaoServiceTest {
         when(categoriaRepository.existsByIdAndUsuarioId(CategoriaId.of(1L), UsuarioId.of(1L))).thenReturn(true);
 
         TransacaoPost transacaoPost = new TransacaoPost(
-                "Teste", new BigDecimal("100"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 1L
+                "Teste", new BigDecimal("100"), TipoMovimentacao.RECEITA, LocalDateTime.now(), 1L, "BRL", 1L
         );
 
         Transacao transacaoEsperada = criarTransacaoDominio(

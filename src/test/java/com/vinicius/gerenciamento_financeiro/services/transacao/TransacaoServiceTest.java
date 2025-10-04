@@ -92,11 +92,12 @@ class TransacaoServiceTest {
     void deveAdicionarTransacaoComSucesso() {
         TransacaoPost transacaoPost = new TransacaoPost(
                 "Salário",
-                BigDecimal.valueOf(1000),
+                new BigDecimal("1000"),
                 TipoMovimentacao.RECEITA,
                 LocalDateTime.now(),
-                categoriaId.getValue()
-
+                1L,
+                "BRL",
+                1L
         );
 
         when(jwtService.getByAutenticaoUsuarioId()).thenReturn(usuarioId.getValue());

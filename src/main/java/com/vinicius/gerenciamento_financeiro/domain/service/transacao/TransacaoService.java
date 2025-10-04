@@ -143,7 +143,8 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
         List<Transacao> transacoes = transacaoRepository.buscarTodasTransacoesPorUsuario(usuarioIdRaw);
 
         BigDecimal saldo = transacoes.stream()
-                .map(this::calcularValorTransacao)
+                .map(Transacao::getValorEfetivo)
+                .map(MontanteMonetario::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         log.debug("Saldo calculado: {}", saldo);
@@ -194,13 +195,5 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
         return transacoes.stream()
                 .map(transacaoMapper::toResponse)
                 .collect(Collectors.toList());
-    }
-
-    private BigDecimal calcularValorTransacao(Transacao transacao) {
-        return switch (transacao.getTipo()) {
-            case RECEITA -> transacao.getValor();
-            case DESPESA -> transacao.getValor().negate();
-            case TRANSFERENCIA -> BigDecimal.ZERO; // Lógica específica se necessário
-        };
     }
 }

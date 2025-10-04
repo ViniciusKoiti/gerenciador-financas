@@ -3,9 +3,12 @@ package com.vinicius.gerenciamento_financeiro.services.transacao;
 import com.vinicius.gerenciamento_financeiro.adapter.out.messaging.RabbitMQConstants;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
+import com.vinicius.gerenciamento_financeiro.domain.model.cliente.ClienteId;
+import com.vinicius.gerenciamento_financeiro.domain.model.moeda.MontanteMonetario;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao;
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.TransacaoId;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.domain.service.transacao.NotificarTransacaoService;
 import com.vinicius.gerenciamento_financeiro.port.in.NotificarUseCase;
@@ -42,8 +45,8 @@ class NotificarTransacaoServiceTest{
         );
 
         Transacao transacaoFutura = Transacao.reconstituir(
-                1L, "Transação Futura", new BigDecimal("100.00"), TipoMovimentacao.DESPESA,
-                LocalDateTime.now(), UsuarioId.of(1L), CategoriaId.of(1L),
+                TransacaoId.of(1L), "Transação Futura", MontanteMonetario.ofBRL(new BigDecimal("100.00")), TipoMovimentacao.DESPESA,
+                LocalDateTime.now(), UsuarioId.of(1L), CategoriaId.of(1L), ClienteId.of(1L),
                 configuracaoFutura, Auditoria.criarNova(), "Vini"
         );
 
@@ -75,8 +78,8 @@ class NotificarTransacaoServiceTest{
         );
 
         Transacao transacaoVencida = Transacao.reconstituir(
-                2L, "Transação Vencida", new BigDecimal("200.00"), TipoMovimentacao.DESPESA,
-                LocalDateTime.now(), UsuarioId.of(1L), CategoriaId.of(1L),
+                TransacaoId.of(2L), "Transação Vencida", MontanteMonetario.ofBRL(new BigDecimal("200.00")), TipoMovimentacao.DESPESA,
+                LocalDateTime.now(), UsuarioId.of(1L), CategoriaId.of(1L), ClienteId.of(1L),
                 configuracaoVencida, Auditoria.criarNova(), "Vini"
         );
 
@@ -97,7 +100,7 @@ class NotificarTransacaoServiceTest{
         // Arrange - Configuração padrão (dataVencimento = hoje)
         Transacao transacaoComConfiguracaoPadrao = Transacao.criarNova(
                 "Transação com configuração padrão",
-                new BigDecimal("50.00"),
+                MontanteMonetario.ofBRL(new BigDecimal("50.00")),
                 TipoMovimentacao.RECEITA,
                 LocalDateTime.now(),
                 CategoriaId.of(1L),
@@ -122,8 +125,8 @@ class NotificarTransacaoServiceTest{
         ConfiguracaoTransacao configuracao = ConfiguracaoTransacao.comVencimento(dataVencimento);
 
         Transacao transacao = Transacao.reconstituir(
-                3L, "Transação Teste Delay", new BigDecimal("75.00"), TipoMovimentacao.DESPESA,
-                LocalDateTime.now(), UsuarioId.of(1L), CategoriaId.of(1L),
+                TransacaoId.of(3L), "Transação Teste Delay", MontanteMonetario.ofBRL(new BigDecimal("75.00")), TipoMovimentacao.DESPESA,
+                LocalDateTime.now(), UsuarioId.of(1L), CategoriaId.of(1L), ClienteId.of(1L),
                 configuracao, Auditoria.criarNova(), "Vini"
         );
 

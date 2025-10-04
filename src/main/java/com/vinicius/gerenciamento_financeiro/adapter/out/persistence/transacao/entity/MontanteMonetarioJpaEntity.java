@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 @Embeddable
 public class MontanteMonetarioJpaEntity {
 
-    @Column(name = "valor", precision = 19, scale = 6, nullable = false)
+    @Column(name = "valor_definitivo", precision = 19, scale = 6, nullable = false)
     private BigDecimal valor;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
