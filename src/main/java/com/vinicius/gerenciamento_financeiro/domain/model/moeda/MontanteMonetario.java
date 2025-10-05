@@ -8,7 +8,7 @@ public class MontanteMonetario {
 
     public static final MontanteMonetario ZERO_BRL = new MontanteMonetario(BigDecimal.ZERO, MoedaId.of("BRL"));
     public static final MontanteMonetario ZERO_EUR = new MontanteMonetario(BigDecimal.ZERO, MoedaId.of("EUR"));
-    public static final MontanteMonetario ZERO_USD = new MontanteMonetario(BigDecimal.ZERO, MoedaId.of("EUR"));
+    public static final MontanteMonetario ZERO_USD = new MontanteMonetario(BigDecimal.ZERO, MoedaId.of("USD"));
 
     private final BigDecimal valor;
     private final MoedaId moedaId;
