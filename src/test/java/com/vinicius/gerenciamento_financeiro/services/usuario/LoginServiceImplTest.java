@@ -1,6 +1,5 @@
 package com.vinicius.gerenciamento_financeiro.services.usuario;
 
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.SpringUserDetails;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.UsuarioMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario.LoginRequest;
@@ -8,6 +7,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticaca
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.UsuarioResponse;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.application.service.usuario.LoginServiceImpl;
+import com.vinicius.gerenciamento_financeiro.port.in.TokenService;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +33,7 @@ class LoginServiceImplTest {
     private UsuarioRepository usuarioRepository;
 
     @Mock
-    private JwtService jwtService;
+    private TokenService jwtService;
 
     @Mock
     private UsuarioMapper usuarioMapper;
@@ -72,7 +72,7 @@ class LoginServiceImplTest {
                 .thenReturn(authenticatedAuth);
 
         // Mock JWT service
-        when(jwtService.gerarToken(userDetails, usuario.getId().getValue()))
+        when(jwtService.gerarToken(usuario))
                 .thenReturn(expectedToken);
 
         when(usuarioMapper.toResponse(usuario))
@@ -91,7 +91,7 @@ class LoginServiceImplTest {
                 )
         );
 
-        verify(jwtService).gerarToken(userDetails, usuario.getId().getValue());
+        verify(jwtService).gerarToken(usuario);
         verify(usuarioMapper).toResponse(usuario);
     }
     @Test

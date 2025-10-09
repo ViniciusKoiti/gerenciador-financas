@@ -1,11 +1,11 @@
 package com.vinicius.gerenciamento_financeiro;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtAuthenticationFilter;
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.UsuarioMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.out.messaging.RabbitMQConsumer;
 import com.vinicius.gerenciamento_financeiro.adapter.out.messaging.RabbitMQNotificador;
 import com.vinicius.gerenciamento_financeiro.application.service.usuario.UsuarioServiceImpl;
+import com.vinicius.gerenciamento_financeiro.port.in.TokenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ class GerenciamentoFinanceiroApplicationTests {
 	private MockMvc mockMvc;
 
 	@MockitoBean
-	private JwtService jwtService;
+	private TokenService jwtService;
 
 	@MockitoBean
 	private UsuarioServiceImpl usuarioService;

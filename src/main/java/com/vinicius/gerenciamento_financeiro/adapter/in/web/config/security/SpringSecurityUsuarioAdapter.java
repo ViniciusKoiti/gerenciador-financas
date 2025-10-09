@@ -21,7 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class SpringSecurityUsuarioAdapter implements UsuarioAutenticadoPort {
 
-    private final JwtService jwtService;
+    private final JwtTokenService jwtService;
     private final CategoriaRepository categoriaRepository;
 
     @Override
@@ -30,37 +30,60 @@ public class SpringSecurityUsuarioAdapter implements UsuarioAutenticadoPort {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             if (authentication == null || !authentication.isAuthenticated()) {
-                throw new UsuarioNaoAutenticadoException("Nenhuma autenticação encontrada no contexto");
+                throw new UsuarioNaoAutenticadoException("Nenhuma autenticação encontrada");
             }
 
+            // Opção 1: Usuário já carregado no SecurityContext
             if (authentication.getPrincipal() instanceof SpringUserDetails userDetails) {
                 UsuarioId usuarioId = userDetails.getUsuario().getId();
                 log.debug("Usuário obtido via SpringUserDetails: {}", usuarioId.getValue());
                 return usuarioId;
             }
 
+            // Opção 2: Usuário anônimo
             if ("anonymousUser".equals(authentication.getPrincipal())) {
-                throw new UsuarioNaoAutenticadoException("Usuário anônimo - não autenticado");
+                throw new UsuarioNaoAutenticadoException("Usuário anônimo");
             }
 
-            Long usuarioIdRaw = jwtService.getByAutenticaoUsuarioId();
-
-            if (usuarioIdRaw == null || usuarioIdRaw <= 0) {
-                throw new UsuarioNaoAutenticadoException("ID de usuário inválido ou ausente no token");
+            // ✅ Opção 3: Fallback - extrair do token na requisição atual
+            String token = extrairTokenDaRequisicao();
+            if (token != null) {
+                Long usuarioIdRaw = jwtService.extrairUsuarioId(token);
+                if (usuarioIdRaw != null && usuarioIdRaw > 0) {
+                    log.debug("Usuário obtido via token: {}", usuarioIdRaw);
+                    return UsuarioId.of(usuarioIdRaw);
+                }
             }
 
-            log.debug("Usuário obtido via JwtService: {}", usuarioIdRaw);
-            return UsuarioId.of(usuarioIdRaw);
+            throw new UsuarioNaoAutenticadoException("ID de usuário não encontrado");
 
         } catch (UsuarioNaoAutenticadoException e) {
-            log.warn("Falha na obtenção do usuário autenticado: {}", e.getMessage());
+            log.warn("Falha na obtenção do usuário: {}", e.getMessage());
             throw e;
-        } catch (IllegalStateException e) {
-            log.warn("Erro no contexto de autenticação: {}", e.getMessage());
-            throw new UsuarioNaoAutenticadoException("Contexto de autenticação inválido: " + e.getMessage());
         } catch (Exception e) {
             log.error("Erro inesperado ao obter usuário autenticado", e);
             throw new UsuarioNaoAutenticadoException("Erro interno de autenticação");
+        }
+    }
+
+    private String extrairTokenDaRequisicao() {
+        try {
+            ServletRequestAttributes attributes =
+                    (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+
+            if (attributes != null) {
+                HttpServletRequest request = attributes.getRequest();
+                String authHeader = request.getHeader("Authorization");
+
+                if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                    return authHeader.substring(7);
+                }
+            }
+
+            return null;
+        } catch (Exception e) {
+            log.debug("Erro ao extrair token da requisição", e);
+            return null;
         }
     }
 

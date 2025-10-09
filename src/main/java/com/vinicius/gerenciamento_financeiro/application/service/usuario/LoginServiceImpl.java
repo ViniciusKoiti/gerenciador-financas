@@ -1,6 +1,6 @@
 package com.vinicius.gerenciamento_financeiro.application.service.usuario;
 
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtTokenService;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.SpringUserDetails;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.UsuarioMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario.LoginRequest;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class LoginServiceImpl implements LoginUseCase {
-    private final JwtService jwtService;
+    private final JwtTokenService jwtService;
     private final UsuarioMapper mapper;
     private final AuthenticationManager authenticationManager;
 
@@ -32,7 +32,7 @@ public class LoginServiceImpl implements LoginUseCase {
         SpringUserDetails userDetails = (SpringUserDetails) authentication.getPrincipal();
         Usuario usuario = userDetails.getUsuario();
 
-        String token = jwtService.gerarToken(userDetails, usuario.getId().getValue());
+        String token = jwtService.gerarToken(usuario);
         return new AuthenticationResponse(token, mapper.toResponse(usuario));
     }
 }

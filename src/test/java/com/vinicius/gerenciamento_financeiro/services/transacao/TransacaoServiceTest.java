@@ -1,11 +1,11 @@
 package com.vinicius.gerenciamento_financeiro.services.transacao;
 
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao.ConfiguracaoTransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao.TransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.ConfiguracaoTransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponseMapper;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
 import com.vinicius.gerenciamento_financeiro.domain.model.moeda.MontanteMonetario;
 import com.vinicius.gerenciamento_financeiro.domain.model.pessoa.Email;
@@ -17,6 +17,8 @@ import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.application.service.transacao.NotificarTransacaoService;
 import com.vinicius.gerenciamento_financeiro.application.service.transacao.TransacaoService;
+import com.vinicius.gerenciamento_financeiro.port.in.TokenService;
+import com.vinicius.gerenciamento_financeiro.port.in.UsuarioAutenticadoPort;
 import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
 import com.vinicius.gerenciamento_financeiro.port.out.transacao.TransacaoRepository;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
@@ -52,7 +54,10 @@ class TransacaoServiceTest {
     private UsuarioRepository usuarioRepository;
 
     @Mock
-    private JwtService jwtService;
+    private UsuarioAutenticadoPort jwtService;
+
+    @Mock
+    private TransacaoResponseMapper transacaoResponseMapper;
 
     @Mock
     private TransacaoRepository transacaoRepository;
@@ -98,7 +103,7 @@ class TransacaoServiceTest {
                 1L
         );
 
-        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(usuarioId.getValue());
+        when(jwtService.obterUsuarioAtual()).thenReturn(usuarioId);
         when(usuarioRepository.findById(usuarioId)).thenReturn(Optional.of(usuario));
         when(categoriaRepository.existsByIdAndUsuarioId(categoriaId, usuarioId))
                 .thenReturn(true);
@@ -113,7 +118,7 @@ class TransacaoServiceTest {
 
     @Test
     void deveCalcularSaldoCorretamente() {
-        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(usuarioId.getValue());
+        when(jwtService.obterUsuarioAtual()).thenReturn(UsuarioId.of(1L));
 
         Transacao receita = Transacao.criarNova(
                 "Salário",
@@ -144,7 +149,7 @@ class TransacaoServiceTest {
 
     @Test
     void deveBuscarTransacoesPorCategoriaId() {
-        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(usuarioId.getValue());
+        when(jwtService.obterUsuarioAtual()).thenReturn(UsuarioId.of(1L));
         when(categoriaRepository.existsByIdAndUsuarioId(categoriaId, usuarioId))
                 .thenReturn(true);
 
@@ -173,8 +178,8 @@ class TransacaoServiceTest {
         )).thenReturn(transacoes);
 
         when(transacaoMapper.toResponse(any(Transacao.class)))
-                .thenReturn(TransacaoResponse.fromEntity(transacao1))
-                .thenReturn(TransacaoResponse.fromEntity(transacao2));
+                .thenReturn(transacaoResponseMapper.toResponse(transacao1))
+                .thenReturn(transacaoResponseMapper.toResponse(transacao2));
 
         List<TransacaoResponse> resultado = transacaoService.buscarTransacoesPorCategoriaId(categoriaId.getValue());
 
@@ -191,7 +196,7 @@ class TransacaoServiceTest {
         Long transacaoId = 1L;
         Long novaCategoriaId = 3L;
 
-        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(usuarioId.getValue());
+        when(jwtService.obterUsuarioAtual()).thenReturn(UsuarioId.of(1L));
 
         Transacao transacaoExistente = Transacao.reconstituir(
                 TransacaoId.of(transacaoId),

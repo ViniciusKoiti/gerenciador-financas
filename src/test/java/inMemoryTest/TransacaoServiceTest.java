@@ -1,6 +1,5 @@
 package inMemoryTest;
 
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao.ConfiguracaoTransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao.TransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
@@ -20,6 +19,7 @@ import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.application.service.transacao.NotificarTransacaoService;
 import com.vinicius.gerenciamento_financeiro.application.service.transacao.TransacaoService;
+import com.vinicius.gerenciamento_financeiro.port.in.UsuarioAutenticadoPort;
 import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,7 +59,7 @@ public class TransacaoServiceTest {
     private NotificarTransacaoService notificarTransacaoService;
 
     @Mock
-    private JwtService jwtService;
+    private UsuarioAutenticadoPort jwtService;
 
     @Mock
     private ConfiguracaoTransacaoMapper configuracaoMapper;
@@ -78,11 +78,11 @@ public class TransacaoServiceTest {
         service = new TransacaoService(
                 categoriaRepository,
                 usuarioRepository,
-                jwtService,
                 configuracaoMapper,
                 memoryRepository,
                 notificarTransacaoService,
-                mapper
+                mapper,
+                jwtService
         );
 
         usuarioTeste = Usuario.reconstituir(
@@ -116,7 +116,7 @@ public class TransacaoServiceTest {
     void deveAdicionarTransacaoComSucesso() {
 
 
-        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
+        when(jwtService.obterUsuarioAtual()).thenReturn(UsuarioId.of(1L));
         when(usuarioRepository.findById(UsuarioId.of(1L))).thenReturn(Optional.of(usuarioTeste));
         when(categoriaRepository.existsByIdAndUsuarioId(CategoriaId.of(1L), UsuarioId.of(1L))).thenReturn(true);
 
@@ -161,7 +161,7 @@ public class TransacaoServiceTest {
     @DisplayName("Deve calcular saldo corretamente com múltiplas transações")
     void deveCalcularSaldoCorretamente() {
         // Arrange
-        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
+        when(jwtService.obterUsuarioAtual()).thenReturn(UsuarioId.of(1L));
         when(usuarioRepository.findById(UsuarioId.of(1L))).thenReturn(Optional.of(usuarioTeste));
         when(categoriaRepository.existsByIdAndUsuarioId(CategoriaId.of(1L), UsuarioId.of(1L))).thenReturn(true);
 
@@ -260,7 +260,7 @@ public class TransacaoServiceTest {
     @DisplayName("Deve lançar exceção quando categoria não encontrada")
     void deveLancarExcecaoQuandoCategoriaNaoEncontrada() {
         // Arrange
-        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
+        when(jwtService.obterUsuarioAtual()).thenReturn(UsuarioId.of(1L));
         when(usuarioRepository.findById(UsuarioId.of(1L))).thenReturn(Optional.of(usuarioTeste));
         when(categoriaRepository.existsByIdAndUsuarioId(CategoriaId.of(999L),UsuarioId.of( 1L))).thenReturn(false);
 
@@ -281,7 +281,7 @@ public class TransacaoServiceTest {
     @DisplayName("Deve lançar exceção quando usuário não encontrado")
     void deveLancarExcecaoQuandoUsuarioNaoEncontrado() {
         // Arrange
-        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
+        when(jwtService.obterUsuarioAtual()).thenReturn(UsuarioId.of(1L));
         when(usuarioRepository.findById(UsuarioId.of(1L))).thenReturn(Optional.empty());
 
         TransacaoPost transacaoPost = new TransacaoPost(
@@ -304,7 +304,7 @@ public class TransacaoServiceTest {
     @DisplayName("Deve verificar se notificação é chamada corretamente")
     void deveVerificarNotificacao() {
         // Arrange
-        when(jwtService.getByAutenticaoUsuarioId()).thenReturn(1L);
+        when(jwtService.obterUsuarioAtual()).thenReturn(UsuarioId.of(1L));
         when(usuarioRepository.findById(UsuarioId.of(1L))).thenReturn(Optional.of(usuarioTeste));
         when(categoriaRepository.existsByIdAndUsuarioId(CategoriaId.of(1L), UsuarioId.of(1L))).thenReturn(true);
 

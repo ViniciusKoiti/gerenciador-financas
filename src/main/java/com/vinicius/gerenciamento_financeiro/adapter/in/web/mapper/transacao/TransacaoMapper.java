@@ -2,8 +2,8 @@ package com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponseMapper;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
-import com.vinicius.gerenciamento_financeiro.domain.model.cliente.ClienteId;
 import com.vinicius.gerenciamento_financeiro.domain.model.moeda.MoedaId;
 import com.vinicius.gerenciamento_financeiro.domain.model.moeda.MontanteMonetario;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
@@ -14,9 +14,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class TransacaoMapper {
 
+    private final TransacaoResponseMapper transacaoResponseMapper;
+
+
     private final ConfiguracaoTransacaoMapper configuracaoMapper;
 
-    public TransacaoMapper(ConfiguracaoTransacaoMapper configuracaoMapper) {
+    public TransacaoMapper(TransacaoResponseMapper transacaoResponseMapper, ConfiguracaoTransacaoMapper configuracaoMapper) {
+        this.transacaoResponseMapper = transacaoResponseMapper;
         this.configuracaoMapper = configuracaoMapper;
     }
 
@@ -78,6 +82,6 @@ public class TransacaoMapper {
         if (transacao == null) {
             throw new IllegalArgumentException("Transacao não pode ser nula");
         }
-        return TransacaoResponse.fromEntity(transacao);
+        return transacaoResponseMapper.toResponse(transacao);
     }
 }

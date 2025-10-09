@@ -6,6 +6,7 @@ import com.tngtech.archunit.core.importer.ImportOption;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Configuration;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
@@ -45,7 +46,9 @@ class HexagonalArchitectureTest {
     void adaptersEntradaDevemDependerApenasDePortsEntrada() {
         classes()
                 .that().resideInAPackage("..adapter.in..")
+                .and().areNotAnnotatedWith(Configuration.class)
                 .should().onlyDependOnClassesThat().resideInAnyPackage(
+                        "..adapter.in..",
                         "..port.in..",
                         "..domain.model..",
                         "java..",

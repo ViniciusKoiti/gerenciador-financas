@@ -1,6 +1,5 @@
 package com.vinicius.gerenciamento_financeiro.application.service.transacao;
 
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao.ConfiguracaoTransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao.TransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
@@ -16,6 +15,7 @@ import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
+import com.vinicius.gerenciamento_financeiro.port.in.UsuarioAutenticadoPort;
 import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -37,36 +37,35 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
 
     private final CategoriaRepository categoriaRepository;
     private final UsuarioRepository usuarioRepository;
-    private final JwtService jwtService;
 
     private final ConfiguracaoTransacaoMapper configuracaoTransacaoMapper;
     private final TransacaoRepository transacaoRepository;
     private final NotificarTransacaoService notificarTransacaoService;
     private final TransacaoMapper transacaoMapper;
 
+    private final UsuarioAutenticadoPort autenticadoPort;
+
     public TransacaoService(
             CategoriaRepository categoriaRepository,
             UsuarioRepository usuarioRepository,
-            JwtService jwtService,
             ConfiguracaoTransacaoMapper configuracaoTransacaoMapper,
             @Qualifier("transacaoPersistenceAdapter") TransacaoRepository transacaoRepository,
             NotificarTransacaoService notificarTransacaoService,
-            TransacaoMapper transacaoMapper) {
+            TransacaoMapper transacaoMapper, UsuarioAutenticadoPort autenticadoPort) {
         this.categoriaRepository = categoriaRepository;
         this.usuarioRepository = usuarioRepository;
-        this.jwtService = jwtService;
         this.configuracaoTransacaoMapper = configuracaoTransacaoMapper;
         this.transacaoRepository = transacaoRepository;
         this.notificarTransacaoService = notificarTransacaoService;
         this.transacaoMapper = transacaoMapper;
+        this.autenticadoPort = autenticadoPort;
     }
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void adicionarTransacao(TransacaoPost transacaoPost) {
         try {
-            Long usuarioIdRaw = jwtService.getByAutenticaoUsuarioId();
-            UsuarioId usuarioId = UsuarioId.of(usuarioIdRaw);
+            UsuarioId usuarioId = autenticadoPort.obterUsuarioAtual();
             log.debug("Usuário autenticado: {}", usuarioId.getValue());
 
             Usuario usuario = usuarioRepository.findById(usuarioId)
@@ -122,10 +121,10 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
     public List<TransacaoResponse> obterTodasTransacoes() {
         log.debug("Buscando todas as transações do usuário");
 
-        Long usuarioIdRaw = jwtService.getByAutenticaoUsuarioId();
-        List<Transacao> transacoes = transacaoRepository.buscarTodasTransacoesPorUsuario(usuarioIdRaw);
+        UsuarioId usuarioId = autenticadoPort.obterUsuarioAtual();
+        List<Transacao> transacoes = transacaoRepository.buscarTodasTransacoesPorUsuario(usuarioId.getValue());
 
-        log.debug("Encontradas {} transações para o usuário {}", transacoes.size(), usuarioIdRaw);
+        log.debug("Encontradas {} transações para o usuário {}", transacoes.size(), usuarioId.getValue());
 
         return transacoes.stream()
                 .map(transacaoMapper::toResponse)
@@ -137,8 +136,8 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
     public BigDecimal calcularSaldo() {
         log.debug("Calculando saldo do usuário");
 
-        Long usuarioIdRaw = jwtService.getByAutenticaoUsuarioId();
-        List<Transacao> transacoes = transacaoRepository.buscarTodasTransacoesPorUsuario(usuarioIdRaw);
+        UsuarioId usuarioId = autenticadoPort.obterUsuarioAtual();
+        List<Transacao> transacoes = transacaoRepository.buscarTodasTransacoesPorUsuario(usuarioId.getValue());
 
         BigDecimal saldo = transacoes.stream()
                 .map(Transacao::getValorEfetivo)
@@ -155,10 +154,9 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
         log.debug("Atualizando categoria da transação {} para categoria {}", transacaoId, categoriaId);
 
         try {
-            Long usuarioIdRaw = jwtService.getByAutenticaoUsuarioId();
-            UsuarioId usuarioId = UsuarioId.of(usuarioIdRaw);
+            UsuarioId usuarioId = autenticadoPort.obterUsuarioAtual();
 
-            Transacao transacao = transacaoRepository.buscarTransacaoPorIdEUsuario(transacaoId, usuarioIdRaw)
+            Transacao transacao = transacaoRepository.buscarTransacaoPorIdEUsuario(transacaoId, usuarioId.getValue())
                     .orElseThrow(() -> new ResourceNotFoundException("Transacao", transacaoId));
 
             CategoriaId novaCategoriaId = CategoriaId.of(categoriaId);
@@ -181,14 +179,13 @@ public class TransacaoService implements GerenciarTransacaoUseCase {
     @Override
     @Transactional(readOnly = true)
     public List<TransacaoResponse> buscarTransacoesPorCategoriaId(Long id) {
-        Long usuarioIdRaw = jwtService.getByAutenticaoUsuarioId();
-        UsuarioId usuarioId = UsuarioId.of(usuarioIdRaw);
-        CategoriaId categoriaId = CategoriaId.of(usuarioIdRaw);
+        UsuarioId usuarioId = autenticadoPort.obterUsuarioAtual();
+        CategoriaId categoriaId = CategoriaId.of(usuarioId.getValue());
         if (!categoriaRepository.existsByIdAndUsuarioId(categoriaId, usuarioId)) {
             throw new InsufficientPermissionException("categoria", "listar transações");
         }
 
-        List<Transacao> transacoes = transacaoRepository.buscarTransacoesPorCategoriaIdEUsuario(id, usuarioIdRaw);
+        List<Transacao> transacoes = transacaoRepository.buscarTransacoesPorCategoriaIdEUsuario(id, usuarioId.getValue());
 
         return transacoes.stream()
                 .map(transacaoMapper::toResponse)
