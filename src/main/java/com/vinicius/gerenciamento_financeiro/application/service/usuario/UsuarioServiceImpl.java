@@ -1,4 +1,4 @@
-package com.vinicius.gerenciamento_financeiro.domain.service.usuario;
+package com.vinicius.gerenciamento_financeiro.application.service.usuario;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.UsuarioMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario.LoginRequest;

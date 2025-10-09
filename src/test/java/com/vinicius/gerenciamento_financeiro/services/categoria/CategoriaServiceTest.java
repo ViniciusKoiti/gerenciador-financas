@@ -1,18 +1,16 @@
 package com.vinicius.gerenciamento_financeiro.services.categoria;
 
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.CategoriaMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.domain.exception.BusinessRuleViolationException;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
-import com.vinicius.gerenciamento_financeiro.domain.service.categoria.CategoriaService;
+import com.vinicius.gerenciamento_financeiro.application.service.categoria.CategoriaService;
 import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
-import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioAutenticadoPort;
+import com.vinicius.gerenciamento_financeiro.port.in.UsuarioAutenticadoPort;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

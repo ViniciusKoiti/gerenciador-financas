@@ -1,11 +1,10 @@
-package com.vinicius.gerenciamento_financeiro.domain.service.transacao;
+package com.vinicius.gerenciamento_financeiro.application.service.transacao;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao.ConfiguracaoTransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao.TransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao.TransacaoPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.transacao.TransacaoResponse;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao;
 import com.vinicius.gerenciamento_financeiro.domain.exception.BusinessRuleViolationException;
 import com.vinicius.gerenciamento_financeiro.domain.exception.InsufficientPermissionException;
 import com.vinicius.gerenciamento_financeiro.domain.exception.ResourceNotFoundException;
@@ -28,7 +27,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -2,7 +2,7 @@ package com.vinicius.gerenciamento_financeiro.services.moeda;
 
 import com.vinicius.gerenciamento_financeiro.domain.model.moeda.MoedaId;
 import com.vinicius.gerenciamento_financeiro.domain.model.moeda.MontanteMonetario;
-import com.vinicius.gerenciamento_financeiro.domain.service.moeda.MontanteMonetarioFormatterService;
+import com.vinicius.gerenciamento_financeiro.application.service.moeda.MontanteMonetarioFormatterService;
 import com.vinicius.gerenciamento_financeiro.port.out.moeda.MoedaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

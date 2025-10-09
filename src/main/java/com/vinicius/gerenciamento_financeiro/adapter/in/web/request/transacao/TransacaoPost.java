@@ -1,7 +1,7 @@
 package com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao;
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;

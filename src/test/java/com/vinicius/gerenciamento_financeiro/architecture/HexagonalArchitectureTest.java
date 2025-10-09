@@ -52,12 +52,13 @@ class HexagonalArchitectureTest {
                         "org.springframework..",
                         "jakarta..",
                         "com.fasterxml.jackson..",
-                        "org.mapstruct.."
+                        "org.mapstruct..",
+                        "lombok..",
+                        "io.swagger.v3.oas.annotations.."
                 )
                 .because("Adapters de entrada devem usar apenas ports de entrada")
                 .check(importedClasses);
     }
-
     @Test
     @DisplayName("Adapters de saída devem implementar ports de saída")
     void adaptersSaidaDevemImplementarPortsSaida() {

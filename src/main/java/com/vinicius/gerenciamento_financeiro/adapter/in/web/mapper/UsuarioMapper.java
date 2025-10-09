@@ -6,11 +6,12 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticaca
 import com.vinicius.gerenciamento_financeiro.domain.model.pessoa.Email;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import org.mapstruct.Mapper;
+import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring")
-public interface UsuarioMapper {
+@Component
+public class UsuarioMapper {
 
-    default UsuarioResponse toResponse(Usuario usuario) {
+    public UsuarioResponse toResponse(Usuario usuario) {
         return UsuarioResponse.builder()
                 .id(usuario.getId() != null ? usuario.getId().getValue() : null)
                 .nome(usuario.getNome())
@@ -18,7 +19,7 @@ public interface UsuarioMapper {
                 .build();
     }
 
-    default Usuario toEntity(UsuarioPost request, String hashSenha) {
+    public Usuario toEntity(UsuarioPost request, String hashSenha) {
         return Usuario.criarNovo(
                 request.nome(),
                 new Email(request.email()),
@@ -26,7 +27,7 @@ public interface UsuarioMapper {
         );
     }
 
-    default Usuario atualizarUsuario(Usuario usuarioExistente, UsuarioPut put) {
+    public Usuario atualizarUsuario(Usuario usuarioExistente, UsuarioPut put) {
         String novoNome = put.nome() != null ? put.nome() : usuarioExistente.getNome();
         Email novoEmail = put.email() != null ? new Email(put.email()) : usuarioExistente.getEmail();
 

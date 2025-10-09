@@ -8,7 +8,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticaca
 import com.vinicius.gerenciamento_financeiro.domain.model.pessoa.Email;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
-import com.vinicius.gerenciamento_financeiro.domain.service.usuario.UsuarioServiceImpl;
+import com.vinicius.gerenciamento_financeiro.application.service.usuario.UsuarioServiceImpl;
 import com.vinicius.gerenciamento_financeiro.port.in.LoginUseCase;
 import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;

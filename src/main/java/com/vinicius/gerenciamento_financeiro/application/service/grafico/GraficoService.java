@@ -1,4 +1,4 @@
-package com.vinicius.gerenciamento_financeiro.domain.service.grafico;
+package com.vinicius.gerenciamento_financeiro.application.service.grafico;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.GraficoResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.ResumoFinanceiroResponse;
@@ -6,12 +6,10 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.Tra
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.port.in.GerarGraficoUseCase;
 import com.vinicius.gerenciamento_financeiro.port.out.grafico.GraficoRepository;
-import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioAutenticadoPort;
+import com.vinicius.gerenciamento_financeiro.port.in.UsuarioAutenticadoPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;

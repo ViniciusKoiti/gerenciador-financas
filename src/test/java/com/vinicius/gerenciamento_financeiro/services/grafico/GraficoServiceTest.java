@@ -5,18 +5,14 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.Res
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.TransacaoPorPeriodoResponse;
 import com.vinicius.gerenciamento_financeiro.domain.exception.UsuarioNaoAutenticadoException;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
-import com.vinicius.gerenciamento_financeiro.domain.service.grafico.GraficoService;
+import com.vinicius.gerenciamento_financeiro.application.service.grafico.GraficoService;
 import com.vinicius.gerenciamento_financeiro.port.out.grafico.GraficoRepository;
-import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioAutenticadoPort;
+import com.vinicius.gerenciamento_financeiro.port.in.UsuarioAutenticadoPort;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

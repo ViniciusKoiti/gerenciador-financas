@@ -7,7 +7,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario.Logi
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.AuthenticationResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.UsuarioResponse;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
-import com.vinicius.gerenciamento_financeiro.domain.service.usuario.LoginServiceImpl;
+import com.vinicius.gerenciamento_financeiro.application.service.usuario.LoginServiceImpl;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,9 +18,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

@@ -3,9 +3,9 @@ package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.auditoria.AuditoriaJpa;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.categoria.entity.CategoriaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente.entity.ClienteJpaEntity;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacaoEntity;
+import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoRecorrenciaEntity;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.usuario.entity.UsuarioJpaEntity;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoRecorrencia;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -37,7 +37,7 @@ public class TransacaoJpaEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TipoMovimentacao tipo;
+    private TipoMovimentacaoEntity tipo;
 
     @Column(nullable = false)
     private LocalDateTime data;
@@ -65,7 +65,7 @@ public class TransacaoJpaEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_recorrencia")
-    private TipoRecorrencia tipoRecorrencia;
+    private TipoRecorrenciaEntity tipoRecorrencia;
 
     @Column(name = "ignorar_limite_categoria")
     private Boolean ignorarLimiteCategoria = false;

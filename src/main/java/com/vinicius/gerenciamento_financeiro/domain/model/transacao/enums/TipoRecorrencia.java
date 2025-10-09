@@ -1,4 +1,4 @@
-package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums;
+package com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums;
 
 public enum TipoRecorrencia {
     DIARIO,

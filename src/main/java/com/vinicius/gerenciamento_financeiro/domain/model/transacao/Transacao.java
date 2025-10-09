@@ -2,9 +2,9 @@ package com.vinicius.gerenciamento_financeiro.domain.model.transacao;
 
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.cliente.ClienteId;
 import com.vinicius.gerenciamento_financeiro.domain.model.moeda.MontanteMonetario;
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

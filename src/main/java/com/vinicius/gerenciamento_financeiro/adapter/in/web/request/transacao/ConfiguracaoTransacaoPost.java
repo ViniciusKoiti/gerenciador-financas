@@ -1,7 +1,7 @@
 package com.vinicius.gerenciamento_financeiro.adapter.in.web.request.transacao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoRecorrencia;
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoRecorrencia;
 import jakarta.validation.constraints.Min;
 import java.time.LocalDate;
 

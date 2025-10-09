@@ -1,6 +1,5 @@
 package inMemoryTest;
 
-import ch.qos.logback.core.net.server.Client;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtService;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao.ConfiguracaoTransacaoMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.transacao.TransacaoMapper;
@@ -11,17 +10,16 @@ import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.usuario.ent
 import com.vinicius.gerenciamento_financeiro.domain.exception.ResourceNotFoundException;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
-import com.vinicius.gerenciamento_financeiro.domain.model.cliente.Cliente;
 import com.vinicius.gerenciamento_financeiro.domain.model.cliente.ClienteId;
 import com.vinicius.gerenciamento_financeiro.domain.model.moeda.MontanteMonetario;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.TransacaoId;
+import com.vinicius.gerenciamento_financeiro.domain.model.transacao.enums.TipoMovimentacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
-import com.vinicius.gerenciamento_financeiro.domain.service.transacao.NotificarTransacaoService;
-import com.vinicius.gerenciamento_financeiro.domain.service.transacao.TransacaoService;
+import com.vinicius.gerenciamento_financeiro.application.service.transacao.NotificarTransacaoService;
+import com.vinicius.gerenciamento_financeiro.application.service.transacao.TransacaoService;
 import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,4 +1,4 @@
-package com.vinicius.gerenciamento_financeiro.domain.service.moeda;
+package com.vinicius.gerenciamento_financeiro.application.service.moeda;
 
 import com.vinicius.gerenciamento_financeiro.domain.model.moeda.MoedaId;
 import com.vinicius.gerenciamento_financeiro.domain.model.moeda.MontanteMonetario;

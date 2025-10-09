@@ -7,15 +7,17 @@ import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import org.mapstruct.Mapper;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
-public interface CategoriaMapper {
 
-    default Categoria toEntity(CategoriaPost request, UsuarioId usuarioId) {
+@Component
+public class CategoriaMapper {
+
+    public Categoria toEntity(CategoriaPost request, UsuarioId usuarioId) {
         if (request == null) {
             return null;
         }
@@ -28,7 +30,7 @@ public interface CategoriaMapper {
         );
     }
 
-    default Categoria toEntity(CategoriaPut request, UsuarioId usuarioId) {
+    public Categoria toEntity(CategoriaPut request, UsuarioId usuarioId) {
         if (request == null) {
             return null;
         }
@@ -37,7 +39,7 @@ public interface CategoriaMapper {
         );
     }
 
-    default CategoriaResponse toResponse(Categoria categoria) {
+    public CategoriaResponse toResponse(Categoria categoria) {
         if (categoria == null) {
             return null;
         }
@@ -56,7 +58,7 @@ public interface CategoriaMapper {
         );
     }
 
-    default List<CategoriaResponse> toResponseList(List<Categoria> categorias) {
+    public List<CategoriaResponse> toResponseList(List<Categoria> categorias) {
         if (categorias == null) {
             return Collections.emptyList();
         }

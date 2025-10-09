@@ -1,13 +1,9 @@
 package com.vinicius.gerenciamento_financeiro.adapter.out.memory;
 
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao;
-import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
-import com.vinicius.gerenciamento_financeiro.domain.model.cliente.ClienteId;
+
 import com.vinicius.gerenciamento_financeiro.domain.model.moeda.MontanteMonetario;
-import com.vinicius.gerenciamento_financeiro.domain.model.transacao.ConfiguracaoTransacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.TransacaoId;
-import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.port.out.transacao.TransacaoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

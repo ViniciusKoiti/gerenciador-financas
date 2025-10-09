@@ -1,4 +1,4 @@
-package com.vinicius.gerenciamento_financeiro.domain.service.usuario;
+package com.vinicius.gerenciamento_financeiro.application.service.usuario;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.SpringUserDetails;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;

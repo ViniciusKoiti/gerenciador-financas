@@ -6,7 +6,6 @@ import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente.ent
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.moeda.entity.MoedaJpaEntity;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.MontanteMonetarioJpaEntity;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.TransacaoJpaEntity;
-import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.usuario.entity.UsuarioJpaEntity;
 import com.vinicius.gerenciamento_financeiro.domain.model.auditoria.Auditoria;
 import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
@@ -20,15 +19,20 @@ import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-
 @Component
 public class TransacaoJpaMapper {
 
     private final EntityManager entityManager;
+    private final TipoRecorrenciaMapper tipoRecorrenciaMapper;
 
-    public TransacaoJpaMapper(EntityManager entityManager) {
+    private final TipoMovimentacaoMapper tipoMovimentacaoMapper;
+
+    public TransacaoJpaMapper(EntityManager entityManager,
+                              TipoRecorrenciaMapper tipoRecorrenciaMapper,
+                              TipoMovimentacaoMapper tipoMovimentacaoMapper) {
         this.entityManager = entityManager;
+        this.tipoRecorrenciaMapper = tipoRecorrenciaMapper;
+        this.tipoMovimentacaoMapper = tipoMovimentacaoMapper;
     }
 
     public TransacaoJpaEntity toJpaEntity(Transacao transacao) {
@@ -67,7 +71,7 @@ public class TransacaoJpaMapper {
                 .descricao(transacao.getDescricao())
                 .valor(transacao.getValor())
                 .montante(montanteJpa)
-                .tipo(transacao.getTipo())
+                .tipo(tipoMovimentacaoMapper.toEntity(transacao.getTipo()))
                 .data(transacao.getData())
                 .observacao(transacao.getObservacoes())
                 .usuario(usuarioRef)
@@ -93,7 +97,7 @@ public class TransacaoJpaMapper {
                 TransacaoId.of(jpa.getId()), // ✅ Value Object, não Long
                 jpa.getDescricao(),
                 montante,
-                jpa.getTipo(),
+                tipoMovimentacaoMapper.toDomain(jpa.getTipo()),
                 jpa.getData(),
                 UsuarioId.of(jpa.getUsuario().getId()),
                 CategoriaId.of(jpa.getCategoria().getId()),
@@ -113,7 +117,7 @@ public class TransacaoJpaMapper {
         jpaEntity.setPago(config.getPago());
         jpaEntity.setRecorrente(config.getRecorrente());
         jpaEntity.setPeriodicidade(config.getPeriodicidade());
-        jpaEntity.setTipoRecorrencia(config.getTipoRecorrencia());
+        jpaEntity.setTipoRecorrencia(tipoRecorrenciaMapper.toEntity(config.getTipoRecorrencia()));
         jpaEntity.setIgnorarLimiteCategoria(config.getIgnorarLimiteCategoria());
         jpaEntity.setIgnorarOrcamento(config.getIgnorarOrcamento());
         jpaEntity.setParcelado(config.getParcelado());
@@ -126,7 +130,7 @@ public class TransacaoJpaMapper {
                 .pago(jpaEntity.getPago())
                 .recorrente(jpaEntity.getRecorrente())
                 .periodicidade(jpaEntity.getPeriodicidade())
-                .tipoRecorrencia(jpaEntity.getTipoRecorrencia())
+                .tipoRecorrencia(tipoRecorrenciaMapper.toDomain(jpaEntity.getTipoRecorrencia()))
                 .ignorarLimiteCategoria(jpaEntity.getIgnorarLimiteCategoria())
                 .ignorarOrcamento(jpaEntity.getIgnorarOrcamento())
                 .parcelado(jpaEntity.getParcelado())

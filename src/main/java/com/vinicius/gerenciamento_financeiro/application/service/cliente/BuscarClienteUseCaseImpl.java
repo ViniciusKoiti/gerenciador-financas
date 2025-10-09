@@ -1,4 +1,4 @@
-package com.vinicius.gerenciamento_financeiro.domain.service.cliente;
+package com.vinicius.gerenciamento_financeiro.application.service.cliente;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.cliente.ClienteFiltroMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.cliente.ClienteResponseMapper;
@@ -11,7 +11,7 @@ import com.vinicius.gerenciamento_financeiro.domain.model.cliente.ClienteId;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.port.in.BuscarClienteUseCase;
 import com.vinicius.gerenciamento_financeiro.port.out.cliente.ClienteRepository;
-import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioAutenticadoPort;
+import com.vinicius.gerenciamento_financeiro.port.in.UsuarioAutenticadoPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

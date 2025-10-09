@@ -1,4 +1,4 @@
-package com.vinicius.gerenciamento_financeiro.domain.service.transacao;
+package com.vinicius.gerenciamento_financeiro.application.service.transacao;
 
 import com.vinicius.gerenciamento_financeiro.adapter.out.messaging.RabbitMQConstants;
 import com.vinicius.gerenciamento_financeiro.domain.model.transacao.Transacao;
