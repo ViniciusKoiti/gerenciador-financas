@@ -1,4 +1,4 @@
-package com.vinicius.gerenciamento_financeiro.port.in;
+package com.vinicius.gerenciamento_financeiro.port.out.autorizacao;
 
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 

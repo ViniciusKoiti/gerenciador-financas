@@ -1,6 +1,6 @@
 package com.vinicius.gerenciamento_financeiro.application.service.usuario;
 
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.JwtTokenService;
+import com.vinicius.gerenciamento_financeiro.adapter.out.criptografia.JwtTokenService;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.SpringUserDetails;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.UsuarioMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario.LoginRequest;
@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -1,7 +1,7 @@
 package com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.cliente;
 
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.exception.RequestInvalidaException;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.cliente.ClienteFiltroRequest;
-import com.vinicius.gerenciamento_financeiro.domain.exception.ClienteException;
 import com.vinicius.gerenciamento_financeiro.domain.model.cliente.ClienteFiltro;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +15,7 @@ public class ClienteFiltroMapper {
 
     public ClienteFiltro toDomain(ClienteFiltroRequest request) {
         if (request == null) {
-            return ClienteFiltro.vazio();
+            throw new RequestInvalidaException("Filtros não podem ser nulos");
         }
 
         ClienteFiltroRequest requestLimpo = request.limpar();
@@ -33,7 +33,7 @@ public class ClienteFiltroMapper {
                     .build();
 
         } catch (IllegalArgumentException ex) {
-            throw ClienteException.filtrosInvalidos(ex.getMessage());
+            throw new RequestInvalidaException("Filtros inválidos: " + ex.getMessage());
         }
     }
 

@@ -5,8 +5,8 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario.Logi
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario.UsuarioPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.AuthenticationResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.UsuarioResponse;
-import com.vinicius.gerenciamento_financeiro.application.service.usuario.UsuarioServiceImpl;
 import com.vinicius.gerenciamento_financeiro.port.in.LoginUseCase;
+import com.vinicius.gerenciamento_financeiro.port.in.UsuarioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UsuarioController {
 
-    private final UsuarioServiceImpl usuarioService;
+    private final UsuarioService usuarioService;
     private final LoginUseCase loginUseCase;
 
     @PostMapping("/registrar")

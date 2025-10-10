@@ -7,7 +7,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticaca
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.UsuarioResponse;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.application.service.usuario.LoginServiceImpl;
-import com.vinicius.gerenciamento_financeiro.port.in.TokenService;
+import com.vinicius.gerenciamento_financeiro.port.out.autorizacao.TokenService;
 import com.vinicius.gerenciamento_financeiro.port.out.usuario.UsuarioRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

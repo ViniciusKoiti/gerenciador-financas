@@ -4,7 +4,7 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.ApiResponseSistema;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.GraficoResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.ResumoFinanceiroResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.TransacaoPorPeriodoResponse;
-import com.vinicius.gerenciamento_financeiro.application.service.grafico.GraficoService;
+import com.vinicius.gerenciamento_financeiro.port.in.GerarGraficoUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -25,7 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GraficoController {
 
-    private final GraficoService graficoService;
+    private final GerarGraficoUseCase graficoService;
     @Operation(summary = "Grafico de total por Categorias")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "")

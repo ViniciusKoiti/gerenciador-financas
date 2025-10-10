@@ -1,6 +1,6 @@
-package com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security;
+package com.vinicius.gerenciamento_financeiro.adapter.out.criptografia;
 
-import com.vinicius.gerenciamento_financeiro.port.in.TokenService;
+import com.vinicius.gerenciamento_financeiro.port.out.autorizacao.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

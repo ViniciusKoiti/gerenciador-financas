@@ -57,7 +57,8 @@ class HexagonalArchitectureTest {
                         "com.fasterxml.jackson..",
                         "org.mapstruct..",
                         "lombok..",
-                        "io.swagger.v3.oas.annotations.."
+                        "io.swagger.v3.oas.annotations..",
+                        "org.slf4j.."
                 )
                 .because("Adapters de entrada devem usar apenas ports de entrada")
                 .check(importedClasses);

@@ -1,6 +1,6 @@
-package com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security;
+package com.vinicius.gerenciamento_financeiro.adapter.out.criptografia;
 
-import com.vinicius.gerenciamento_financeiro.port.in.TokenService;
+import com.vinicius.gerenciamento_financeiro.port.out.autorizacao.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

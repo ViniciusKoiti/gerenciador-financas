@@ -2,6 +2,7 @@ package com.vinicius.gerenciamento_financeiro.adapter.in.web.config;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.ApiResponseSistema;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.ErrorResponse;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.exception.RequestInvalidaException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -77,8 +79,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ApiResponseSistema<Void>> handleBadRequest(BadRequestException ex) {
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponseSistema<Void>> handleBadRequest(HttpMessageNotReadableException ex) {
         ApiResponseSistema<Void> response = new ApiResponseSistema<>(null, "Requisição inválida: " + ex.getMessage(), HttpStatus.BAD_REQUEST.value());
         return ResponseEntity.badRequest().body(response);
     }
@@ -138,6 +140,17 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+
+    @ExceptionHandler(RequestInvalidaException.class)
+    public ResponseEntity<ErrorResponse> handleRequestInvalida(RequestInvalidaException ex) {
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .error("INTERNAL_SERVER_ERROR")
+                .message("Ocorreu um erro interno. Nossa equipe foi notificada.")
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     private String determineIntegrityErrorMessage(DataIntegrityViolationException ex) {

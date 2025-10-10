@@ -1,11 +1,11 @@
-package com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security;
+package com.vinicius.gerenciamento_financeiro.adapter.out.security;
 
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.SpringUserDetails;
+import com.vinicius.gerenciamento_financeiro.adapter.out.criptografia.JwtTokenService;
 import com.vinicius.gerenciamento_financeiro.domain.exception.UsuarioNaoAutenticadoException;
-import com.vinicius.gerenciamento_financeiro.domain.model.categoria.CategoriaId;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.ContextoUsuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.port.in.UsuarioAutenticadoPort;
-import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -22,7 +22,6 @@ import jakarta.servlet.http.HttpServletRequest;
 public class SpringSecurityUsuarioAdapter implements UsuarioAutenticadoPort {
 
     private final JwtTokenService jwtService;
-    private final CategoriaRepository categoriaRepository;
 
     @Override
     public UsuarioId obterUsuarioAtual() {
@@ -249,37 +248,6 @@ public class SpringSecurityUsuarioAdapter implements UsuarioAutenticadoPort {
         } catch (Exception e) {
             log.debug("Erro ao obter IP de origem", e);
             return "unknown";
-        }
-    }
-
-    @Override
-    public boolean ehProprietarioDaCategoria(CategoriaId categoriaId) {
-        try {
-            if (categoriaId == null) {
-                log.warn("Tentativa de verificar propriedade de categoria com ID nulo");
-                return false;
-            }
-
-            UsuarioId usuarioAtual = obterUsuarioAtual();
-
-            boolean ehProprietario = categoriaRepository
-                    .existsByIdAndUsuarioId(categoriaId, usuarioAtual);
-
-            if (!ehProprietario) {
-                log.warn("Tentativa de acesso a categoria de outro usuário: usuarioId={}, categoriaId={}",
-                        usuarioAtual.getValue(), categoriaId.getValue());
-            }
-
-            return ehProprietario;
-
-        } catch (UsuarioNaoAutenticadoException e) {
-            log.warn("Tentativa de verificar propriedade de categoria sem autenticação: categoriaId={}",
-                    categoriaId.getValue());
-            return false;
-        } catch (Exception e) {
-            log.error("Erro ao verificar propriedade da categoria: categoriaId={}",
-                    categoriaId.getValue(), e);
-            return false;
         }
     }
 }

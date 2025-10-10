@@ -1,5 +1,6 @@
 package com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security;
 
+import com.vinicius.gerenciamento_financeiro.adapter.out.criptografia.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

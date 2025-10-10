@@ -17,7 +17,6 @@ import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Usuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.application.service.transacao.NotificarTransacaoService;
 import com.vinicius.gerenciamento_financeiro.application.service.transacao.TransacaoService;
-import com.vinicius.gerenciamento_financeiro.port.in.TokenService;
 import com.vinicius.gerenciamento_financeiro.port.in.UsuarioAutenticadoPort;
 import com.vinicius.gerenciamento_financeiro.port.out.categoria.CategoriaRepository;
 import com.vinicius.gerenciamento_financeiro.port.out.transacao.TransacaoRepository;

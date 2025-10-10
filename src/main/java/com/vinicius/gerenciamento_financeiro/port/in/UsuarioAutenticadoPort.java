@@ -14,5 +14,4 @@ public interface UsuarioAutenticadoPort {
 
     ContextoUsuario obterContextoParaLogs();
 
-    boolean ehProprietarioDaCategoria(CategoriaId categoriaId);
 }
