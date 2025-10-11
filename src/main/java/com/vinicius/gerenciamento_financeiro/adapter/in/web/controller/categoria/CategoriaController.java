@@ -1,14 +1,10 @@
 package com.vinicius.gerenciamento_financeiro.adapter.in.web.controller.categoria;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.ApiResponseSistema;
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.CategoriaMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
-import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
-import com.vinicius.gerenciamento_financeiro.port.in.CategoriaUseCase;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.service.categoria.CategoriaWebService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -22,124 +18,102 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Controller REST para operaÃ§Ãµes de Categoria.
+ * ResponsÃ¡vel APENAS por adaptaÃ§Ã£o HTTP - delega tudo para Application Service.
+ */
 @RestController
 @RequestMapping("/api/categorias")
 @RequiredArgsConstructor
 public class CategoriaController {
 
-    private final CategoriaMapper  categoriaMapper;
-    private final CategoriaUseCase categoriaUseCase;
+    private final CategoriaWebService categoriaWebService;
 
-    @Operation(summary = "Salva Categoria ")
-    @ApiResponses(value = {
-          @ApiResponse(
-                  responseCode = "201",
-                  description = "CategoriaJpaEntity criada com sucesso",
-                  content = @Content(
-                          mediaType = "application/json",
-                          schema = @Schema(implementation = ApiResponseSistema.class)
-                  )
-          ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Dados inválidos",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ApiResponseSistema.class)
-                    )
-            )
-    })
     @PostMapping
-    public ResponseEntity<ApiResponseSistema<CategoriaResponse>> save(@Valid @RequestBody CategoriaPost categoriaPost){
-        CategoriaResponse categoria = categoriaMapper.toResponse(categoriaUseCase.save(categoriaPost));
-        ApiResponseSistema<CategoriaResponse> response = new ApiResponseSistema<>(
-                categoria,
-                "CategoriaJpaEntity criada com sucesso.",
-                HttpStatus.OK.value());
-        return ResponseEntity.ok(response);
+    @Operation(summary = "Cria uma nova categoria")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Categoria criada com sucesso"),
+        @ApiResponse(responseCode = "400", description = "Dados invÃ¡lidos")
+    })
+    public ResponseEntity<ApiResponseSistema<CategoriaResponse>> criar(
+            @Valid @RequestBody CategoriaPost request) {
+        
+        CategoriaResponse response = categoriaWebService.criarCategoria(request);
+        
+        ApiResponseSistema<CategoriaResponse> apiResponse = new ApiResponseSistema<>(
+            response,
+            "Categoria criada com sucesso.",
+            HttpStatus.CREATED.value()
+        );
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
 
-    @Operation(summary = "Busca todas as categoriaJpaEntities")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",description = "Buscar todas as categoriaJpaEntities",content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ApiResponseSistema.class)
-            )),
-            @ApiResponse(responseCode = "400",description = "Erro ao buscar as categoriaJpaEntities",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ApiResponseSistema.class)
-                    ))
-    })
-
-   @GetMapping("/all")
-    public ResponseEntity<ApiResponseSistema<List<CategoriaResponse>>> findAll(){
-        List<CategoriaResponse> categoriaResponses = categoriaMapper.toResponseList(categoriaUseCase.findAll());
-        ApiResponseSistema<List<CategoriaResponse>> response = new ApiResponseSistema<>(categoriaResponses, "Categorias obtidas com sucesso.", HttpStatus.OK.value());
-        return ResponseEntity.ok(response);
+    @GetMapping("/all")
+    @Operation(summary = "Lista todas as categorias do usuÃ¡rio")
+    public ResponseEntity<ApiResponseSistema<List<CategoriaResponse>>> listarTodas() {
+        
+        List<CategoriaResponse> responses = categoriaWebService.listarTodas();
+        
+        return ResponseEntity.ok(new ApiResponseSistema<>(
+            responses,
+            "Categorias listadas com sucesso.",
+            HttpStatus.OK.value()
+        ));
     }
 
-    @Operation(summary = "Busca as categoriaJpaEntities de forma paginada")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",description = "Buscou as categoriaJpaEntities",content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ApiResponseSistema.class)
-            )),
-            @ApiResponse(responseCode = "400",description = "Erro ao buscar as categoriaJpaEntities",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ApiResponseSistema.class)
-                    )),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Acesso não autorizado"
-            ),
-    })
     @GetMapping
-    public ResponseEntity<ApiResponseSistema<Page<CategoriaResponse>>> findAllPaged( @PageableDefault(size = 10) Pageable pageable){
-
-
-        Page<Categoria> categorias = categoriaUseCase.findAllPaginated(pageable);
-        Page<CategoriaResponse> categoriaResponses = categorias.map(categoriaMapper::toResponse);
-
-
-        ApiResponseSistema<Page<CategoriaResponse>> response = new ApiResponseSistema<>(categoriaResponses, "Categorias obtidas com sucesso.", HttpStatus.OK.value());
-        return ResponseEntity.ok(response);
+    @Operation(summary = "Lista categorias paginadas")
+    public ResponseEntity<ApiResponseSistema<Page<CategoriaResponse>>> listarPaginado(
+            @PageableDefault(size = 10) Pageable pageable) {
+        
+        Page<CategoriaResponse> responses = categoriaWebService.listarPaginado(pageable);
+        
+        return ResponseEntity.ok(new ApiResponseSistema<>(
+            responses,
+            "Categorias listadas com sucesso.",
+            HttpStatus.OK.value()
+        ));
     }
 
-    @Operation(summary = "Busca a categoriaJpaEntity por ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",description = "Encontrou a categoriaJpaEntity ",content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ApiResponseSistema.class)
-            )),
-            @ApiResponse(responseCode = "400",description = "Erro ao buscar as categoriaJpaEntities",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ApiResponseSistema.class)
-                    )),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Acesso não autorizado"
-            ),
-            @ApiResponse(responseCode = "404",description = "CategoriaJpaEntity com esse ID não encontrada",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ApiResponseSistema.class)
-                    )),
-    })
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponseSistema<CategoriaResponse>> findById(@PathVariable String id) {
-        CategoriaResponse categoriaResponse = categoriaMapper.toResponse(categoriaUseCase.findById(id));
-        ApiResponseSistema<CategoriaResponse> response = new ApiResponseSistema<>(categoriaResponse, "CategoriaJpaEntity obtida com sucesso.", HttpStatus.OK.value());
-        return ResponseEntity.ok(response);
+    @Operation(summary = "Busca categoria por ID")
+    public ResponseEntity<ApiResponseSistema<CategoriaResponse>> buscarPorId(
+            @PathVariable String id) {
+        
+        CategoriaResponse response = categoriaWebService.buscarPorId(id);
+        
+        return ResponseEntity.ok(new ApiResponseSistema<>(
+            response,
+            "Categoria encontrada com sucesso.",
+            HttpStatus.OK.value()
+        ));
     }
     @GetMapping("/usuarios/{userId}/categorias")
-    public ResponseEntity<ApiResponseSistema<List<CategoriaResponse>>> findByUsuarioId(@PathVariable Long userId) {
-        List<CategoriaResponse> categoriaResponse = categoriaMapper.toResponseList(categoriaUseCase.findCategoriasByUser(userId));
-        ApiResponseSistema<List<CategoriaResponse>> response = new ApiResponseSistema<>(categoriaResponse, "Categorias obtidas com sucesso.", HttpStatus.OK.value());
-        return ResponseEntity.ok(response);
+    @Operation(summary = "Lista categorias por usuÃ¡rio")
+    public ResponseEntity<ApiResponseSistema<List<CategoriaResponse>>> listarPorUsuario(
+            @PathVariable Long userId) {
+        
+        List<CategoriaResponse> responses = categoriaWebService.listarPorUsuario(userId);
+        
+        return ResponseEntity.ok(new ApiResponseSistema<>(
+            responses,
+            "Categorias obtidas com sucesso.",
+            HttpStatus.OK.value()
+        ));
     }
 
-
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Remove uma categoria")
+    public ResponseEntity<ApiResponseSistema<Void>> deletar(@PathVariable String id) {
+        
+        categoriaWebService.deletarCategoria(id);
+        
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
+            new ApiResponseSistema<>(null, "Categoria removida com sucesso.", HttpStatus.NO_CONTENT.value())
+        );
+    }
 }
+
+
+

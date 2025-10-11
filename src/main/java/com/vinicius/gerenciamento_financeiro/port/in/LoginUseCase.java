@@ -1,15 +1,18 @@
 package com.vinicius.gerenciamento_financeiro.port.in;
 
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.usuario.LoginRequest;
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.autenticacao.AuthenticationResponse;
+import com.vinicius.gerenciamento_financeiro.domain.model.usuario.Credencial;
+import com.vinicius.gerenciamento_financeiro.domain.model.usuario.SessaoUsuario;
 
-public interface LoginUseCase{
-
-
-    AuthenticationResponse autenticar(LoginRequest loginRequest);
-
-
-
+/**
+ * Port de entrada para operações de autenticação.
+ * Define contratos usando APENAS tipos de domínio.
+ */
+public interface LoginUseCase {
+    
+    /**
+     * Autentica um usuário com suas credenciais
+     */
+    SessaoUsuario autenticar(Credencial credencial);
 }
 
 

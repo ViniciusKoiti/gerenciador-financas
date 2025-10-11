@@ -9,7 +9,7 @@ import java.util.Objects;
 public class Cpf implements Serializable {
 
     @Getter
-    private String numero;
+    private final String numero;
 
     public Cpf(String numero) {
         if (numero == null) {

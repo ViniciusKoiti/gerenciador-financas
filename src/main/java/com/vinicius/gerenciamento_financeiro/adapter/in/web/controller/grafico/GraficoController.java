@@ -1,6 +1,7 @@
 package com.vinicius.gerenciamento_financeiro.adapter.in.web.controller.grafico;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.ApiResponseSistema;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.grafico.GraficoResponseMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.GraficoResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.ResumoFinanceiroResponse;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.TransacaoPorPeriodoResponse;
@@ -26,6 +27,7 @@ import java.util.List;
 public class GraficoController {
 
     private final GerarGraficoUseCase graficoService;
+    private final GraficoResponseMapper mapper;
     @Operation(summary = "Grafico de total por Categorias")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "")
@@ -35,7 +37,8 @@ public class GraficoController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime dataInicio,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime dataFim
     ){
-        List<GraficoResponse> linhasDoGraficoPorCategoria = graficoService.gerarGraficoTotalPorCategoria(dataInicio, dataFim);
+        var graficos = graficoService.gerarGraficoTotalPorCategoria(dataInicio, dataFim);
+        List<GraficoResponse> linhasDoGraficoPorCategoria = mapper.toResponseList(graficos);
         ApiResponseSistema<List<GraficoResponse>> response = new ApiResponseSistema<>(linhasDoGraficoPorCategoria, "Transações obtidas com sucesso.", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }
@@ -45,7 +48,8 @@ public class GraficoController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime dataInicio,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime dataFim) {
 
-        List<TransacaoPorPeriodoResponse> resultado = graficoService.gerarEvolucaoFinanceira(dataInicio, dataFim);
+        var evolucoes = graficoService.gerarEvolucaoFinanceira(dataInicio, dataFim);
+        List<TransacaoPorPeriodoResponse> resultado = mapper.toTransacaoPorPeriodoResponseList(evolucoes);
         ApiResponseSistema<List<TransacaoPorPeriodoResponse>> response = new ApiResponseSistema<>(resultado, "Transações obtidas com sucesso.", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }
@@ -55,7 +59,8 @@ public class GraficoController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime dataInicio,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime dataFim) {
 
-        ResumoFinanceiroResponse resultado = graficoService.gerarResumoFinanceiro(dataInicio, dataFim);
+        var resumo = graficoService.gerarResumoFinanceiro(dataInicio, dataFim);
+        ResumoFinanceiroResponse resultado = mapper.toResponse(resumo);
         ApiResponseSistema<ResumoFinanceiroResponse> response = new ApiResponseSistema<>(resultado, "Resumo financeiro obtido com sucesso.", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }

@@ -15,7 +15,7 @@ public class Email implements Serializable {
             Pattern.compile("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
 
     @Getter
-    private String endereco;
+    private final String endereco;
 
     public Email(String endereco) {
         if (endereco == null) {
