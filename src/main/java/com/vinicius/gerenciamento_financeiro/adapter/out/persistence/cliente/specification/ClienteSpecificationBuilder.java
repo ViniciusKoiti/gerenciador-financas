@@ -1,31 +1,27 @@
 package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente.specification;
 
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente.entity.ClienteJpaEntity;
-import com.vinicius.gerenciamento_financeiro.application.command.cliente.BuscarClientesCommand;
+import com.vinicius.gerenciamento_financeiro.domain.model.cliente.ClienteFiltro;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
-import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Builder para criar Specifications dinâmicas de busca de clientes
- */
 @Component
 public class ClienteSpecificationBuilder {
 
-    /**
-     * Constrói Specification a partir de um comando de busca
-     */
-    public Specification<ClienteJpaEntity> build(Long usuarioId, BuscarClientesCommand command) {
+    public Specification<ClienteJpaEntity> build(Long usuarioId, ClienteFiltro filtro) {
+        ClienteFiltro filtroEfetivo = filtro != null ? filtro : ClienteFiltro.vazio();
+
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             predicates.add(criteriaBuilder.equal(root.get("usuarioId"), usuarioId));
 
-            if (command.getBuscarGeral() != null && !command.getBuscarGeral().isBlank()) {
-                String buscaGeral = "%" + command.getBuscarGeral().toLowerCase() + "%";
+            if (temTexto(filtroEfetivo.getBuscaGeral())) {
+                String buscaGeral = "%" + filtroEfetivo.getBuscaGeral().toLowerCase() + "%";
 
                 Predicate nomeMatch = criteriaBuilder.like(
                         criteriaBuilder.lower(root.get("nome")),
@@ -38,47 +34,50 @@ public class ClienteSpecificationBuilder {
                 );
 
                 Predicate cpfMatch = criteriaBuilder.like(
-                        root.get("cpf"),
+                        criteriaBuilder.lower(root.get("cpf")),
                         buscaGeral
                 );
 
                 predicates.add(criteriaBuilder.or(nomeMatch, emailMatch, cpfMatch));
             }
 
-            // Filtros específicos
-            if (command.getNome() != null && !command.getNome().isBlank()) {
+            if (temTexto(filtroEfetivo.getNome())) {
                 predicates.add(criteriaBuilder.like(
                         criteriaBuilder.lower(root.get("nome")),
-                        "%" + command.getNome().toLowerCase() + "%"
+                        "%" + filtroEfetivo.getNome().toLowerCase() + "%"
                 ));
             }
 
-            if (command.getEmail() != null && !command.getEmail().isBlank()) {
+            if (temTexto(filtroEfetivo.getEmail())) {
                 predicates.add(criteriaBuilder.like(
                         criteriaBuilder.lower(root.get("email")),
-                        "%" + command.getEmail().toLowerCase() + "%"
+                        "%" + filtroEfetivo.getEmail().toLowerCase() + "%"
                 ));
             }
 
-            if (command.getCpf() != null && !command.getCpf().isBlank()) {
+            if (temTexto(filtroEfetivo.getCpf())) {
                 predicates.add(criteriaBuilder.equal(
                         root.get("cpf"),
-                        command.getCpf().replaceAll("[^0-9]", "")
+                        filtroEfetivo.getCpf().replaceAll("[^0-9]", "")
                 ));
             }
 
-            if (command.getTelefone() != null && !command.getTelefone().isBlank()) {
+            if (temTexto(filtroEfetivo.getTelefone())) {
                 predicates.add(criteriaBuilder.like(
                         root.get("telefone"),
-                        "%" + command.getTelefone().replaceAll("[^0-9]", "") + "%"
+                        "%" + filtroEfetivo.getTelefone().replaceAll("[^0-9]", "") + "%"
                 ));
             }
 
-            if (command.getAtivo() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("ativo"), command.getAtivo()));
+            if (filtroEfetivo.getAtivo() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("ativo"), filtroEfetivo.getAtivo()));
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    private boolean temTexto(String valor) {
+        return valor != null && !valor.isBlank();
     }
 }

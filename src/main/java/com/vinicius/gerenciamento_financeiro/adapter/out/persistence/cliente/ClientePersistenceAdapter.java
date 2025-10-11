@@ -2,11 +2,12 @@ package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente;
 
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente.entity.ClienteJpaEntity;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente.specification.ClienteSpecificationBuilder;
-import com.vinicius.gerenciamento_financeiro.application.command.PaginacaoCommand;
-import com.vinicius.gerenciamento_financeiro.application.command.cliente.BuscarClientesCommand;
-import com.vinicius.gerenciamento_financeiro.application.command.result.PaginaResult;
 import com.vinicius.gerenciamento_financeiro.domain.model.cliente.Cliente;
+import com.vinicius.gerenciamento_financeiro.domain.model.cliente.ClienteFiltro;
 import com.vinicius.gerenciamento_financeiro.domain.model.cliente.ClienteId;
+import com.vinicius.gerenciamento_financeiro.domain.model.shared.Pagina;
+import com.vinicius.gerenciamento_financeiro.domain.model.shared.Paginacao;
+import com.vinicius.gerenciamento_financeiro.domain.model.shared.Paginacao.OrdenacaoDirecao;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
 import com.vinicius.gerenciamento_financeiro.port.out.cliente.ClienteRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Adapter de persistência para Cliente.
- * Implementa a porta de saída ClienteRepository.
- * Responsável por converter entre modelos de domínio e entidades JPA.
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -44,11 +40,9 @@ public class ClientePersistenceAdapter implements ClienteRepository {
             ClienteJpaEntity jpaEntity;
 
             if (cliente.isNovo()) {
-                // Cliente novo - cria entidade
                 jpaEntity = clienteJpaMapper.toJpaEntity(cliente);
                 log.debug("Criando novo cliente: {}", cliente.getNome());
             } else {
-                // Cliente existente - busca e atualiza
                 jpaEntity = jpaClienteRepository.findById(cliente.getClienteId().getValue())
                         .orElseThrow(() -> new IllegalStateException(
                                 "Cliente com ID " + cliente.getClienteId().getValue() + " não encontrado para atualização"
@@ -123,14 +117,10 @@ public class ClientePersistenceAdapter implements ClienteRepository {
         }
     }
 
-    // ========================================
-    // BUSCAS COM FILTROS (SEM PAGINAÇÃO)
-    // ========================================
-
     @Override
     @Transactional(readOnly = true)
     public List<Cliente> buscarPorUsuario(UsuarioId usuarioId) {
-        log.debug("Buscando todos os clientes para usuário: {}", usuarioId.getValue());
+        log.debug("Buscando clientes do usuário: {}", usuarioId.getValue());
 
         return jpaClienteRepository.findByUsuarioId(usuarioId.getValue())
                 .stream()
@@ -140,62 +130,59 @@ public class ClientePersistenceAdapter implements ClienteRepository {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Cliente> buscarComFiltros(BuscarClientesCommand command, UsuarioId usuarioId) {
-        log.debug("Buscando clientes com filtros para usuário: {}", usuarioId.getValue());
-        log.debug("Filtros: {}", command);
+    public List<Cliente> buscarComFiltros(ClienteFiltro filtro, UsuarioId usuarioId) {
+        ClienteFiltro filtroEfetivo = filtro != null ? filtro : ClienteFiltro.vazio();
 
-        // Constrói Specification a partir do Command
+        log.debug("Buscando clientes com filtros (lista): usuário {}, filtros {}",
+                usuarioId.getValue(), filtroEfetivo);
+
         Specification<ClienteJpaEntity> specification = specificationBuilder.build(
                 usuarioId.getValue(),
-                command
+                filtroEfetivo
         );
 
-        List<ClienteJpaEntity> entities = jpaClienteRepository.findAll(specification);
-
-        log.debug("Encontrados {} clientes com filtros", entities.size());
-
-        return entities.stream()
+        return jpaClienteRepository.findAll(specification).stream()
                 .map(clienteJpaMapper::toDomainEntity)
                 .toList();
     }
 
-    // ========================================
-    // BUSCAS PAGINADAS
-    // ========================================
-
     @Override
     @Transactional(readOnly = true)
-    public PaginaResult<Cliente> buscarPaginado(PaginacaoCommand paginacao, UsuarioId usuarioId) {
-        log.debug("Buscando clientes paginados (sem filtros) para usuário: {} - página: {}",
-                usuarioId.getValue(), paginacao.getPagina());
+    public Pagina<Cliente> buscarPaginado(Paginacao paginacao, UsuarioId usuarioId) {
+        Paginacao paginacaoEfetiva = paginacao != null ? paginacao : Paginacao.padrao();
 
-        PageRequest pageRequest = criarPageRequest(paginacao);
+        log.debug("Buscando clientes paginados (sem filtros) para usuário: {} - página: {}",
+                usuarioId.getValue(), paginacaoEfetiva.getPagina());
+
+        PageRequest pageRequest = criarPageRequest(paginacaoEfetiva);
 
         Page<ClienteJpaEntity> page = jpaClienteRepository.findByUsuarioId(
                 usuarioId.getValue(),
                 pageRequest
         );
 
-        // Converte Page → PaginaResult
-        return converterParaPaginaResult(page);
+        return converterParaPagina(page);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public PaginaResult<Cliente> buscarPaginadoComFiltros(
-            BuscarClientesCommand command,
-            PaginacaoCommand paginacao,
+    public Pagina<Cliente> buscarPaginadoComFiltros(
+            ClienteFiltro filtro,
+            Paginacao paginacao,
             UsuarioId usuarioId
     ) {
-        log.debug("Buscando clientes paginados com filtros para usuário: {} - página: {}",
-                usuarioId.getValue(), paginacao.getPagina());
-        log.debug("Filtros: {}", command);
+        ClienteFiltro filtroEfetivo = filtro != null ? filtro : ClienteFiltro.vazio();
+        Paginacao paginacaoEfetiva = paginacao != null ? paginacao : Paginacao.padrao();
 
-        PageRequest pageRequest = criarPageRequest(paginacao);
+        log.debug("Buscando clientes paginados com filtros para usuário: {} - página: {}",
+                usuarioId.getValue(), paginacaoEfetiva.getPagina());
+        log.debug("Filtros: {}", filtroEfetivo);
+
+        PageRequest pageRequest = criarPageRequest(paginacaoEfetiva);
 
         Specification<ClienteJpaEntity> specification = specificationBuilder.build(
                 usuarioId.getValue(),
-                command
+                filtroEfetivo
         );
 
         Page<ClienteJpaEntity> page = jpaClienteRepository.findAll(specification, pageRequest);
@@ -203,40 +190,28 @@ public class ClientePersistenceAdapter implements ClienteRepository {
         log.debug("Encontrados {} clientes paginados (total: {})",
                 page.getNumberOfElements(), page.getTotalElements());
 
-        // Converte Page → PaginaResult
-        return converterParaPaginaResult(page);
+        return converterParaPagina(page);
     }
-
-    // ========================================
-    // OPERAÇÕES ADMINISTRATIVAS
-    // ========================================
 
     @Override
     @Transactional(readOnly = true)
-    public PaginaResult<Cliente> buscarTodosPaginado(PaginacaoCommand paginacao) {
-        log.debug("Buscando todos os clientes do sistema - página: {}", paginacao.getPagina());
+    public Pagina<Cliente> buscarTodosPaginado(Paginacao paginacao) {
+        Paginacao paginacaoEfetiva = paginacao != null ? paginacao : Paginacao.padrao();
 
-        PageRequest pageRequest = criarPageRequest(paginacao);
+        log.debug("Buscando todos os clientes do sistema - página: {}", paginacaoEfetiva.getPagina());
+
+        PageRequest pageRequest = criarPageRequest(paginacaoEfetiva);
         Page<ClienteJpaEntity> page = jpaClienteRepository.findAll(pageRequest);
 
-        return converterParaPaginaResult(page);
+        return converterParaPagina(page);
     }
 
-    // ========================================
-    // MÉTODOS AUXILIARES (CONVERSÃO)
-    // ========================================
-
-    /**
-     * Converte PaginacaoCommand em PageRequest do Spring Data
-     */
-    private PageRequest criarPageRequest(PaginacaoCommand paginacao) {
+    private PageRequest criarPageRequest(Paginacao paginacao) {
         Sort sort = Sort.unsorted();
 
-        if (paginacao.getCampoOrdenacao() != null) {
-            Sort.Direction direction = "DESC".equalsIgnoreCase(paginacao.getDirecaoOrdenacao())
-                    ? Sort.Direction.DESC
-                    : Sort.Direction.ASC;
-
+        if (paginacao.getCampoOrdenacao() != null && !paginacao.getCampoOrdenacao().isBlank()) {
+            OrdenacaoDirecao direcao = paginacao.direcaoOrPadrao();
+            Sort.Direction direction = direcao == OrdenacaoDirecao.DESC ? Sort.Direction.DESC : Sort.Direction.ASC;
             sort = Sort.by(direction, paginacao.getCampoOrdenacao());
         }
 
@@ -247,43 +222,32 @@ public class ClientePersistenceAdapter implements ClienteRepository {
         );
     }
 
-    /**
-     * Converte Page do Spring Data em PaginaResult do domínio
-     */
-    private PaginaResult<Cliente> converterParaPaginaResult(Page<ClienteJpaEntity> page) {
+    private Pagina<Cliente> converterParaPagina(Page<ClienteJpaEntity> page) {
         List<Cliente> clientes = page.getContent()
                 .stream()
                 .map(clienteJpaMapper::toDomainEntity)
                 .toList();
 
-        return PaginaResult.of(
+        return Pagina.of(
                 clientes,
                 page.getNumber(),
                 page.getSize(),
                 page.getTotalElements()
         );
     }
-    /**
-     * Conta total de clientes de um usuário
-     */
+
     @Transactional(readOnly = true)
     public long contarPorUsuario(UsuarioId usuarioId) {
         log.debug("Contando clientes do usuário: {}", usuarioId.getValue());
         return jpaClienteRepository.countByUsuarioId(usuarioId.getValue());
     }
 
-    /**
-     * Verifica se CPF já existe para o usuário
-     */
     @Transactional(readOnly = true)
     public boolean existeCpfParaUsuario(String cpf, UsuarioId usuarioId) {
         log.debug("Verificando CPF {} para usuário: {}", cpf, usuarioId.getValue());
         return jpaClienteRepository.existsByCpfAndUsuarioId(cpf, usuarioId.getValue());
     }
 
-    /**
-     * Verifica se email já existe para o usuário
-     */
     @Transactional(readOnly = true)
     public boolean existeEmailParaUsuario(String email, UsuarioId usuarioId) {
         log.debug("Verificando email {} para usuário: {}", email, usuarioId.getValue());

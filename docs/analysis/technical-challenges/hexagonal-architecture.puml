@@ -1,0 +1,58 @@
+﻿@startuml HexagonalArchitecture
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+package "Domain" {
+  class "Cliente" as Cliente
+  class "ClienteFiltro" as ClienteFiltro
+  class "Usuario" as Usuario
+  class "UsuarioId" as UsuarioId
+  class "Paginacao" as Paginacao
+  class "Pagina<T>" as Pagina
+}
+
+package "Ports IN" {
+  interface "BuscarClienteUseCase" as BuscarClienteUseCase
+  interface "UsuarioService" as UsuarioServicePort
+}
+
+package "Application" {
+  class "BuscarClienteService" as BuscarClienteService
+  class "UsuarioServiceImpl" as UsuarioServiceImpl
+}
+
+package "Ports OUT" {
+  interface "ClienteRepository" as ClienteRepositoryPort
+  interface "TokenService" as TokenServicePort
+}
+
+package "Adapters OUT" {
+  class "ClientePersistenceAdapter" as ClientePersistenceAdapter
+  class "ClienteSpecificationBuilder" as ClienteSpecificationBuilder
+  class "Jdbc/JPA Components" as PersistenceInfra
+}
+
+package "Adapters IN" {
+  class "ClienteFiltroMapper" as ClienteFiltroMapper
+  class "UserDetailsServiceImpl" as UserDetailsAdapter
+}
+
+ClienteFiltroMapper --> ClienteFiltro : maps DTO -> Domain
+UsuarioServicePort <|.. UsuarioServiceImpl
+BuscarClienteUseCase <|.. BuscarClienteService
+BuscarClienteService --> ClienteRepositoryPort
+ClientePersistenceAdapter ..> ClienteSpecificationBuilder
+ClientePersistenceAdapter ..> PersistenceInfra : uses
+ClienteRepositoryPort <|.. ClientePersistenceAdapter
+UsuarioServiceImpl --> UsuarioServicePort : implements
+UsuarioServiceImpl --> TokenServicePort
+UserDetailsAdapter --> UsuarioServicePort
+BuscarClienteService --> Paginacao
+BuscarClienteService --> ClienteFiltro
+ClienteRepositoryPort --> Cliente
+Paginacao --> Pagina
+Pagina --> Cliente
+UsuarioServiceImpl --> Pagina
+UsuarioServicePort --> Cliente
+
+@enduml

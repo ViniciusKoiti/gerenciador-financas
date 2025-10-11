@@ -5,13 +5,8 @@ import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.cliente.Clie
 import com.vinicius.gerenciamento_financeiro.domain.model.cliente.ClienteFiltro;
 import org.springframework.stereotype.Component;
 
-/**
- * Mapper responsável por converter entre ClienteFiltroRequest (DTO) e ClienteFiltro (Domain).
- * Segue o padrão de separação entre camadas da Clean Architecture.
- */
 @Component
 public class ClienteFiltroMapper {
-
 
     public ClienteFiltro toDomain(ClienteFiltroRequest request) {
         if (request == null) {
@@ -43,14 +38,14 @@ public class ClienteFiltroMapper {
         }
 
         return new ClienteFiltroRequest(
-                filtro.nome().orElse(null),
-                filtro.cpf().orElse(null),
-                filtro.email().orElse(null),
-                filtro.telefone().orElse(null),
-                filtro.ativo().orElse(null),
-                filtro.buscaGeral().orElse(null),
-                filtro.dataNascimentoInicio().orElse(null),
-                filtro.dataNascimentoFim().orElse(null)
+                filtro.getNome(),
+                filtro.getCpf(),
+                filtro.getEmail(),
+                filtro.getTelefone(),
+                filtro.getAtivo(),
+                filtro.getBuscaGeral(),
+                filtro.getDataNascimentoInicio(),
+                filtro.getDataNascimentoFim()
         );
     }
 

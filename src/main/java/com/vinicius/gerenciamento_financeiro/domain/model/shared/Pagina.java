@@ -1,17 +1,13 @@
-package com.vinicius.gerenciamento_financeiro.application.command.result;
+package com.vinicius.gerenciamento_financeiro.domain.model.shared;
 
 import lombok.Builder;
 import lombok.Value;
 
 import java.util.List;
 
-/**
- * Resultado paginado genérico
- * Não depende do Page do Spring
- */
 @Value
 @Builder
-public class PaginaResult<T> {
+public class Pagina<T> {
     List<T> conteudo;
     int paginaAtual;
     int tamanhoPagina;
@@ -20,18 +16,14 @@ public class PaginaResult<T> {
     boolean temProxima;
     boolean temAnterior;
 
-    public static <T> PaginaResult<T> of(
-            List<T> conteudo,
-            int pagina,
-            int tamanho,
-            long total
-    ) {
-        int totalPaginas = (int) Math.ceil((double) total / tamanho);
+    public static <T> Pagina<T> of(List<T> conteudo, int pagina, int tamanho, long total) {
+        int tamanhoSeguro = tamanho <= 0 ? 1 : tamanho;
+        int totalPaginas = (int) Math.ceil((double) total / tamanhoSeguro);
 
-        return PaginaResult.<T>builder()
+        return Pagina.<T>builder()
                 .conteudo(conteudo)
                 .paginaAtual(pagina)
-                .tamanhoPagina(tamanho)
+                .tamanhoPagina(tamanhoSeguro)
                 .totalElementos(total)
                 .totalPaginas(totalPaginas)
                 .temProxima(pagina < totalPaginas - 1)
