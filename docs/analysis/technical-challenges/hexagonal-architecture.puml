@@ -1,58 +1,165 @@
-﻿@startuml HexagonalArchitecture
+﻿
+@startuml HexagonalArchitecture
+allowmixing
+
 skinparam packageStyle rectangle
 skinparam linetype ortho
+skinparam componentStyle rectangle
+skinparam arrowColor #555555
+skinparam shadowing false
 
-package "Domain" {
-  class "Cliente" as Cliente
-  class "ClienteFiltro" as ClienteFiltro
-  class "Usuario" as Usuario
-  class "UsuarioId" as UsuarioId
-  class "Paginacao" as Paginacao
-  class "Pagina<T>" as Pagina
+rectangle "Domain" {
+  package "Core Models" {
+    class Usuario
+    class UsuarioId
+    class Cliente
+    class ClienteId
+    class ClienteFiltro
+    class Paginacao
+    class "Pagina<T>"
+  }
+
+  package "Value Objects" {
+    class Email
+    class Cpf
+  }
 }
 
-package "Ports IN" {
-  interface "BuscarClienteUseCase" as BuscarClienteUseCase
-  interface "UsuarioService" as UsuarioServicePort
+rectangle "Ports" {
+  package "Input (port.in)" {
+    interface LoginUseCase
+    interface UsuarioServicePort
+    interface BuscarClienteUseCase
+    interface CategoriaUseCase
+    interface GerarGraficoUseCase
+    interface GerenciarTransacaoUseCase
+  }
+  package "Output (port.out)" {
+    interface ClienteRepositoryPort
+    interface GraficoRepositoryPort
+    interface CategoriaRepositoryPort
+    interface UsuarioRepositoryPort
+    interface TokenServicePort
+  }
 }
 
-package "Application" {
-  class "BuscarClienteService" as BuscarClienteService
-  class "UsuarioServiceImpl" as UsuarioServiceImpl
+rectangle "Application" {
+  component "UsuarioService" as UsuarioAppService
+  component "LoginServiceImpl" as LoginAppService
+  component "BuscarClienteService" as BuscarClienteAppService
+  component "CategoriaApplicationService" as CategoriaAppService
+  component "TransacaoService" as TransacaoAppService
+  component "GraficoService" as GraficoAppService
 }
 
-package "Ports OUT" {
-  interface "ClienteRepository" as ClienteRepositoryPort
-  interface "TokenService" as TokenServicePort
+rectangle "Adapters IN (web)" {
+  package "Controllers" {
+    component CategoriaController
+    component UsuarioController
+    component GraficoController
+    component TransacaoController
+  }
+  package "Web Services" {
+    component CategoriaWebService
+    component UsuarioWebService
+  }
+  package "Request/Response Mappers" {
+    component CategoriaRequestMapper
+    component CategoriaResponseMapper
+    component UsuarioMapper
+    component GraficoResponseMapper
+    component ClienteFiltroMapper
+    component TransacaoRequestMapper
+  }
 }
 
-package "Adapters OUT" {
-  class "ClientePersistenceAdapter" as ClientePersistenceAdapter
-  class "ClienteSpecificationBuilder" as ClienteSpecificationBuilder
-  class "Jdbc/JPA Components" as PersistenceInfra
+rectangle "Adapters OUT (persistence/integration)" {
+  package "Persistence" {
+    component CategoriaPersistenceAdapter
+    component ClientePersistenceAdapter
+    component TransacaoPersistenceAdapter
+    component UsuarioPersistenceAdapter
+    component GraficoPersistenceAdapter
+  }
+  package "Infrastructure Helpers" {
+    component ClienteSpecificationBuilder
+    component CategoriaJpaMapper
+    component ClienteJpaMapper
+    component UsuarioJpaMapper
+    component TransacaoJpaMapper
+  }
+  package "External" {
+    component JwtTokenService
+    component SpringRepositories
+  }
 }
 
-package "Adapters IN" {
-  class "ClienteFiltroMapper" as ClienteFiltroMapper
-  class "UserDetailsServiceImpl" as UserDetailsAdapter
-}
+LoginAppService ..|> LoginUseCase
+UsuarioAppService ..|> UsuarioServicePort
+BuscarClienteAppService ..|> BuscarClienteUseCase
+CategoriaAppService ..|> CategoriaUseCase
+GraficoAppService ..|> GerarGraficoUseCase
+TransacaoAppService ..|> GerenciarTransacaoUseCase
 
-ClienteFiltroMapper --> ClienteFiltro : maps DTO -> Domain
-UsuarioServicePort <|.. UsuarioServiceImpl
-BuscarClienteUseCase <|.. BuscarClienteService
-BuscarClienteService --> ClienteRepositoryPort
-ClientePersistenceAdapter ..> ClienteSpecificationBuilder
-ClientePersistenceAdapter ..> PersistenceInfra : uses
-ClienteRepositoryPort <|.. ClientePersistenceAdapter
-UsuarioServiceImpl --> UsuarioServicePort : implements
-UsuarioServiceImpl --> TokenServicePort
-UserDetailsAdapter --> UsuarioServicePort
-BuscarClienteService --> Paginacao
-BuscarClienteService --> ClienteFiltro
-ClienteRepositoryPort --> Cliente
-Paginacao --> Pagina
-Pagina --> Cliente
-UsuarioServiceImpl --> Pagina
-UsuarioServicePort --> Cliente
+LoginAppService --> UsuarioRepositoryPort
+LoginAppService --> TokenServicePort
+UsuarioAppService --> UsuarioRepositoryPort
+UsuarioAppService --> CategoriaRepositoryPort
+UsuarioAppService --> ClienteRepositoryPort
+BuscarClienteAppService --> ClienteRepositoryPort
+CategoriaAppService --> CategoriaRepositoryPort
+GraficoAppService --> GraficoRepositoryPort
+TransacaoAppService --> GraficoRepositoryPort
+
+CategoriaController --> CategoriaWebService
+CategoriaWebService --> CategoriaAppService
+CategoriaWebService --> CategoriaRequestMapper
+CategoriaWebService --> CategoriaResponseMapper
+
+UsuarioController --> UsuarioWebService
+UsuarioWebService --> UsuarioAppService
+UsuarioWebService --> LoginAppService
+UsuarioWebService --> UsuarioMapper
+
+GraficoController --> GraficoAppService
+GraficoController --> GraficoResponseMapper
+
+TransacaoController --> TransacaoAppService
+TransacaoController --> TransacaoRequestMapper
+
+ClienteFiltroMapper --> ClienteFiltro
+UsuarioMapper --> Usuario
+CategoriaRequestMapper --> ClienteFiltro
+CategoriaResponseMapper --> Cliente
+
+UserDetailsServiceImpl --> UsuarioServicePort
+JwtTokenService ..|> TokenServicePort
+
+ClientePersistenceAdapter ..|> ClienteRepositoryPort
+ClientePersistenceAdapter --> ClienteSpecificationBuilder
+ClientePersistenceAdapter --> ClienteJpaMapper
+ClientePersistenceAdapter --> SpringRepositories
+ClientePersistenceAdapter --> Pagina
+ClientePersistenceAdapter --> ClienteFiltro
+ClientePersistenceAdapter --> Paginacao
+
+CategoriaPersistenceAdapter ..|> CategoriaRepositoryPort
+CategoriaPersistenceAdapter --> CategoriaJpaMapper
+CategoriaPersistenceAdapter --> SpringRepositories
+
+UsuarioPersistenceAdapter ..|> UsuarioRepositoryPort
+UsuarioPersistenceAdapter --> UsuarioJpaMapper
+UsuarioPersistenceAdapter --> SpringRepositories
+
+TransacaoPersistenceAdapter --> TransacaoJpaMapper
+GraficoPersistenceAdapter ..|> GraficoRepositoryPort
+GraficoPersistenceAdapter --> SpringRepositories
+
+LoginUseCase --> Usuario
+UsuarioServicePort --> Usuario
+BuscarClienteUseCase --> Cliente
+CategoriaUseCase --> Cliente
+GerenciarTransacaoUseCase --> Cliente
+GerarGraficoUseCase --> Cliente
 
 @enduml

@@ -72,3 +72,10 @@
 #### Atualização - 11/10/2025 (2)
 - Regra de adapters de saída ajustada para permitir dependências explícitas em pacotes de infraestrutura (`adapter.out.persistence`, `entity`, `mapper`, `org.slf4j`). Com isso, os adapters permanecem em conformidade com o desenho hexagonal enquanto usam recursos técnicos inevitáveis.
 - Suite `HexagonalArchitectureTest` executada com sucesso (`.Fmvnw.cmd -Dtest=HexagonalArchitectureTest test`, conclusão às 14:37) sem violações remanescentes.
+#### Plano de Testes
+- Diversos testes antigos em `src/test/java/com/vinicius/gerenciamento_financeiro/services/*` foram removidos porque ainda dependiam diretamente das antigas classes `CategoriaService`, `BuscarClienteUseCaseImpl`, etc. Com a nova estrutura (web services + ports), precisamos reconstruí-los.
+- Estratégia proposta:
+  1. Escrever **testes de integração focados em adapters** utilizando `@SpringBootTest` com perfis slice (`@DataJpaTest` para `ClientePersistenceAdapter`, `@WebMvcTest` para controllers) validando os novos mappers e web services.
+  2. Criar **test doubles** para ports (`ClienteRepositoryPort`, `UsuarioServicePort`) e cobrir os fluxos em `BuscarClienteService`, `UsuarioServiceImpl`, `CategoriaApplicationService` usando JUnit + Mockito.
+  3. Documentar uma matriz de cobertura garantindo que os cenários anteriormente cobertos pelos testes removidos (transações, notificações, gráficos) sejam migrados gradualmente para os novos formatos.
+- Abrir tarefa específica para cada pacote de testes removidos, com prioridade alta após estabilização da arquitetura hexagonal.

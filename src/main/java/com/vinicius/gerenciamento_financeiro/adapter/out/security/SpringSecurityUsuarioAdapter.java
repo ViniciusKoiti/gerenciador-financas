@@ -1,7 +1,7 @@
 package com.vinicius.gerenciamento_financeiro.adapter.out.security;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.config.security.SpringUserDetails;
-import com.vinicius.gerenciamento_financeiro.adapter.out.criptografia.JwtTokenService;
+import com.vinicius.gerenciamento_financeiro.port.out.autorizacao.TokenService;
 import com.vinicius.gerenciamento_financeiro.domain.exception.UsuarioNaoAutenticadoException;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.ContextoUsuario;
 import com.vinicius.gerenciamento_financeiro.domain.model.usuario.UsuarioId;
@@ -21,7 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class SpringSecurityUsuarioAdapter implements UsuarioAutenticadoPort {
 
-    private final JwtTokenService jwtService;
+    private final TokenService tokenService;
 
     @Override
     public UsuarioId obterUsuarioAtual() {
@@ -29,39 +29,39 @@ public class SpringSecurityUsuarioAdapter implements UsuarioAutenticadoPort {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             if (authentication == null || !authentication.isAuthenticated()) {
-                throw new UsuarioNaoAutenticadoException("Nenhuma autenticação encontrada");
+                throw new UsuarioNaoAutenticadoException("Nenhuma autenticaÃ§Ã£o encontrada");
             }
 
-            // Opção 1: Usuário já carregado no SecurityContext
+            // OpÃ§Ã£o 1: UsuÃ¡rio jÃ¡ carregado no SecurityContext
             if (authentication.getPrincipal() instanceof SpringUserDetails userDetails) {
                 UsuarioId usuarioId = userDetails.getUsuario().getId();
-                log.debug("Usuário obtido via SpringUserDetails: {}", usuarioId.getValue());
+                log.debug("UsuÃ¡rio obtido via SpringUserDetails: {}", usuarioId.getValue());
                 return usuarioId;
             }
 
-            // Opção 2: Usuário anônimo
+            // OpÃ§Ã£o 2: UsuÃ¡rio anÃ´nimo
             if ("anonymousUser".equals(authentication.getPrincipal())) {
-                throw new UsuarioNaoAutenticadoException("Usuário anônimo");
+                throw new UsuarioNaoAutenticadoException("UsuÃ¡rio anÃ´nimo");
             }
 
-            // ✅ Opção 3: Fallback - extrair do token na requisição atual
+            // âœ… OpÃ§Ã£o 3: Fallback - extrair do token na requisiÃ§Ã£o atual
             String token = extrairTokenDaRequisicao();
             if (token != null) {
-                Long usuarioIdRaw = jwtService.extrairUsuarioId(token);
+                Long usuarioIdRaw = tokenService.extrairUsuarioId(token);
                 if (usuarioIdRaw != null && usuarioIdRaw > 0) {
-                    log.debug("Usuário obtido via token: {}", usuarioIdRaw);
+                    log.debug("UsuÃ¡rio obtido via token: {}", usuarioIdRaw);
                     return UsuarioId.of(usuarioIdRaw);
                 }
             }
 
-            throw new UsuarioNaoAutenticadoException("ID de usuário não encontrado");
+            throw new UsuarioNaoAutenticadoException("ID de usuÃ¡rio nÃ£o encontrado");
 
         } catch (UsuarioNaoAutenticadoException e) {
-            log.warn("Falha na obtenção do usuário: {}", e.getMessage());
+            log.warn("Falha na obtenÃ§Ã£o do usuÃ¡rio: {}", e.getMessage());
             throw e;
         } catch (Exception e) {
-            log.error("Erro inesperado ao obter usuário autenticado", e);
-            throw new UsuarioNaoAutenticadoException("Erro interno de autenticação");
+            log.error("Erro inesperado ao obter usuÃ¡rio autenticado", e);
+            throw new UsuarioNaoAutenticadoException("Erro interno de autenticaÃ§Ã£o");
         }
     }
 
@@ -81,7 +81,7 @@ public class SpringSecurityUsuarioAdapter implements UsuarioAutenticadoPort {
 
             return null;
         } catch (Exception e) {
-            log.debug("Erro ao extrair token da requisição", e);
+            log.debug("Erro ao extrair token da requisiÃ§Ã£o", e);
             return null;
         }
     }
@@ -90,31 +90,31 @@ public class SpringSecurityUsuarioAdapter implements UsuarioAutenticadoPort {
     public boolean temPermissao(String recurso, String acao) {
         try {
             if (recurso == null || recurso.isBlank() || acao == null || acao.isBlank()) {
-                log.warn("Tentativa de verificar permissão com parâmetros inválidos: recurso={}, acao={}",
+                log.warn("Tentativa de verificar permissÃ£o com parÃ¢metros invÃ¡lidos: recurso={}, acao={}",
                         recurso, acao);
                 return false;
             }
 
             UsuarioId usuarioAtual = obterUsuarioAtual();
 
-            log.debug("Verificando permissão: usuário={}, recurso={}, acao={}",
+            log.debug("Verificando permissÃ£o: usuÃ¡rio={}, recurso={}, acao={}",
                     usuarioAtual.getValue(), recurso, acao);
 
             boolean temPermissao = verificarPermissaoEspecifica(recurso.toLowerCase(), acao.toLowerCase());
 
             if (!temPermissao) {
-                log.warn("Permissão negada: usuário={}, recurso={}, acao={}",
+                log.warn("PermissÃ£o negada: usuÃ¡rio={}, recurso={}, acao={}",
                         usuarioAtual.getValue(), recurso, acao);
             }
 
             return temPermissao;
 
         } catch (UsuarioNaoAutenticadoException e) {
-            log.warn("Tentativa de verificar permissão sem usuário autenticado: recurso={}, acao={}",
+            log.warn("Tentativa de verificar permissÃ£o sem usuÃ¡rio autenticado: recurso={}, acao={}",
                     recurso, acao);
             return false;
         } catch (Exception e) {
-            log.error("Erro ao verificar permissão: recurso={}, acao={}", recurso, acao, e);
+            log.error("Erro ao verificar permissÃ£o: recurso={}, acao={}", recurso, acao, e);
             return false;
         }
     }
@@ -132,16 +132,16 @@ public class SpringSecurityUsuarioAdapter implements UsuarioAutenticadoPort {
             boolean ehProprietario = usuarioAtual.equals(proprietarioId);
 
             if (!ehProprietario) {
-                log.warn("Tentativa de acesso a recurso de outro usuário: usuarioAtual={}, proprietarioRecurso={}",
+                log.warn("Tentativa de acesso a recurso de outro usuÃ¡rio: usuarioAtual={}, proprietarioRecurso={}",
                         usuarioAtual.getValue(), proprietarioId.getValue());
             } else {
-                log.debug("Acesso autorizado ao próprio recurso: usuário={}", usuarioAtual.getValue());
+                log.debug("Acesso autorizado ao prÃ³prio recurso: usuÃ¡rio={}", usuarioAtual.getValue());
             }
 
             return ehProprietario;
 
         } catch (UsuarioNaoAutenticadoException e) {
-            log.warn("Tentativa de verificar propriedade sem usuário autenticado: proprietarioId={}",
+            log.warn("Tentativa de verificar propriedade sem usuÃ¡rio autenticado: proprietarioId={}",
                     proprietarioId != null ? proprietarioId.getValue() : "null");
             return false;
         } catch (Exception e) {
@@ -160,16 +160,16 @@ public class SpringSecurityUsuarioAdapter implements UsuarioAutenticadoPort {
 
             ContextoUsuario contexto = ContextoUsuario.criar(usuarioId, email, ipOrigem);
 
-            log.debug("Contexto de usuário criado: usuarioId={}, email={}, ip={}",
+            log.debug("Contexto de usuÃ¡rio criado: usuarioId={}, email={}, ip={}",
                     usuarioId.getValue(), email, ipOrigem);
 
             return contexto;
 
         } catch (UsuarioNaoAutenticadoException e) {
-            log.debug("Contexto solicitado sem usuário autenticado");
+            log.debug("Contexto solicitado sem usuÃ¡rio autenticado");
             return ContextoUsuario.criar(null, "anonymous", obterIpOrigem());
         } catch (Exception e) {
-            log.warn("Erro ao criar contexto de usuário para logs", e);
+            log.warn("Erro ao criar contexto de usuÃ¡rio para logs", e);
             return ContextoUsuario.criar(null, "unknown", "unknown");
         }
     }
@@ -219,7 +219,7 @@ public class SpringSecurityUsuarioAdapter implements UsuarioAutenticadoPort {
 
             return "unknown";
         } catch (Exception e) {
-            log.debug("Erro ao obter email do usuário", e);
+            log.debug("Erro ao obter email do usuÃ¡rio", e);
             return "unknown";
         }
     }
@@ -251,3 +251,4 @@ public class SpringSecurityUsuarioAdapter implements UsuarioAutenticadoPort {
         }
     }
 }
+

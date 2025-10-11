@@ -34,8 +34,8 @@ public interface JpaGraficoRepository extends CrudRepository<TransacaoJpaEntity,
     @Query("""
 SELECT new com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.TransacaoPorPeriodoResponse(
     CONCAT(FUNCTION('MONTH', t.data), '/', FUNCTION('YEAR', t.data)), 
-    SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao.RECEITA THEN t.valor ELSE 0 END),
-    SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao.DESPESA THEN t.valor ELSE 0 END))
+    SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacaoEntity.RECEITA THEN t.valor ELSE 0 END),
+    SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacaoEntity.DESPESA THEN t.valor ELSE 0 END))
 FROM TransacaoJpaEntity t
 WHERE t.usuario.id = :usuarioId
   AND t.data >= :dataInicio
@@ -51,10 +51,10 @@ ORDER BY FUNCTION('YEAR', t.data), FUNCTION('MONTH', t.data)
 
     @Query("""
 SELECT new com.vinicius.gerenciamento_financeiro.adapter.in.web.response.grafico.ResumoFinanceiroResponse(
-    SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao.RECEITA THEN t.valor ELSE 0 END),
-    SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao.DESPESA THEN t.valor ELSE 0 END),
-    (SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao.RECEITA THEN t.valor ELSE 0 END) - 
-     SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao.DESPESA THEN t.valor ELSE 0 END)))
+    SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacaoEntity.RECEITA THEN t.valor ELSE 0 END),
+    SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacaoEntity.DESPESA THEN t.valor ELSE 0 END),
+    (SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacaoEntity.RECEITA THEN t.valor ELSE 0 END) - 
+     SUM(CASE WHEN t.tipo = com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacaoEntity.DESPESA THEN t.valor ELSE 0 END)))
 FROM TransacaoJpaEntity t
 WHERE t.usuario.id = :usuarioId
     AND (CAST(:dataInicio AS TIMESTAMP) IS NULL OR t.data >= :dataInicio)
@@ -72,7 +72,7 @@ WHERE t.usuario.id = :usuarioId
     WHERE t.usuario.id = :usuarioId 
       AND t.data >= :dataInicio 
       AND t.data <= :dataFim
-      AND t.tipo = com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao.RECEITA
+      AND t.tipo = com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacaoEntity.RECEITA
     GROUP BY t.categoria.nome
     ORDER BY SUM(t.valor) DESC 
 """)
@@ -89,7 +89,7 @@ WHERE t.usuario.id = :usuarioId
     WHERE t.usuario.id = :usuarioId 
       AND t.data >= :dataInicio 
       AND t.data <= :dataFim
-      AND t.tipo = com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacao.DESPESA
+      AND t.tipo = com.vinicius.gerenciamento_financeiro.adapter.out.persistence.transacao.entity.enums.TipoMovimentacaoEntity.DESPESA
     GROUP BY t.categoria.nome
     ORDER BY SUM(t.valor) DESC 
 """)
