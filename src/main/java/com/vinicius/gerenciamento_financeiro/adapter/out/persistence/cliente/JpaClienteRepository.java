@@ -1,6 +1,8 @@
 package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente;
 
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente.entity.ClienteJpaEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -19,6 +21,7 @@ public interface JpaClienteRepository extends
         JpaRepository<ClienteJpaEntity, Long>,
         JpaSpecificationExecutor<ClienteJpaEntity> {
     List<ClienteJpaEntity> findByUsuarioId(Long usuarioId);
+    Page<ClienteJpaEntity> findByUsuarioId(Long usuarioId, PageRequest pageRequest);
     boolean existsByIdAndUsuarioId(Long clienteId, Long usuarioId);
     Optional<ClienteJpaEntity> findByIdAndUsuarioId(Long clienteId, Long usuarioId);
     long countByUsuarioId(Long usuarioId);

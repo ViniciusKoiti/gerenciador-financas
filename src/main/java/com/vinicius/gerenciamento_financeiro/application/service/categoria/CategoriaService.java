@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,12 +32,11 @@ import java.util.stream.Collectors;
 public class CategoriaService implements CategoriaUseCase {
 
     private final CategoriaRepository categoriaRepository;
-    private final CategoriaMapper categoriaMapper;
     private final UsuarioAutenticadoPort usuarioAutenticado;
     private final UsuarioRepository usuarioRepository;
 
     @Override
-    public CategoriaResponse save(CategoriaPost request) {
+    public Categoria save(CategoriaPost request) {
         if (request == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria não pode ser nula");
         }
@@ -62,7 +62,7 @@ public class CategoriaService implements CategoriaUseCase {
             Categoria categoriaSalva = categoriaRepository.save(categoria);
             log.debug("Categoria criada com sucesso: ID {}", categoriaSalva.getId().getValue());
 
-            return categoriaMapper.toResponse(categoriaSalva);
+            return categoriaSalva;
 
         } catch (Exception e) {
             log.error("Erro ao criar categoria: {}", e.getMessage(), e);
@@ -71,13 +71,12 @@ public class CategoriaService implements CategoriaUseCase {
     }
 
     @Override
-    public CategoriaResponse findById(String id) {
+    public Categoria findById(String id) {
         try {
             CategoriaId categoriaId = CategoriaId.of(Long.valueOf(id));
             log.debug("Buscando categoria por ID: {}", categoriaId.getValue());
 
             return categoriaRepository.findById(categoriaId)
-                    .map(categoriaMapper::toResponse)
                     .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada com id: " + id));
 
         } catch (NumberFormatException e) {
@@ -87,25 +86,22 @@ public class CategoriaService implements CategoriaUseCase {
     }
 
     @Override
-    public List<CategoriaResponse> findCategoriasByUser(Long usuarioIdRaw) {
+    public List<Categoria> findCategoriasByUser(Long usuarioIdRaw) {
         log.debug("Buscando categorias para usuário: {}", usuarioIdRaw);
 
         UsuarioId usuarioId = UsuarioId.of(usuarioIdRaw);
         List<Categoria> categorias = categoriaRepository.findByUsuarioId(usuarioId);
 
-        return categorias.stream()
-                .map(categoriaMapper::toResponse)
-                .collect(Collectors.toList());
+        return new ArrayList<>(categorias);
     }
 
     @Override
-    public Page<CategoriaResponse> findAllPaginated(Pageable pageable) {
+    public Page<Categoria> findAllPaginated(Pageable pageable) {
         log.debug("Buscando categorias paginadas: página {}", pageable.getPageNumber());
 
         UsuarioId usuarioId = usuarioAutenticado.obterUsuarioAtual();
 
-        return categoriaRepository.findByUsuarioId(usuarioId, pageable)
-                .map(categoriaMapper::toResponse);
+        return categoriaRepository.findByUsuarioId(usuarioId, pageable);
     }
 
     @Override
@@ -129,15 +125,13 @@ public class CategoriaService implements CategoriaUseCase {
     }
 
     @Override
-    public List<CategoriaResponse> findAll() {
+    public List<Categoria> findAll() {
         log.debug("Buscando todas as categorias");
 
         UsuarioId usuarioId = usuarioAutenticado.obterUsuarioAtual();
 
         List<Categoria> categorias = categoriaRepository.findByUsuarioId(usuarioId);
 
-        return categorias.stream()
-                .map(categoriaMapper::toResponse)
-                .collect(Collectors.toList());
+        return new ArrayList<>(categorias);
     }
 }

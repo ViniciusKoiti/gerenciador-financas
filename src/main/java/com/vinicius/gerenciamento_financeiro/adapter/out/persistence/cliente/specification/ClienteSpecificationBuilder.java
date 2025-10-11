@@ -1,148 +1,84 @@
 package com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente.specification;
 
-import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.cliente.ClienteFiltroRequest;
 import com.vinicius.gerenciamento_financeiro.adapter.out.persistence.cliente.entity.ClienteJpaEntity;
+import com.vinicius.gerenciamento_financeiro.application.command.cliente.BuscarClientesCommand;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
+import jakarta.persistence.criteria.Predicate;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Builder de Specifications - APENAS camada de infraestrutura.
- * Trabalha exclusivamente com DTOs e entidades JPA.
- * NÃO conhece objetos de domínio.
+ * Builder para criar Specifications dinâmicas de busca de clientes
  */
 @Component
 public class ClienteSpecificationBuilder {
 
-    public Specification<ClienteJpaEntity> build(Long usuarioId, ClienteFiltroRequest filtros) {
-        // ✅ Validações básicas de infraestrutura
-        if (usuarioId == null) {
-            throw new IllegalArgumentException("UsuarioId não pode ser nulo");
-        }
+    /**
+     * Constrói Specification a partir de um comando de busca
+     */
+    public Specification<ClienteJpaEntity> build(Long usuarioId, BuscarClientesCommand command) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
 
-        // ✅ Sempre começar com filtro obrigatório do usuário
-        Specification<ClienteJpaEntity> spec = ClienteSpecification.temUsuarioId(usuarioId);
+            predicates.add(criteriaBuilder.equal(root.get("usuarioId"), usuarioId));
 
-        // Se não há filtros, retorna apenas o filtro de usuário
-        if (filtros == null || !filtros.temFiltros()) {
-            return spec;
-        }
+            if (command.getBuscarGeral() != null && !command.getBuscarGeral().isBlank()) {
+                String buscaGeral = "%" + command.getBuscarGeral().toLowerCase() + "%";
 
-        return adicionarFiltros(spec, filtros);
-    }
+                Predicate nomeMatch = criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("nome")),
+                        buscaGeral
+                );
 
+                Predicate emailMatch = criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("email")),
+                        buscaGeral
+                );
 
-    private Specification<ClienteJpaEntity> adicionarFiltros(
-            Specification<ClienteJpaEntity> spec,
-            ClienteFiltroRequest filtros) {
+                Predicate cpfMatch = criteriaBuilder.like(
+                        root.get("cpf"),
+                        buscaGeral
+                );
 
-        if (filtros.temBuscaGeral()) {
-            spec = spec.and(ClienteSpecification.nomeOuEmail(filtros.buscaGeral()));
-            spec = adicionarFiltrosComplementares(spec, filtros);
-        } else {
-            spec = aplicarTodosFiltros(spec, filtros);
-        }
+                predicates.add(criteriaBuilder.or(nomeMatch, emailMatch, cpfMatch));
+            }
 
-        return spec;
-    }
+            // Filtros específicos
+            if (command.getNome() != null && !command.getNome().isBlank()) {
+                predicates.add(criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("nome")),
+                        "%" + command.getNome().toLowerCase() + "%"
+                ));
+            }
 
+            if (command.getEmail() != null && !command.getEmail().isBlank()) {
+                predicates.add(criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("email")),
+                        "%" + command.getEmail().toLowerCase() + "%"
+                ));
+            }
 
-    private Specification<ClienteJpaEntity> aplicarTodosFiltros(
-            Specification<ClienteJpaEntity> spec,
-            ClienteFiltroRequest filtros) {
+            if (command.getCpf() != null && !command.getCpf().isBlank()) {
+                predicates.add(criteriaBuilder.equal(
+                        root.get("cpf"),
+                        command.getCpf().replaceAll("[^0-9]", "")
+                ));
+            }
 
-        if (filtros.temFiltroNome()) {
-            spec = spec.and(ClienteSpecification.nomeContains(filtros.nome()));
-        }
+            if (command.getTelefone() != null && !command.getTelefone().isBlank()) {
+                predicates.add(criteriaBuilder.like(
+                        root.get("telefone"),
+                        "%" + command.getTelefone().replaceAll("[^0-9]", "") + "%"
+                ));
+            }
 
-        if (temValor(filtros.email())) {
-            spec = spec.and(ClienteSpecification.emailContains(filtros.email()));
-        }
+            if (command.getAtivo() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("ativo"), command.getAtivo()));
+            }
 
-        if (temValor(filtros.cpf())) {
-            spec = spec.and(ClienteSpecification.cpfContains(filtros.cpf()));
-        }
-
-        if (temValor(filtros.telefone())) {
-            spec = spec.and(ClienteSpecification.telefoneContains(filtros.telefone()));
-        }
-
-        if (filtros.ativo() != null) {
-            spec = spec.and(ClienteSpecification.ativo(filtros.ativo()));
-        }
-
-        if (temPeriodoNascimento(filtros)) {
-            spec = spec.and(ClienteSpecification.dataNascimentoEntre(
-                    filtros.dataNascimentoInicio(),
-                    filtros.dataNascimentoFim()
-            ));
-        }
-
-        return spec;
-    }
-
-    private Specification<ClienteJpaEntity> adicionarFiltrosComplementares(
-            Specification<ClienteJpaEntity> spec,
-            ClienteFiltroRequest filtros) {
-
-        if (temValor(filtros.cpf())) {
-            spec = spec.and(ClienteSpecification.cpfContains(filtros.cpf()));
-        }
-
-        if (filtros.ativo() != null) {
-            spec = spec.and(ClienteSpecification.ativo(filtros.ativo()));
-        }
-
-        if (temPeriodoNascimento(filtros)) {
-            spec = spec.and(ClienteSpecification.dataNascimentoEntre(
-                    filtros.dataNascimentoInicio(),
-                    filtros.dataNascimentoFim()
-            ));
-        }
-
-        if (temValor(filtros.telefone())) {
-            spec = spec.and(ClienteSpecification.telefoneContains(filtros.telefone()));
-        }
-
-        return spec;
-    }
-
-
-
-    public Specification<ClienteJpaEntity> apenasUsuario(Long usuarioId) {
-        if (usuarioId == null) {
-            throw new IllegalArgumentException("UsuarioId não pode ser nulo");
-        }
-        return ClienteSpecification.temUsuarioId(usuarioId);
-    }
-
-    public Specification<ClienteJpaEntity> buscaRapida(Long usuarioId, String texto) {
-        if (usuarioId == null) {
-            throw new IllegalArgumentException("UsuarioId não pode ser nulo");
-        }
-
-        Specification<ClienteJpaEntity> spec = ClienteSpecification.temUsuarioId(usuarioId);
-
-        if (texto != null && !texto.trim().isEmpty()) {
-            spec = spec.and(ClienteSpecification.nomeOuEmail(texto));
-        }
-
-        return spec;
-    }
-
-    public Specification<ClienteJpaEntity> apenasAtivos(Long usuarioId) {
-        if (usuarioId == null) {
-            throw new IllegalArgumentException("UsuarioId não pode ser nulo");
-        }
-
-        return ClienteSpecification.temUsuarioId(usuarioId)
-                .and(ClienteSpecification.ativo(true));
-    }
-
-    private boolean temValor(String valor) {
-        return valor != null && !valor.trim().isEmpty();
-    }
-
-    private boolean temPeriodoNascimento(ClienteFiltroRequest filtros) {
-        return filtros.dataNascimentoInicio() != null || filtros.dataNascimentoFim() != null;
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
     }
 }

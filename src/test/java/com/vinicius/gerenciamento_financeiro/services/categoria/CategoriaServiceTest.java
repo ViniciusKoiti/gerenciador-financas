@@ -91,11 +91,11 @@ class CategoriaServiceTest {
         when(categoriaRepository.save(any(Categoria.class))).thenReturn(categoria);
         when(categoriaMapper.toResponse(any(Categoria.class))).thenReturn(expectedResponse);
 
-        CategoriaResponse result = categoriaService.save(categoriaPost);
+        Categoria result = categoriaService.save(categoriaPost);
 
         assertNotNull(result);
-        assertEquals(expectedResponse.id(), result.id());
-        assertEquals(expectedResponse.name(), result.name());
+        assertEquals(expectedResponse.id(), result.getId());
+        assertEquals(expectedResponse.name(), result.getNome());
         verify(categoriaRepository).save(any(Categoria.class));
     }
 
@@ -139,11 +139,11 @@ class CategoriaServiceTest {
         when(categoriaRepository.findById(id)).thenReturn(Optional.of(categoria));
         when(categoriaMapper.toResponse(categoria)).thenReturn(expectedResponse);
 
-        CategoriaResponse result = categoriaService.findById(id.getValue().toString());
+        Categoria result = categoriaService.findById(id.getValue().toString());
 
         assertNotNull(result);
-        assertEquals(expectedResponse.id(), result.id());
-        assertEquals(expectedResponse.name(), result.name());
+        assertEquals(expectedResponse.id(), result.getId());
+        assertEquals(expectedResponse.name(), result.getNome());
         verify(categoriaRepository).findById(id);
         verify(categoriaMapper).toResponse(categoria);
         verifyNoMoreInteractions(categoriaRepository, categoriaMapper);

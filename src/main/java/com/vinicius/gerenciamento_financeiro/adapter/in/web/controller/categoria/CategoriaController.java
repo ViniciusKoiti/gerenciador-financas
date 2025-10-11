@@ -1,8 +1,10 @@
 package com.vinicius.gerenciamento_financeiro.adapter.in.web.controller.categoria;
 
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.ApiResponseSistema;
+import com.vinicius.gerenciamento_financeiro.adapter.in.web.mapper.CategoriaMapper;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.request.categoria.CategoriaPost;
 import com.vinicius.gerenciamento_financeiro.adapter.in.web.response.categoria.CategoriaResponse;
+import com.vinicius.gerenciamento_financeiro.domain.model.categoria.Categoria;
 import com.vinicius.gerenciamento_financeiro.port.in.CategoriaUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,6 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoriaController {
 
+    private final CategoriaMapper  categoriaMapper;
     private final CategoriaUseCase categoriaUseCase;
 
     @Operation(summary = "Salva Categoria ")
@@ -48,7 +51,7 @@ public class CategoriaController {
     })
     @PostMapping
     public ResponseEntity<ApiResponseSistema<CategoriaResponse>> save(@Valid @RequestBody CategoriaPost categoriaPost){
-        CategoriaResponse categoria = categoriaUseCase.save(categoriaPost);
+        CategoriaResponse categoria = categoriaMapper.toResponse(categoriaUseCase.save(categoriaPost));
         ApiResponseSistema<CategoriaResponse> response = new ApiResponseSistema<>(
                 categoria,
                 "CategoriaJpaEntity criada com sucesso.",
@@ -71,7 +74,7 @@ public class CategoriaController {
 
    @GetMapping("/all")
     public ResponseEntity<ApiResponseSistema<List<CategoriaResponse>>> findAll(){
-        List<CategoriaResponse> categoriaResponses = categoriaUseCase.findAll();
+        List<CategoriaResponse> categoriaResponses = categoriaMapper.toResponseList(categoriaUseCase.findAll());
         ApiResponseSistema<List<CategoriaResponse>> response = new ApiResponseSistema<>(categoriaResponses, "Categorias obtidas com sucesso.", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }
@@ -94,7 +97,12 @@ public class CategoriaController {
     })
     @GetMapping
     public ResponseEntity<ApiResponseSistema<Page<CategoriaResponse>>> findAllPaged( @PageableDefault(size = 10) Pageable pageable){
-        Page<CategoriaResponse> categoriaResponses = categoriaUseCase.findAllPaginated(pageable);
+
+
+        Page<Categoria> categorias = categoriaUseCase.findAllPaginated(pageable);
+        Page<CategoriaResponse> categoriaResponses = categorias.map(categoriaMapper::toResponse);
+
+
         ApiResponseSistema<Page<CategoriaResponse>> response = new ApiResponseSistema<>(categoriaResponses, "Categorias obtidas com sucesso.", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }
@@ -122,13 +130,13 @@ public class CategoriaController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponseSistema<CategoriaResponse>> findById(@PathVariable String id) {
-        CategoriaResponse categoriaResponse = categoriaUseCase.findById(id);
+        CategoriaResponse categoriaResponse = categoriaMapper.toResponse(categoriaUseCase.findById(id));
         ApiResponseSistema<CategoriaResponse> response = new ApiResponseSistema<>(categoriaResponse, "CategoriaJpaEntity obtida com sucesso.", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }
     @GetMapping("/usuarios/{userId}/categorias")
     public ResponseEntity<ApiResponseSistema<List<CategoriaResponse>>> findByUsuarioId(@PathVariable Long userId) {
-        List<CategoriaResponse> categoriaResponse = categoriaUseCase.findCategoriasByUser(userId);
+        List<CategoriaResponse> categoriaResponse = categoriaMapper.toResponseList(categoriaUseCase.findCategoriasByUser(userId));
         ApiResponseSistema<List<CategoriaResponse>> response = new ApiResponseSistema<>(categoriaResponse, "Categorias obtidas com sucesso.", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }
